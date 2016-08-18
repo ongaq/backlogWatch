@@ -1,0 +1,51 @@
+{
+	"manifest_version": 2,
+	"name": "Backlog watch",
+	"description": "Backlog上でチェックしておきたい課題やプロジェクトを個別にダッシュボードに表示します。",
+	"version": "1.2.1",
+	"icons": {
+		"16": "source/images/icon16.png",
+		"48": "source/images/icon48.png",
+		"128": "source/images/icon128.png"
+	},
+	"options_page": "source/options.html",
+	"content_scripts": [
+		{
+			"matches": [
+				"http://*.backlog.jp/*",
+				"https://*.backlog.jp/*"
+			],
+			"css": [
+				"source/css/font-awesome.min.css",
+				"source/css/contents_style.css"
+			],
+			"js": [
+				"source/js/jquery-2.1.1.min.js",
+				"source/js/content_scripts/storage.js",
+				"source/js/content_scripts/common.js",
+				"source/js/content_scripts/issues.js",
+				"source/js/content_scripts/projects.js"
+			]
+		}
+	],
+	"background": {
+		"scripts": [
+			"source/js/jquery-2.1.1.min.js",
+			"source/js/content_scripts/storage.js",
+			"source/js/content_scripts/common.js",
+			"source/js/content_scripts/event.js"
+		],
+		"persistent": false
+	},
+	"permissions": [
+		"tabs",
+		"alarms",
+		"notifications",
+		"https://*.backlog.jp/*",
+		"http://*.backlog.jp/*",
+		"storage",
+		"unlimitedStorage",
+		"webNavigation",
+		"background"
+	]
+}

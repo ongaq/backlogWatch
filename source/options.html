@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<title>options | Backlog Watch</title>
+	<link rel="stylesheet" href="css/options.css">
+</head>
+<body>
+
+<div class="wrap">
+	<section class="section">
+		<h1 class="di_block mb10">スペース情報の入力</h1>
+		<strong class="mb5 di_block">スペース名(****.backlog.jp)を入力</strong>
+		<input id="js-options-spaceName" class="input mb10 di_block input-spaceName" type="text" placeholder="nulab">
+		<strong class="mb5 di_block">生成したAPI Keyを入力</strong>
+		<input id="js-options-spaceApi" class="input di_block input-spaceApi" type="text" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+		<p class="mt5">※Backlogの個人設定にある「新しいAPIキーを発行」から登録して下さい。
+		<a href="http://www.backlog.jp/help/usersguide/personal-settings/userguide2378.html" target="_blank">詳しくはコチラ</a></p>
+	</section>
+
+	<section class="section">
+		<h1>機能オプション</h1>
+		<ul class="optionList">
+			<li class="optionList-li">
+				<p class="di_iblock mr10">通知ウインドウを何秒後に閉じるか:</p>
+				<select id="js-options-autoClose" class="select di_iblock">
+					<option value="0">閉じない(default)</option>
+					<option value="5">5秒後</option>
+					<option value="6">6秒後</option>
+					<option value="7">7秒後</option>
+					<option value="8">8秒後</option>
+					<option value="9">9秒後</option>
+					<option value="10">10秒後</option>
+				</select>
+			</li>
+			<li class="optionList-li">
+				<p class="di_iblock mr10">課題完了時にウォッチを解除するか:</p>
+				<select id="js-options-releaseWatch" class="select di_iblock">
+					<option value="0">解除しない(default)</option>
+					<option value="1">解除する</option>
+				</select>
+			</li>
+		</ul>
+	</section>
+
+	<div class="buttonArea">
+		<button id="js-options-spaceSubmit" class="button input-spaceSubmit" type="button">
+			<span>設定を保存する</span>
+			<span id="js-options-notice" class="notice"></span>
+		</button>
+	</div>
+</div>
+
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/content_scripts/options.js"></script>
+</body>
+</html>

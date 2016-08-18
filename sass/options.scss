@@ -1,0 +1,158 @@
+/* ====================================== */
+/* reset */
+@import "ress";
+
+/* ====================================== */
+/* Global */
+body {
+	background-color: #e5e5e5;
+}
+h1 {
+	font-size: 18px;
+}
+ul {
+	list-style: none;
+}
+a { color: #42791b;}
+
+/* ====================================== */
+/* parts */
+.di_block { display: block;}
+.di_iblock { display: inline-block;}
+.mt5 { margin-top: 5px;}
+.mr10 { margin-right: 10px;}
+.mb5 { margin-bottom: 5px;}
+.mb10 { margin-bottom: 10px;}
+.mb20 { margin-bottom: 20px;}
+.mb30 { margin-bottom: 30px;}
+
+.input-spaceName { width: 250px;}
+.input-spaceApi { width: 100%;}
+.input-spaceSubmit { width: 150px;}
+
+/* ====================================== */
+/* selector */
+.wrap {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -275px;
+	padding: 20px;
+	width: 550px;
+	height: auto;
+	background-color: #fff;
+	border-radius: 6px;
+	box-shadow:
+		1px 1px 7px rgba(0,0,0, 0.15),
+		-1px -1px 7px rgba(0,0,0, 0.15);
+	transform: translate3d(0, -50%, 0);
+}
+.section {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #e5e5e5;
+
+	&:first-child {
+		margin-top: 0;
+		padding-top: 0;
+		border-top: 0;
+	}
+}
+.optionList {
+	margin-top: 10px;
+
+	&-li {
+		margin-top: 10px;
+
+		&:first-child { margin-top: 0;}
+	}
+}
+.select,
+.input,
+.button {
+	padding: 5px 8px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	outline: none;
+}
+.buttonArea {
+	position: relative;
+	display: block;
+	margin: 30px -20px 0;
+	padding-top: 20px;
+	text-align: center;
+	border-top: 1px solid #e5e5e5;
+}
+.select {
+	padding: 0 8px;
+	height: 26px;
+}
+.button {
+	position: relative;
+	display: inline-block;
+	padding: 10px 0;
+	width: 150px;
+	height: 37px;
+	background-color: #eee;
+	cursor: pointer;
+	box-shadow:
+		1px 0 2px rgba(#000, 0.1),
+		-1px 0 2px rgba(#000, 0.1),
+		0 3px 4px rgba(#000, 0.1);
+	transition: all 0.3s ease;
+
+	&:hover {
+		background-color: #fff;
+	}
+	&:active {
+		top: 1px;
+		box-shadow: none;
+	}
+}
+.notice {
+	position: absolute;
+	bottom: -20px;
+	left: 50%;
+	padding: 10px 20px;
+	width: auto;
+	vertical-align: middle;
+	line-height: 1.2;
+	color: #fff;
+	font-weight: bold;
+	background-color: #000;
+	border: 1px solid #000;
+	border-radius: 3px;
+	white-space: nowrap;
+	opacity: 0;
+	transition: all 0.3s ease;
+	transform: translate3d(-50%, 20px, 0);
+
+	&:before {
+		position: absolute;
+		top: -10px;
+		left: 50%;
+		content: "";
+		display: block;
+		margin-left: -8px;
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0 8px 10px 8px;
+		border-color: transparent transparent #000 transparent;
+	}
+
+	&.is-visible {
+		opacity: 1;
+		transform: translate3d(-50%, 30px, 0);
+	}
+	&.is-error {
+		bottom: -35px;
+		color: #fff;
+		background-color: #d70000;
+		border-color: #d70000;
+
+		&:before {
+			border-color: transparent transparent #d70000 transparent;
+		}
+	}
+}

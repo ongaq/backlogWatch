@@ -1,0 +1,71 @@
+i {
+	&.fa { font-size: 36px;}
+	&.fa-eye { font-size: 18px; color: #333;}
+	&.fa-heart {
+		cursor: pointer;
+
+		&.is-watch { color: #e00040;}
+		&.is-running {
+			-webkit-animation: heartBeat 0.4s ease-in-out;
+			animation: heartBeat 0.4s ease-in-out;
+		}
+	}
+}
+
+#projectList {
+	.Project {
+		position: relative;
+
+		.fa-star {
+			position: absolute;
+			top: 17px;
+			right: 10px;
+			margin-top: -12px;
+			font-size: 24px;
+			cursor: pointer;
+
+			&.is-watch { color: orange;}
+			&.is-running {
+				-webkit-animation: heartBeat 0.4s ease-in-out;
+				animation: heartBeat 0.4s ease-in-out;
+			}
+		}
+	}
+}
+#issuecard {
+	.desc { position: relative;}
+	.desc i.fa {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+	}
+}
+.watch-issue {
+	table-layout: fixed;
+	font-size: 93%;
+
+	&-col-1 { width: 115px;}
+	&-col-3 { width: 90px;}
+	&-col-5 { width: 65px;}
+
+	&-list.is-hover,
+	&-list.is-hover td { background-color: #fffde9 !important;}
+
+	.Assigner,
+	.Watch {
+		text-align: center;
+
+		i.fa { font-size: 30px;}
+	}
+}
+.Description {
+	.is-visible { display: block;}
+	.is-hidden { display: none;}
+}
+
+@-webkit-keyframes heartBeat {
+	50% { transform: scale(2); opacity: 0.5;}
+}
+@keyframes heartBeat {
+	50% { transform: scale(2); opacity: 0.5;}
+}
