@@ -269,6 +269,10 @@ var WATCH_NOTICE = null;
 		WATCH_NOTICE.acceptNotification();
 
 		if(details.reason === 'install' || details.reason === 'update') {
+			var oldVersion = 1.2;
+			if(parseFloat(details.previousVersion) <= oldVersion) {
+				WATCH_STORAGE.Storage.clear((items) => console.log(items));
+			}
 			if(chrome.runtime.openOptionsPage) {
 				chrome.runtime.openOptionsPage();
 			} else {
