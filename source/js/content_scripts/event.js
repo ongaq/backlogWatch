@@ -268,7 +268,7 @@ var WATCH_NOTICE = null;
 	chrome.runtime.onInstalled.addListener((details) => {
 		WATCH_NOTICE.acceptNotification();
 
-		if(details.reason === 'install') {
+		if(details.reason === 'install' || details.reason === 'update') {
 			if(chrome.runtime.openOptionsPage) {
 				chrome.runtime.openOptionsPage();
 			} else {
