@@ -3,18 +3,37 @@
 <head>
 	<meta charset="UTF-8">
 	<title>options | Backlog Watch</title>
+	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/options.css">
 </head>
 <body>
 
 <div class="wrap">
+	<h1 class="heading01">Backlog Options</h1>
 	<section class="section">
-		<h1 class="di_block mb10">スペース情報の入力</h1>
-		<strong class="mb5 di_block">スペース名(****.backlog.jp)を入力</strong>
-		<input id="js-options-spaceName" class="input mb10 di_block input-spaceName" type="text" placeholder="nulab">
-		<strong class="mb5 di_block">生成したAPI Keyを入力</strong>
-		<input id="js-options-spaceApi" class="input di_block input-spaceApi" type="text" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
-		<p class="mt5">※Backlogの個人設定にある「新しいAPIキーを発行」から登録して下さい。
+		<h2 class="di_block mb5">スペース情報の入力</h2>
+		<p class="mb10 fs_small">課題にコメントされた際、通知が必要な場合は以下を入力して下さい。<br>
+		複数スペースで通知をされたい方は入力フィールド横のプラスアイコンをクリックして入力フィールドを増やして下さい。</p>
+		<div class="js-field field">
+			<ul class="js-field-list field-list" data-id="0">
+				<li class="field-list-li field-list-li_spaceName">
+					<strong class="mb5 di_block fs_small">スペース名(****.backlog.jp)を入力</strong>
+					<input data-id="0" data-name="space" class="input di_block input-spaceName" type="text" placeholder="****部分を入力して下さい。">
+				</li>
+				<li class="field-list-li field-list-li_spaceApi">
+					<strong class="mb5 di_block fs_small">生成したAPI Keyを入力</strong>
+					<input data-id="0" data-name="key" class="input di_block input-spaceApi" type="text" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+				</li>
+				<li class="field-list-li field-list-li_plus">
+					<span class="icon icon_ctrl">
+						<span class="icon icon_plus"><i class="fa fa-plus-circle"></i></span>
+						<span class="icon icon_minus"><i class="fa fa-minus-circle"></i></span>
+					</span>
+					<span class="icon icon_pencil"><i class="fa fa-pencil"></i></span>
+				</li>
+			</ul>
+		</div>
+		<p class="fs_small">※API KeyはBacklogの個人設定にある「新しいAPIキーを発行」から登録して下さい。
 		<a href="http://www.backlog.jp/help/usersguide/personal-settings/userguide2378.html" target="_blank">詳しくはコチラ</a></p>
 	</section>
 

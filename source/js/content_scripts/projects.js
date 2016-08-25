@@ -1,6 +1,8 @@
 var WATCH_PROJECTS;
 
 (($, WATCH_DB, WATCH_COMMON, WATCH_STORAGE) => {
+	var spaceName = location.hostname.split('.')[0];
+
 	WATCH_PROJECTS = {
 		createFavoriteProject(){
 			var _this = this;
@@ -8,14 +10,19 @@ var WATCH_PROJECTS;
 			var timer = 250;
 
 			// chrome.storageに課題キーが存在するか確認
-			var promise = WATCH_STORAGE.throwItem('projects');
+			var promise = WATCH_STORAGE.throwItem('projects', spaceName);
 			promise.done((result) => {
 				checkKey = result;
+
 				_this.createStar(checkKey);
 				_this.createWatchProject(checkKey, true);
 			}).fail((result) => {
 				_this.createStar();
-				console.log('fail', result);
+				if(result === 'noItems') {
+					console.warn('Not watch projects.');
+				} else {
+					console.error('projects failed', result);
+				}
 			});
 
 			// プロジェクト「すべて見る」をクリックするとDOMが生成され直すのでお気に入りボタンも生成し直す。
@@ -52,7 +59,7 @@ var WATCH_PROJECTS;
 
 				if($this.is('.is-watch')) {
 					WATCH_COMMON.watchControl(e.currentTarget, 'remove');
-					WATCH_STORAGE.remove(target, 'projects');
+					WATCH_STORAGE.remove(target, 'projects', spaceName);
 
 					var speed = 500;
 					$('[data-id="projects-fav"]').find(`[data-id="${target.id}"]`).stop().animate({
@@ -63,7 +70,7 @@ var WATCH_PROJECTS;
 					});
 				} else {
 					WATCH_COMMON.watchControl(e.currentTarget, 'add');
-					WATCH_STORAGE.add(target, 'projects');
+					WATCH_STORAGE.add(target, 'projects', spaceName);
 					this.createWatchProject(projectItem, false);
 				}
 			});
@@ -96,7 +103,7 @@ var WATCH_PROJECTS;
 			var projectsFav = document.querySelectorAll('[data-id="projects-fav"]');
 			var obj = _object;
 			var item = null;
-			var section, h1, icon, ul, li, a, span, img;
+			var section, h1, icon, ul, li, a, span, img, fragment;
 
 			if(projectsFav.length === 0) {
 				section = document.createElement('section');
@@ -121,39 +128,43 @@ var WATCH_PROJECTS;
 			projectsFav = document.querySelectorAll('[data-id="projects-fav"]');
 
 			if(projectsFav.length > 0) {
-				var fragment = document.createDocumentFragment();
+				fragment = document.createDocumentFragment();
 
 				for(var i=0; i < (obj.length+1); i++) {
 					if(i === obj.length) break;
-					item = _bool ? obj[i] : obj[0];
-
-					li = document.createElement('li');
-					a = document.createElement('a');
-					span = {
-						icon: document.createElement('span'),
-						name: document.createElement('span')
-					};
-					img = document.createElement('img');
-					icon = document.createElement('i');
-
-					li.classList.add('Project');
-					li.setAttribute('data-id', item.id);
-					a.href = '/projects/'+item.id;
-					span.icon.classList.add('Project-icon');
-					span.name.classList.add('Project-name');
-					span.name.innerText = item.title;
-					img.src = item.icon;
-					img.alt = item.title;
-					img.style.height = '25px';
-					icon.classList.add('fa', 'fa-star', 'is-watch');
-					span.icon.appendChild(img);
-					a.appendChild(span.icon);
-					a.appendChild(span.name);
-					li.appendChild(a);
-					li.appendChild(icon);
-					fragment.appendChild(li);
+					createProjectsList(i);
 				}
 				projectsFav[0].querySelector('#projectList').appendChild(fragment);
+			}
+
+			function createProjectsList(_i){
+				item = _bool ? obj[_i] : obj[0];
+
+				li = document.createElement('li');
+				a = document.createElement('a');
+				span = {
+					icon: document.createElement('span'),
+					name: document.createElement('span')
+				};
+				img = document.createElement('img');
+				icon = document.createElement('i');
+
+				li.classList.add('Project');
+				li.setAttribute('data-id', item.id);
+				a.href = '/projects/'+item.id;
+				span.icon.classList.add('Project-icon');
+				span.name.classList.add('Project-name');
+				span.name.innerText = item.title;
+				img.src = item.icon;
+				img.alt = item.title;
+				img.style.height = '25px';
+				icon.classList.add('fa', 'fa-star', 'is-watch');
+				span.icon.appendChild(img);
+				a.appendChild(span.icon);
+				a.appendChild(span.name);
+				li.appendChild(a);
+				li.appendChild(icon);
+				fragment.appendChild(li);
 			}
 		},
 

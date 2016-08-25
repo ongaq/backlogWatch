@@ -40,14 +40,39 @@ i.fa-heart.is-running {
   animation: heartBeat 0.4s ease-in-out;
 }
 
-#issuecard .desc {
+.Page--view-issue {
   position: relative;
 }
 
-#issuecard .desc i.fa {
-  position: absolute;
+.Page--view-issue > .watchIconWrap {
+  position: fixed;
   bottom: 0;
   right: 0;
+  display: table;
+  width: auto;
+  white-space: nowrap;
+  background-color: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.Page--view-issue > .watchIconWrap > span,
+.Page--view-issue > .watchIconWrap > i.fa-heart {
+  display: table-cell;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.Page--view-issue > .watchIconWrap > span {
+  padding: 0 20px;
+  color: #fff;
+  background-color: #222;
+  border-radius: 4px 0 0 0;
+}
+
+.Page--view-issue > .watchIconWrap > i.fa-heart {
+  padding: 10px 20px;
 }
 
 .watch-issue {

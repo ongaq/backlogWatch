@@ -32,12 +32,37 @@ i {
 		}
 	}
 }
-#issuecard {
-	.desc { position: relative;}
-	.desc i.fa {
-		position: absolute;
+.Page--view-issue {
+	position: relative;
+
+	> .watchIconWrap {
+		position: fixed;
 		bottom: 0;
 		right: 0;
+		display: table;
+		width: auto;
+		white-space: nowrap;
+		background-color: #fff;
+		box-sizing: border-box;
+		box-shadow: 0 0 7px rgba(#000, 0.15);
+		cursor: pointer;
+
+		> span,
+		> i.fa-heart {
+			display: table-cell;
+			vertical-align: middle;
+			box-sizing: border-box;
+		}
+
+		> span {
+			padding: 0 20px;
+			color: #fff;
+			background-color: #222;
+			border-radius: 4px 0 0 0;
+		}
+		> i.fa-heart {
+			padding: 10px 20px;
+		}
 	}
 }
 .watch-issue {

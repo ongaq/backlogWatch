@@ -1,6 +1,8 @@
 var WATCH_ISSUE = null;
 
-(($, WATCH_COMMON, WATCH_STORAGE, WATCH_NOTICE) => {
+(($, WATCH_COMMON, WATCH_STORAGE) => {
+	var spaceName = location.hostname.split('.')[0];
+
 	WATCH_ISSUE = {
 		createWatchIssue(){
 			var issueCard = $('#issuecard');
@@ -13,34 +15,47 @@ var WATCH_ISSUE = null;
 			};
 
 			if(issueCard.length > 0) {
-				$(issueCard).find('.desc').append('<i class="fa fa-heart" title="watchリストに入れる"></i>');
+				var isWatch = 'ウォッチ中';
+				var notWatch = 'ウォッチリストに入れる';
+				var html = (_text) => {
+					return `<div class="watchIconWrap">
+					<span>${_text}</span>
+					<i class="fa fa-heart" title="${_text}"></i>
+					</div>`;
+				};
 
 				// Storageに課題キーが存在するか確認
-				var promise = WATCH_STORAGE.getItem(issueItem, 'issues');
+				var promise = WATCH_STORAGE.getItem(issueItem, 'issues', spaceName);
 				promise.done((result) => {
-					console.log('createWatchIssue:', result);
-					if(result) WATCH_COMMON.watchControl(document.querySelector('.fa-heart'), 'add');
-				});
-
-				$('body').on('click', '.fa-heart', (e) => {
-					var $this = $(e.currentTarget);
-
-					if($this.is('.is-watch')) {
-						WATCH_COMMON.watchControl(e.currentTarget, 'remove');
-						WATCH_STORAGE.remove(issueItem, 'issues');
+					if(result) {
+						$('body').append(html(isWatch));
+						WATCH_COMMON.watchControl(document.querySelector('.fa-heart'), 'add');
 					} else {
-						WATCH_COMMON.watchControl(e.currentTarget, 'add');
-						WATCH_STORAGE.add(issueItem, 'issues');
+						$('body').append(html(notWatch));
+					}
+				}).fail(() => $('body').append(html(notWatch)));
+
+				$('body').on('click', '.watchIconWrap', (e) => {
+					var $this = $(e.currentTarget);
+					var heart = e.currentTarget.querySelector('.fa-heart');
+
+					if($this.find('.fa-heart').is('.is-watch')) {
+						WATCH_COMMON.watchControl(heart, 'remove');
+						WATCH_STORAGE.remove(issueItem, 'issues', spaceName);
+						$('.watchIconWrap > span').text(notWatch);
+					} else {
+						WATCH_COMMON.watchControl(heart, 'add');
+						WATCH_STORAGE.add(issueItem, 'issues', spaceName);
+						$('.watchIconWrap > span').text(isWatch);
 					}
 				});
 			}
 		},
 		createWatchHome: function(){
 			// Storageに課題キーが存在するか確認
-			var promise = WATCH_STORAGE.throwItem('issues');
+			var promise = WATCH_STORAGE.throwItem('issues', spaceName);
 			promise.done((result) => {
-				console.log(result);
-				this.createWatchIssues(result);
+				if(result.length) this.createWatchIssues(result);
 
 				$('body').on('click', '.fa-heart', (e) => {
 					var $this = $(e.currentTarget);
@@ -52,8 +67,7 @@ var WATCH_ISSUE = null;
 
 					if($this.is('.is-watch')) {
 						WATCH_COMMON.watchControl(e.currentTarget, 'remove');
-						WATCH_STORAGE.remove(issueItem, 'issues');
-						WATCH_NOTICE.deletingCommentIdFromLocalStorage(issueItem.id);
+						WATCH_STORAGE.remove(issueItem, 'issues', spaceName);
 
 						$tr.stop().animate({
 							'opacity':'0'
@@ -79,7 +93,11 @@ var WATCH_ISSUE = null;
 					}
 				});
 			}).fail((result) => {
-				console.log('fail', result);
+				if(result === 'noItems') {
+					console.warn('Not watch issues.');
+				} else {
+					console.error('issues failed', result);
+				}
 			});
 		},
 		createWatchIssues(_object){
@@ -132,20 +150,7 @@ var WATCH_ISSUE = null;
 			for(i=0; i < resultLength; i++) {
 				var item = _object[i];
 				var evenOdd = i % 2 ? 'odd' : 'even';
-				var textTrim = item.description.substr(0, cut);
-
-				tbodyTr = document.createElement('tr');
-				tbodyTr.classList.add('Issue', 'watch-issue-list', evenOdd);
-				tbodyTr.innerHTML = `
-				<td class="Key">
-					<p><a href="/view/${item.id}" class="watch-issue-anchor" title="${item.id}">${item.id}</a></p>
-				</td>
-				<td class="Title"><p>${item.title}</p></td>
-				<td class="Assigner">${item.assigner}</td>
-				<td class="Description" title="${item.description}"><p>${textTrim}...</p></td>
-				<td class="Watch"><i class="fa fa-heart is-watch"></i></td>`;
-
-				fragment.appendChild(tbodyTr);
+				createTR(item, evenOdd);
 			}
 			tbody.appendChild(fragment);
 			table.appendChild(tbody);
@@ -155,6 +160,25 @@ var WATCH_ISSUE = null;
 
 			var projects = document.querySelector('#projects:not([data-id="projects-fav"])');
 			return projects.parentNode.insertBefore(section, projects.nextSibling);
+
+			function createTR(_item, _evenOdd){
+				var itemChild = _item;
+				var textTrim = itemChild.description.substr(0, cut);
+
+				tbodyTr = document.createElement('tr');
+				tbodyTr.classList.add('Issue', 'watch-issue-list', _evenOdd);
+				tbodyTr.innerHTML = `
+				<td class="Key">
+					<p><a href="/view/${itemChild.id}" class="watch-issue-anchor" title="${itemChild.id}">
+					${itemChild.id}</a></p>
+				</td>
+				<td class="Title"><p>${itemChild.title}</p></td>
+				<td class="Assigner">${itemChild.assigner}</td>
+				<td class="Description" title="${itemChild.description}"><p>${textTrim}...</p></td>
+				<td class="Watch"><i class="fa fa-heart is-watch"></i></td>`;
+
+				fragment.appendChild(tbodyTr);
+			}
 		},
 
 		run: function(){
@@ -171,4 +195,4 @@ var WATCH_ISSUE = null;
 
 	$(() => WATCH_ISSUE.run());
 
-})(window.jQuery, window.WATCH_COMMON, window.WATCH_STORAGE, window.WATCH_NOTICE);
+})(window.jQuery, window.WATCH_COMMON, window.WATCH_STORAGE);

@@ -8,22 +8,30 @@ var WATCH_STORAGE;
 		 * 第一引数で指定された_item(object)を_tableに追加する。
 		 * @param {object} _item objectを指定します。objectにidは必ず含めて下さい。
 		 * @param {string} _table DBのテーブル名を入力します。
+		 * @param {string} _space データを挿入するBacklogスペース名を入力します。
 		 */
-		add(_item, _table){
-			var tableName = _table;
+		add(_item, _table, _space){
 			var item = _item;
+			var tableName = _table;
+			var space = _space;
 			var db = {};
 
 			this.Storage.get(tableName, (value) => {
+				console.log('value_before:', value);
 				if(Object.keys(value).length === 0) {
 					db[tableName] = {};
-					db[tableName][item.id] = item;
+					db[tableName][space] = {};
+					db[tableName][space][item.id] = item;
 					this.Storage.set(db);
 				} else {
 					db[tableName] = value[tableName];
-					db[tableName][item.id] = item;
+					if(typeof db[tableName][space] === 'undefined') {
+						db[tableName][space] = {};
+					}
+					db[tableName][space][item.id] = item;
 					this.Storage.set(db);
 				}
+				console.log('value_after:', db);
 			});
 		},
 
@@ -31,15 +39,21 @@ var WATCH_STORAGE;
 		 * 第一引数で指定された_item(object)を_tableから削除する。
 		 * @param {object} _item objectを指定します。objectにidは必ず含めて下さい。
 		 * @param {string} _table DBのテーブル名を入力します。
+		 * @param {string} _space データを挿入するBacklogスペース名を入力します。
 		 */
-		remove(_item, _table){
-			var tableName = _table;
+		remove(_item, _table, _space){
 			var item = _item;
+			var tableName = _table;
+			var space = _space;
 			var db = {};
+			console.log('item:', item);
+			console.log('tableName:', tableName);
+			console.log('space:', space);
 
 			this.Storage.get(tableName, (value) => {
 				db[tableName] = value[tableName];
-				delete db[tableName][item.id];
+				console.log('db:', db);
+				delete db[tableName][space][item.id];
 				this.Storage.set(db);
 			});
 		},
@@ -48,22 +62,26 @@ var WATCH_STORAGE;
 		 * 第一引数で指定された_item(object)を_tableに取得に行く。
 		 * @param {object} _item objectを指定します。objectにidは必ず含めて下さい。
 		 * @param {string} _table DBのテーブル名を入力します。
+		 * @param {string} _space データを挿入するBacklogスペース名を入力します。
 		 * @return {boolean}
 		 */
-		getItem(_item, _table){
+		getItem(_item, _table, _space){
 			var item = _item;
+			var tableName = _table;
+			var space = _space;
 			var result = false;
 			var defer = $.Deferred();
 
-			this.Storage.get(_table, (value) => {
+			this.Storage.get(tableName, (value) => {
+				console.log('value:', value);
 				if(Object.keys(value).length === 0) {
 					defer.reject(result);
 				} else {
 					var db;
-					if(typeof value[_table][_item.id] === 'undefined') {
+					if(typeof value[tableName][space] === 'undefined') {
 						defer.reject(result);
 					} else {
-						db = value[_table][_item.id];
+						db = value[tableName][space][item.id];
 					}
 					if(db && db.id === item.id) {
 						result = true;
@@ -78,23 +96,43 @@ var WATCH_STORAGE;
 		/**
 		 * 第一引数で指定された_tableに格納されているitemを全て配列で返す。
 		 * @param {string} _table DBのテーブル名を入力します。
+		 * @param {string} _space データを挿入するBacklogスペース名を入力します。
 		 * @return {array.<object>}
 		 */
 
-		throwItem(_table){
+		throwItem(_table, _space){
 			var table = _table;
+			var space = _space;
 			var res = [];
 			var defer = $.Deferred();
+			var objValue;
 
 			this.Storage.get(table, (value) => {
-				Object.keys(value).forEach((key) => {
-					var object = value[key];
-					Object.keys(object).forEach((key2) => {
-						res.push(object[key2]);
-					});
-				});
-				defer.resolve(res);
+				if(typeof value[table] === 'undefined') {
+					defer.reject('noItems');
+				} else {
+					objValue = value[table][space];
+
+					if(typeof objValue === 'undefined') {
+						defer.reject('noItems');
+					} else {
+						createItemArray(objValue);
+					}
+				}
 			});
+
+			function createItemArray(_obj){
+				var obj = Object.keys(_obj);
+
+				obj.forEach((key, idx) => {
+					var object = _obj[key];
+					res.push(object);
+
+					if(idx === (obj.length-1)) {
+						res.length ? defer.resolve(res) : defer.reject('noItems');
+					}
+				});
+			}
 
 			return defer.promise();
 		},

@@ -14,8 +14,6 @@ var WATCH_COMMON;
 			return mil * sec * _int;
 		},
 		position(){
-			var spaceName = location.hostname.split('.')[0];
-
 			if(this.location.href.indexOf('backlog.jp/dashboard') > 0) {
 				this.location.home = true;
 			}

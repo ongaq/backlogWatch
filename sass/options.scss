@@ -4,8 +4,14 @@
 
 /* ====================================== */
 /* Global */
+html {
+	font-size: 62.5%;
+}
 body {
-	background-color: #e5e5e5;
+	font-family: Arial, Meiryo, sans-serif;
+	font-size: 1.3rem;
+	background-color: rgba(#93c400, 0.1);
+	// background: linear-gradient(to bottom, #6b8e00 0%,#93c400 50%,#6b8e00 100%);
 }
 h1 {
 	font-size: 18px;
@@ -26,9 +32,41 @@ a { color: #42791b;}
 .mb20 { margin-bottom: 20px;}
 .mb30 { margin-bottom: 30px;}
 
-.input-spaceName { width: 250px;}
+.fs {
+	&_small { font-size: 1.1rem;}
+	&_middle { font-size: 1.6rem;}
+	&_large { font-size: 2.4rem;}
+}
+
+.input-spaceName { width: 180px;}
 .input-spaceApi { width: 100%;}
 .input-spaceSubmit { width: 150px;}
+
+.fa {
+	position: relative;
+	display: inline-block;
+	text-align: center;
+	transition: all 0.3s ease;
+	cursor: pointer;
+}
+.fa-plus-circle,
+.fa-minus-circle,
+.fa-pencil {
+	width: 20px;
+	height: 20px;
+	color: #93c400;
+	font-size: 2.0rem;
+
+	&:hover {
+		color: darken(#93c400, 10%);
+	}
+}
+.fa-pencil {
+	width: 18px;
+	height: 18px;
+	color: #333;
+	font-size: 1.8rem;
+}
 
 /* ====================================== */
 /* selector */
@@ -36,9 +74,9 @@ a { color: #42791b;}
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin-left: -275px;
+	margin-left: -395px;
 	padding: 20px;
-	width: 550px;
+	width: 790px;
 	height: auto;
 	background-color: #fff;
 	border-radius: 6px;
@@ -46,13 +84,151 @@ a { color: #42791b;}
 		1px 1px 7px rgba(0,0,0, 0.15),
 		-1px -1px 7px rgba(0,0,0, 0.15);
 	transform: translate3d(0, -50%, 0);
+	z-index: 10;
+
+	&:before {
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: block;
+		content: "";
+		width: 100%;
+		height: 15px;
+		background-color: #fff;
+		border-radius: 6px;
+		z-index: 11;
+	}
+}
+.heading01 {
+	position: absolute;
+	top: -50px;
+	left: 17px;
+	letter-spacing: -1px;
+	color: rgba(#93c400, 0.3);
+	font-family: Verdana;
+	font-size: 50px;
+	z-index: 1;
+}
+.field {
+	margin-bottom: 10px;
+	padding: 10px;
+	width: 710px;
+	background-color: #f0f0f0;
+	border-radius: 4px;
+
+	&-list {
+		position: relative;
+		display: flex;
+		margin-top: 10px;
+
+		&:first-child { margin-top: 0;}
+
+		&:not(:first-child) strong { display: none;}
+
+		&.is-ok &-li_spaceApi { width: 460px;}
+		&.is-ok &-li_plus {
+			padding-left: 15px;
+			width: 40px;
+		}
+		&.is-ok .icon_pencil {
+			display: inline-block;
+		}
+
+		.fa-plus-circle {
+			display: none;
+		}
+		&:last-child .fa-plus-circle {
+			display: inline-block;
+		}
+	}
+
+	&-list-li {
+		&_spaceName { width: 190px;}
+		&_spaceApi { width: 500px;}
+		&_plus {
+			position: relative;
+			align-self: flex-end;
+			width: 0;
+			height: 25px;
+
+			.icon {
+				position: relative;
+
+				&:before,
+				&:after {
+					visibility: hidden;
+					transition: all 0.3s ease;
+					opacity: 0;
+					z-index: -1;
+				}
+				&:hover:before,
+				&:hover:after {
+					visibility: visible;
+					opacity: 1;
+					z-index: 1;
+				}
+
+				&:not(.icon_ctrl):before {
+					position: absolute;
+					top: -1px;
+					left: 45px;
+					padding: 8px 10px;
+					display: block;
+					width: 180px;
+					vertical-align: middle;
+					line-height: 1.2;
+					color: #fff;
+					font-weight: normal;
+					font-size: 1.2rem;
+					background-color: #000;
+					border: 1px solid #000;
+					border-radius: 3px;
+				}
+				&:not(.icon_ctrl):after {
+					position: absolute;
+					top: 7px;
+					left: 38px;
+					content: "";
+					display: block;
+					width: 0;
+					height: 0;
+					border-style: solid;
+					border-width: 5px 7px 5px 0;
+					border-color: transparent #000 transparent transparent;
+				}
+
+				&_ctrl {
+					position: absolute;
+					top: 3px;
+					right: -68px;
+					width: 50px;
+				}
+				&_plus:before {
+					content: "スペースを追加したい場合は＋をクリック";
+				}
+				&_minus:before {
+					content: "スペースを削除したい場合は－をクリック";
+				}
+				&_pencil {
+					position: absolute;
+					bottom: 3px;
+					right: 5px;
+					display: none;
+
+					&:before {
+						content: "スペースを編集したい場合は✎をクリック";
+					}
+				}
+			}
+		}
+	}
 }
 .section {
 	margin-top: 20px;
 	padding-top: 20px;
 	border-top: 1px solid #e5e5e5;
 
-	&:first-child {
+	&:first-of-type {
 		margin-top: 0;
 		padding-top: 0;
 		border-top: 0;
@@ -87,10 +263,32 @@ a { color: #42791b;}
 	padding: 0 8px;
 	height: 26px;
 }
+.input {
+	background-color: #fff;
+	transition: all 0.3s ease;
+
+	&:focus {
+		border-color: #93c400;
+		box-shadow: 0 0 5px rgba(#93c400,0.7);
+	}
+	&.is-error {
+		border-width: 2px;
+		border-color: #c90000;
+
+		&:focus {
+			box-shadow: 0 0 5px rgba(#c90000,0.7);
+		}
+	}
+	&.is-ok {
+		padding: 5px 0;
+		background-color: #f0f0f0;
+		border: 0;
+	}
+}
 .button {
 	position: relative;
 	display: inline-block;
-	padding: 10px 0;
+	padding: 8px 0 10px;
 	width: 150px;
 	height: 37px;
 	background-color: #eee;
@@ -140,7 +338,6 @@ a { color: #42791b;}
 		border-width: 0 8px 10px 8px;
 		border-color: transparent transparent #000 transparent;
 	}
-
 	&.is-visible {
 		opacity: 1;
 		transform: translate3d(-50%, 30px, 0);

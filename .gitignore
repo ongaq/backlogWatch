@@ -1,0 +1,12 @@
+/.git
+/.sass-cache
+/.svn
+/_bk
+/node_modules
+*.css
+*.bat
+*.db
+*.dll
+*.svn-base
+*.md
+*.mno
