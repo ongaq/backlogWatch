@@ -1,6 +1,8 @@
 var WATCH_NOTICE = null;
 
 (($, WATCH_COMMON, WATCH_STORAGE, chrome) => {
+	var reSpace, reAutoCloseSecond, reAutoReleaseWatch;
+
 	WATCH_NOTICE = {
 		getOptions(_target){
 			var item = '';
@@ -93,9 +95,9 @@ var WATCH_NOTICE = null;
 			}
 		},
 		checkWatchIssues(_results){
-			var space = _results[0];
-			var autoCloseSecond = _results[1];
-			var autoReleaseWatch = Boolean(_results[2]);
+			var space = reSpace || _results[0];
+			var autoCloseSecond = reAutoCloseSecond || _results[1];
+			var autoReleaseWatch = Boolean(reAutoReleaseWatch) || Boolean(_results[2]);
 
 			Object.keys(space).forEach((key) => {
 				var promise = WATCH_STORAGE.throwItem('issues', key);
@@ -282,6 +284,16 @@ var WATCH_NOTICE = null;
 	});
 	// Chrome起動時に実行
 	chrome.runtime.onStartup.addListener(() => WATCH_NOTICE.acceptNotification());
+	// オプションが更新されたらスペース情報を上書く
+	chrome.storage.onChanged.addListener((changes) => {
+		Object.keys(changes).forEach((key) => {
+			if(key === 'options') {
+				WATCH_NOTICE.getOptions('space').then((result) => { reSpace = result; });
+				WATCH_NOTICE.getOptions('close').then((result) => { reAutoCloseSecond = result; });
+				WATCH_NOTICE.getOptions('watch').then((result) => { reAutoReleaseWatch = Boolean(result); });
+			}
+		});
+	});
 
 	// 10分毎にBacklog通知がセットされているか確認する
 	checkAlarm('checkEvent', () => {
