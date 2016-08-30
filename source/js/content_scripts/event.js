@@ -270,7 +270,7 @@ var WATCH_NOTICE = null;
 	chrome.runtime.onInstalled.addListener((details) => {
 		WATCH_NOTICE.acceptNotification();
 
-		if(details.reason === 'install' || details.reason === 'update') {
+		if(details.reason === 'install') {
 			var oldVersion = 1.2;
 			if(parseFloat(details.previousVersion) <= oldVersion) {
 				WATCH_STORAGE.Storage.clear((items) => console.log(items));
@@ -283,7 +283,10 @@ var WATCH_NOTICE = null;
 		}
 	});
 	// Chrome起動時に実行
-	chrome.runtime.onStartup.addListener(() => WATCH_NOTICE.acceptNotification());
+	chrome.runtime.onStartup.addListener(() => {
+		chrome.runtime.reload();
+		WATCH_NOTICE.acceptNotification();
+	});
 	// オプションが更新されたらスペース情報を上書く
 	chrome.storage.onChanged.addListener((changes) => {
 		Object.keys(changes).forEach((key) => {
