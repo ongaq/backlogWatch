@@ -1,7 +1,7 @@
 var WATCH_NOTICE = null;
 
 (($, WATCH_COMMON, WATCH_STORAGE, chrome) => {
-	var reSpace, reAutoCloseSecond, reAutoReleaseWatch;
+	var reSpace, reAutoCloseSecond, reAutoReleaseWatch, array;
 
 	WATCH_NOTICE = {
 		getOptions(_target){
@@ -36,7 +36,7 @@ var WATCH_NOTICE = null;
 
 		acceptNotification(){
 			console.log('check acceptNotification...');
-			var array = [
+			array = [
 				this.space(),
 				this.autoCloseSecond(),
 				this.autoReleaseWatch()
@@ -266,6 +266,8 @@ var WATCH_NOTICE = null;
 		}
 	};
 
+	WATCH_NOTICE.acceptNotification();
+
 	// Chromeインストール時に実行
 	chrome.runtime.onInstalled.addListener((details) => {
 		WATCH_NOTICE.acceptNotification();
@@ -282,11 +284,6 @@ var WATCH_NOTICE = null;
 			}
 		}
 	});
-	// Chrome起動時に実行
-	chrome.runtime.onStartup.addListener(() => {
-		chrome.runtime.reload();
-		WATCH_NOTICE.acceptNotification();
-	});
 	// オプションが更新されたらスペース情報を上書く
 	chrome.storage.onChanged.addListener((changes) => {
 		Object.keys(changes).forEach((key) => {
@@ -298,28 +295,16 @@ var WATCH_NOTICE = null;
 		});
 	});
 
-	// 10分毎にBacklog通知がセットされているか確認する
-	checkAlarm('checkEvent', () => {
-		var minute = 10;
-		createAlarm('checkEvent', minute, () => {
-			checkAlarm('backlog', () => WATCH_NOTICE.acceptNotification());
+	array = [
+		WATCH_NOTICE.space(),
+		WATCH_NOTICE.autoCloseSecond(),
+		WATCH_NOTICE.autoReleaseWatch()
+	];
+	return Promise.all(array).then((results) => {
+		chrome.alarms.onAlarm.addListener((alarm) => {
+			if(alarm && alarm.name === 'backlog') {
+				WATCH_NOTICE.checkWatchIssues(results);
+			}
 		});
 	});
-
-	function checkAlarm(_alarmName, _function){
-		return chrome.alarms.get(_alarmName, (val) => {
-			if(typeof val === 'undefined') {
-				_function();
-			}
-		});
-	}
-	function createAlarm(_alarmName, _time, _function){
-		chrome.alarms.create(_alarmName, { periodInMinutes: _time });
-
-		chrome.alarms.onAlarm.addListener((alarm) => {
-			if(alarm && alarm.name === _alarmName) {
-				_function();
-			}
-		});
-	}
 })(window.jQuery, window.WATCH_COMMON, window.WATCH_STORAGE, window.chrome);
