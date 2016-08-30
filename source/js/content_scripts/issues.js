@@ -5,6 +5,7 @@ var WATCH_ISSUE = null;
 
 	WATCH_ISSUE = {
 		createWatchIssue(){
+			var limitedBytes = 100;
 			var issueCard = $('#issuecard');
 			var issueItem = {
 				id: $(issueCard).find('.key > strong[data-bind]').text(),
@@ -13,6 +14,9 @@ var WATCH_ISSUE = null;
 				description: $('#issueDescription').text(),
 				time: new Date()
 			};
+			if(issueItem.description.length > limitedBytes) {
+				issueItem.description = `${issueItem.description.substr(0, limitedBytes)}...`;
+			}
 
 			if(issueCard.length > 0) {
 				var isWatch = 'ウォッチ中';

@@ -4,6 +4,10 @@ var WATCH_STORAGE;
 	WATCH_STORAGE = {
 		Storage: chrome.storage.sync,
 
+		text: {
+			QUOTA_BYTES_PER_ITEM: 'ウォッチ数の限界に到達しました。ウォッチ出来ません。ウォッチの数を減らして下さい。'
+		},
+
 		/**
 		 * 第一引数で指定された_item(object)を_tableに追加する。
 		 * @param {object} _item objectを指定します。objectにidは必ず含めて下さい。
@@ -22,14 +26,28 @@ var WATCH_STORAGE;
 					db[tableName] = {};
 					db[tableName][space] = {};
 					db[tableName][space][item.id] = item;
-					this.Storage.set(db);
+					this.Storage.set(db, () => {
+						if(chrome.runtime.lastError) {
+							console.error(chrome.runtime.lastError.message);
+							if(chrome.runtime.lastError.message === 'QUOTA_BYTES_PER_ITEM quota exceeded') {
+								alert(WATCH_STORAGE.text.QUOTA_BYTES_PER_ITEM);
+							}
+						}
+					});
 				} else {
 					db[tableName] = value[tableName];
 					if(typeof db[tableName][space] === 'undefined') {
 						db[tableName][space] = {};
 					}
 					db[tableName][space][item.id] = item;
-					this.Storage.set(db);
+					this.Storage.set(db, () => {
+						if(chrome.runtime.lastError) {
+							console.error(chrome.runtime.lastError.message);
+							if(chrome.runtime.lastError.message === 'QUOTA_BYTES_PER_ITEM quota exceeded') {
+								alert(WATCH_STORAGE.text.QUOTA_BYTES_PER_ITEM);
+							}
+						}
+					});
 				}
 				console.log('value_after:', db);
 			});
