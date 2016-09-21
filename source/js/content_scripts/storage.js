@@ -64,9 +64,9 @@ var WATCH_STORAGE;
 			var tableName = _table;
 			var space = _space;
 			var db = {};
-			console.log('item:', item);
-			console.log('tableName:', tableName);
-			console.log('space:', space);
+			// console.log('item:', item);
+			// console.log('tableName:', tableName);
+			// console.log('space:', space);
 
 			this.Storage.get(tableName, (value) => {
 				db[tableName] = value[tableName];

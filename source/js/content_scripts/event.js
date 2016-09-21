@@ -116,8 +116,7 @@ var WATCH_NOTICE = null;
 				var db = _issuesDB;
 
 				ajaxRequest(_result, _key, db)
-				.done((result) => requestReturnValue(result))
-				.fail((result) => {
+				.then((result) => requestReturnValue(result), (result) => {
 					console.error(result);
 					throw new Error('popupNotification: promise failed.');
 				});
@@ -164,14 +163,13 @@ var WATCH_NOTICE = null;
 								}).fail(() => createNotifications(options, issueKey));
 							}
 							WATCH_STORAGE.Storage.set(useStorageVal);
+							backlogCompletedWhenCancel();
 						});
 					}
 
 					// 通知を作成する
 					function createNotifications(_options, _issueKey){
-						var id = '';
-						chrome.notifications.create(`backlog-${_issueKey}`, _options, (notificationId) => {
-							id = notificationId;
+						chrome.notifications.create(`backlog-${space[_key].name}-${_issueKey}`, _options, (notificationId) => {
 							var listener = () => {
 								chrome.tabs.create({
 									url: `https://${space[_key].name}.backlog.jp/view/${_issueKey}#comment-${res.id}`
@@ -184,9 +182,9 @@ var WATCH_NOTICE = null;
 								chrome.notifications.onClicked.removeListener(listener);
 								chrome.notifications.clear(notificationId);
 							});
+							// 機能オプション
+							closeNotificationAfterSeconds(notificationId);
 						});
-						// 機能オプション
-						closeNotificationAfterSeconds(id);
 						backlogCompletedWhenCancel();
 					}
 					// 課題情報を取得する
@@ -209,9 +207,11 @@ var WATCH_NOTICE = null;
 					}
 					// 課題完了時にウォッチを解除する
 					function backlogCompletedWhenCancel(){
+						// console.log('res:', res);
 						if(autoReleaseWatch && res.changeLog.length) {
 							Object.keys(res.changeLog).forEach((key) => {
 								var log = res.changeLog[key];
+								// console.log('log:', log);
 
 								if(log.field === 'status' && log.newValue === '完了') {
 									WATCH_STORAGE.remove(issueItem, 'issues', _key);
@@ -221,6 +221,7 @@ var WATCH_NOTICE = null;
 					}
 					// n秒後に通知を閉じる
 					function closeNotificationAfterSeconds(_id){
+						console.log('notificationId:', _id);
 						if(typeof autoCloseSecond !== 'undefined' && Boolean(autoCloseSecond)) {
 							var msec = 1000;
 							chrome.alarms.create('autoClose', {
@@ -236,42 +237,37 @@ var WATCH_NOTICE = null;
 				}
 			}
 			function ajaxRequest(_issueKey, _key, _db){
-				var defer = $.Deferred();
 				var key = _issueKey;
 				var query = '';
 				var path = '';
 
-				WATCH_STORAGE.Storage.get(_db, (items) => {
-					var comment = items[_db];
-					if(comment) {
-						query = typeof comment[key] === 'undefined' ? '&minId=0' : `&minId=${comment[key]}`;
-					}
-					path = `https://${space[_key].name}.backlog.jp/api/v2`+
-					`/issues/${key}/comments?apiKey=${space[_key].apiKey+query}`;
+				return new Promise((resolve, reject) => {
+					WATCH_STORAGE.Storage.get(_db, (items) => {
+						var comment = items[_db];
+						if(comment) {
+							query = typeof comment[key] === 'undefined' ? '&minId=0' : `&minId=${comment[key]}`;
+						}
+						path = `https://${space[_key].name}.backlog.jp/api/v2`+
+						`/issues/${key}/comments?apiKey=${space[_key].apiKey+query}`;
 
-					$.ajax({
-						url: path,
-						type: 'GET',
-						dataType: 'json',
-					}).done((result) => {
-						defer.resolve(result);
-					}).fail((result) => {
-						console.log('ajax failed.....');
-						defer.reject(result);
+						$.ajax({
+							url: path,
+							type: 'GET',
+							dataType: 'json',
+						}).done((result) => {
+							resolve(result);
+						}).fail((result) => {
+							console.log('ajax failed.....');
+							reject(result);
+						});
 					});
 				});
-
-				return defer.promise();
 			}
 		}
 	};
 
-	WATCH_NOTICE.acceptNotification();
-
 	// Chromeインストール時に実行
 	chrome.runtime.onInstalled.addListener((details) => {
-		WATCH_NOTICE.acceptNotification();
-
 		if(details.reason === 'install') {
 			var oldVersion = 1.2;
 			if(parseFloat(details.previousVersion) <= oldVersion) {
