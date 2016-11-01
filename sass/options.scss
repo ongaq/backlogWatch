@@ -4,6 +4,10 @@
 
 /* ====================================== */
 /* Global */
+html,body {
+	min-height: 100%;
+	height: 100%;
+}
 html {
 	font-size: 62.5%;
 }
@@ -12,6 +16,7 @@ body {
 	font-size: 1.3rem;
 	background-color: rgba(#93c400, 0.1);
 	// background: linear-gradient(to bottom, #6b8e00 0%,#93c400 50%,#6b8e00 100%);
+	backface-visibility: hidden;
 }
 h1 {
 	font-size: 18px;
@@ -72,18 +77,16 @@ a { color: #42791b;}
 /* selector */
 .wrap {
 	position: absolute;
-	top: 50%;
+	top: 0;
 	left: 50%;
 	margin-left: -395px;
 	padding: 20px;
 	width: 790px;
-	height: auto;
+	min-height: 100%;
 	background-color: #fff;
-	border-radius: 6px;
 	box-shadow:
 		1px 1px 7px rgba(0,0,0, 0.15),
 		-1px -1px 7px rgba(0,0,0, 0.15);
-	transform: translate3d(0, -50%, 0);
 	z-index: 10;
 
 	&:before {
@@ -100,9 +103,11 @@ a { color: #42791b;}
 	}
 }
 .heading01 {
-	position: absolute;
-	top: -50px;
-	left: 17px;
+	// position: absolute;
+	// top: -50px;
+	// left: 17px;
+	margin-top: -10px;
+	margin-bottom: 20px;
 	letter-spacing: -1px;
 	color: rgba(#93c400, 0.3);
 	font-family: Verdana;
@@ -227,6 +232,7 @@ a { color: #42791b;}
 	margin-top: 20px;
 	padding-top: 20px;
 	border-top: 1px solid #e5e5e5;
+	backface-visibility: hidden;
 
 	&:first-of-type {
 		margin-top: 0;

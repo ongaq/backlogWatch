@@ -18,14 +18,14 @@ var WATCH_NOTICE = null;
 							if(t === 'close') item = String(options.close);
 							if(t === 'watch') item = String(options.watch);
 
-							item.length > 0 ? resolve(item) : reject(null);
+							item.length > 0 ? resolve(item) : reject('close or watch:', items);
 						}
 						if(t === 'space') {
 							item = space;
-							Object.keys(item).length > 0 ? resolve(item) : reject(null);
+							Object.keys(item).length > 0 ? resolve(item) : reject('space:', items);
 						}
 					} else {
-						reject(null);
+						reject('error:', items);
 					}
 				});
 			});
@@ -52,7 +52,11 @@ var WATCH_NOTICE = null;
 					console.warn('please input space name and apiKey.');
 				} else {
 					chrome.notifications.getPermissionLevel((response) => {
-						runNotificationActions(response, results);
+						if(response === 'granted') {
+							WATCH_NOTICE.checkWatchIssues(results);
+						} else if(response === 'denied') {
+							throw new Error('notification request false.');
+						}
 					});
 				}
 			}, (error) => {
@@ -74,25 +78,6 @@ var WATCH_NOTICE = null;
 					throw new Error('promise failed.');
 				}
 			});
-
-			function runNotificationActions(response, results){
-				if(response === 'granted') {
-					// 1分毎にイベントを発生させる
-					chrome.alarms.get('backlog', (val) => {
-						if(typeof val === 'undefined') {
-							chrome.alarms.create('backlog', { periodInMinutes: 1 });
-						}
-					});
-					chrome.alarms.onAlarm.addListener((alarm) => {
-						if(alarm && alarm.name === 'backlog') {
-							WATCH_NOTICE.checkWatchIssues(results);
-						}
-					});
-				}
-				if(response === 'denied') {
-					throw new Error('notification request false.');
-				}
-			}
 		},
 		checkWatchIssues(_results){
 			var space = reSpace || _results[0];
@@ -221,11 +206,12 @@ var WATCH_NOTICE = null;
 					}
 					// n秒後に通知を閉じる
 					function closeNotificationAfterSeconds(_id){
+						var msec = 1000;
 						console.log('notificationId:', _id);
-						if(typeof autoCloseSecond !== 'undefined' && Boolean(autoCloseSecond)) {
-							var msec = 1000;
+
+						if(typeof autoCloseSecond !== 'undefined' && Number(autoCloseSecond) > 0) {
 							chrome.alarms.create('autoClose', {
-								when: Date.now() + (autoCloseSecond * msec)
+								when: Date.now() + (msec * Number(autoCloseSecond))
 							});
 						}
 						chrome.alarms.onAlarm.addListener((alarm) => {
@@ -263,6 +249,41 @@ var WATCH_NOTICE = null;
 					});
 				});
 			}
+		},
+		intervalCheck(){
+			Promise.all([
+				WATCH_NOTICE.space(),
+				WATCH_NOTICE.autoCloseSecond(),
+				WATCH_NOTICE.autoReleaseWatch()
+			]).then((results) => {
+				reSpace = results[0];
+				reAutoCloseSecond = results[1];
+				reAutoReleaseWatch = Boolean(results[2]);
+				WATCH_NOTICE.checkWatchIssues(results);
+			});
+		},
+		runChromeFunctions(){
+			// オプション保存時に発火
+			chrome.storage.onChanged.addListener((changes) => {
+				Object.keys(changes).forEach((key) => {
+					if(key === 'options') {
+						console.log('storage:', new Date());
+						WATCH_NOTICE.intervalCheck();
+					}
+				});
+			});
+			// アラーム設定
+			chrome.alarms.onAlarm.addListener((alarm) => {
+				if(alarm && alarm.name === 'backlog') {
+					WATCH_NOTICE.intervalCheck();
+				}
+			});
+			// 1分毎にイベントを発生させる
+			chrome.alarms.get('backlog', (val) => {
+				if(typeof val === 'undefined') {
+					chrome.alarms.create('backlog', { periodInMinutes: 1 });
+				}
+			});
 		}
 	};
 
@@ -280,27 +301,21 @@ var WATCH_NOTICE = null;
 			}
 		}
 	});
-	// オプションが更新されたらスペース情報を上書く
-	chrome.storage.onChanged.addListener((changes) => {
-		Object.keys(changes).forEach((key) => {
-			if(key === 'options') {
-				WATCH_NOTICE.getOptions('space').then((result) => { reSpace = result; });
-				WATCH_NOTICE.getOptions('close').then((result) => { reAutoCloseSecond = result; });
-				WATCH_NOTICE.getOptions('watch').then((result) => { reAutoReleaseWatch = Boolean(result); });
-			}
-		});
-	});
 
-	array = [
-		WATCH_NOTICE.space(),
-		WATCH_NOTICE.autoCloseSecond(),
-		WATCH_NOTICE.autoReleaseWatch()
-	];
-	return Promise.all(array).then((results) => {
-		chrome.alarms.onAlarm.addListener((alarm) => {
-			if(alarm && alarm.name === 'backlog') {
+	chrome.notifications.getPermissionLevel((response) => {
+		if(response === 'granted') {
+			array = [
+				WATCH_NOTICE.space(),
+				WATCH_NOTICE.autoCloseSecond(),
+				WATCH_NOTICE.autoReleaseWatch()
+			];
+			Promise.all(array).then((results) => {
 				WATCH_NOTICE.checkWatchIssues(results);
-			}
-		});
+			});
+
+			WATCH_NOTICE.runChromeFunctions();
+		} else if(response === 'denied') {
+			throw new Error('notification request false.');
+		}
 	});
 })(window.jQuery, window.WATCH_COMMON, window.WATCH_STORAGE, window.chrome);
