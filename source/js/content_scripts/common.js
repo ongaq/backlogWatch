@@ -21,6 +21,24 @@ var WATCH_COMMON;
 				this.location.issue = true;
 			}
 		},
+		getCookie(){
+			var result = [];
+			var cookies = document.cookie;
+
+			if(cookies !== '') {
+				var cookieArray = cookies.split(';');
+				for(var i = 0; i < cookieArray.length; i++) {
+					var cookie = cookieArray[i].split('=');
+					result[cookie[0].replace(/^\s/, '')] = decodeURIComponent(cookie[1]);
+				}
+			}
+			return result;
+		},
+		checkNewUserInterface(){
+			var bool = WATCH_COMMON.getCookie()['newui'] === 'true';
+
+			return bool;
+		},
 		watchControl(_self, _state){
 			var self = _self;
 			var state = _state;

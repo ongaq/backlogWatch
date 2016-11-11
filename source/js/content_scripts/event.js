@@ -207,7 +207,7 @@ var WATCH_NOTICE = null;
 					// n秒後に通知を閉じる
 					function closeNotificationAfterSeconds(_id){
 						var msec = 1000;
-						console.log('notificationId:', _id);
+						console.log('notificationId:', _id, '->', new Date());
 
 						if(typeof autoCloseSecond !== 'undefined' && Number(autoCloseSecond) > 0) {
 							chrome.alarms.create('autoClose', {

@@ -40,6 +40,28 @@ i.fa-heart.is-running {
   animation: heartBeat 0.4s ease-in-out;
 }
 
+.watch-title {
+  display: block;
+  height: 35px;
+}
+
+.project-list__item .fa-star {
+  position: absolute;
+  bottom: 5px;
+  right: 6px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 6;
+}
+
+.project-list__item .fa-star.is-watch {
+  color: orange;
+}
+
+.project-list__item .fa-star.is-running {
+  animation: heartBeat 0.4s ease-in-out;
+}
+
 .Page--view-issue {
   position: relative;
 }
@@ -55,6 +77,10 @@ i.fa-heart.is-running {
   box-sizing: border-box;
   box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
   cursor: pointer;
+}
+
+.Page--view-issue > .watchIconWrap_new {
+  bottom: 68px;
 }
 
 .Page--view-issue > .watchIconWrap > span,
@@ -75,9 +101,21 @@ i.fa-heart.is-running {
   padding: 10px 20px;
 }
 
+.watch-issueSection {
+  margin-bottom: 40px;
+}
+
 .watch-issue {
   table-layout: fixed;
   font-size: 93%;
+}
+
+.watch-issue_new {
+  font-size: 100%;
+}
+
+.watch-issue_new td {
+  white-space: normal !important;
 }
 
 .watch-issue-col-1 {
@@ -92,9 +130,14 @@ i.fa-heart.is-running {
   width: 65px;
 }
 
-.watch-issue-list.is-hover,
-.watch-issue-list.is-hover td {
+.watch-issue-list.is-hover:not(.watch-issue-list_new),
+.watch-issue-list.is-hover:not(.watch-issue-list_new) td {
   background-color: #fffde9 !important;
+}
+
+.watch-issue-list_new {
+  cursor: pointer;
+  font-size: 90%;
 }
 
 .watch-issue .Assigner,
