@@ -142,6 +142,8 @@ var WATCH_STORAGE;
 			function createItemArray(_obj){
 				var obj = Object.keys(_obj);
 
+				if(!obj.length) defer.reject('noItems');
+
 				obj.forEach((key, idx) => {
 					var object = _obj[key];
 					res.push(object);

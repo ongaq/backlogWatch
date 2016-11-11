@@ -80,7 +80,7 @@ var WATCH_PROJECTS;
 						if(key === obj[j].id) star.classList.add('is-watch');
 					}
 				}
-				var projectName = item.querySelector('a').getAttribute('href').split('/').pop();
+				var projectName = item.querySelector('.project-list__link').getAttribute('href').split('/').pop();
 				item.setAttribute('data-id', projectName);
 				item.appendChild(star);
 			}
