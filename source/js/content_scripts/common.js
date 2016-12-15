@@ -34,11 +34,6 @@ var WATCH_COMMON;
 			}
 			return result;
 		},
-		checkNewUserInterface(){
-			var bool = WATCH_COMMON.getCookie()['newui'] === 'true';
-
-			return bool;
-		},
 		watchControl(_self, _state){
 			var self = _self;
 			var state = _state;
