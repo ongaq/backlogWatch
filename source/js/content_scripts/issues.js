@@ -14,13 +14,17 @@ var WATCH_ISSUE = null;
 				description: $(issueCard).find('.ticket__description').text(),
 				time: new Date()
 			};
+			var isWatch = 'ウォッチ中';
+			var notWatch = 'ウォッチリストに入れる';
+
 			if(issueItem.description.length > limitedBytes) {
 				issueItem.description = `${issueItem.description.substr(0, limitedBytes)}...`;
 			}
+			if($('.watchIconWrap').length) {
+				$('.watchIconWrap').remove();
+			}
 
 			if(issueCard.length > 0) {
-				var isWatch = 'ウォッチ中';
-				var notWatch = 'ウォッチリストに入れる';
 				var html = (_text) => {
 					return `<div class="watchIconWrap watchIconWrap_new">
 					<span>${_text}</span>
@@ -37,17 +41,32 @@ var WATCH_ISSUE = null;
 					} else {
 						$('body').append(html(notWatch));
 					}
-				}).fail(() => $('body').append(html(notWatch)));
+				}).fail(() => {
+					$('body').append(html(notWatch));
+				});
 
-				$('body').on('click', '.watchIconWrap', (e) => {
+				watchBtn();
+			}
+			function watchBtn(){
+				$('body').off('click.watchBtn').on('click.watchBtn', '.watchIconWrap', (e) => {
 					var $this = $(e.currentTarget);
 					var heart = e.currentTarget.querySelector('.fa-heart');
+					issueCard = $('#issueArea');
+					issueItem = {
+						id: $(issueCard).find('.ticket__key-number').text(),
+						title: $(issueCard).find('.title-group__title-text').text(),
+						assigner: $(issueCard).find('.ticket__article-header .user-icon-set__name').text(),
+						description: $(issueCard).find('.ticket__description').text(),
+						time: new Date()
+					};
 
 					if($this.find('.fa-heart').is('.is-watch')) {
+						console.log('is-watch:', true);
 						WATCH_COMMON.watchControl(heart, 'remove');
 						WATCH_STORAGE.remove(issueItem, 'issues', spaceName);
 						$('.watchIconWrap > span').text(notWatch);
 					} else {
+						console.log('is-watch:', false);
 						WATCH_COMMON.watchControl(heart, 'add');
 						WATCH_STORAGE.add(issueItem, 'issues', spaceName);
 						$('.watchIconWrap > span').text(isWatch);
@@ -208,6 +227,12 @@ var WATCH_ISSUE = null;
 		}
 	};
 
-	$(() => WATCH_ISSUE.run());
+	$(() => {
+		WATCH_ISSUE.run();
+
+		WATCH_COMMON.locationObserver(function(){
+			WATCH_ISSUE.run();
+		});
+	});
 
 })(window.jQuery, window.WATCH_COMMON, window.WATCH_STORAGE);

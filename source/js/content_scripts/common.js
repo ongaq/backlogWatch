@@ -34,6 +34,30 @@ var WATCH_COMMON;
 			}
 			return result;
 		},
+		locationObserver(_fn){
+			var target = document.querySelector('.ticket__mask');
+
+			if(target === null) return;
+
+			var timeout = 500;
+			var observeConfig = {
+				attributes: true,
+				childList: true,
+				characterData: true
+			};
+			var state = history.state;
+			var observer = new MutationObserver((mutations) => {
+				mutations.forEach((mutation) => {
+					// loading表示が消えたら実行
+					if(mutation.target.style.display === 'none' && state.issueKey !== history.state.issueKey) {
+						state = history.state;
+						observer.disconnect();
+						setTimeout(() => _fn(), timeout);
+					}
+				});
+			});
+			observer.observe(target, observeConfig);
+		},
 		watchControl(_self, _state){
 			var self = _self;
 			var state = _state;
