@@ -76,6 +76,7 @@ i {
 		box-sizing: border-box;
 		box-shadow: 0 0 7px rgba(#000, 0.15);
 		cursor: pointer;
+		z-index: 50;
 
 		&_new {
 			bottom: 68px;

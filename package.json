@@ -1,6 +1,6 @@
 {
   "name": "backlogWatch",
-  "version": "1.3.0.13",
+  "version": "1.3.0.14",
   "devDependencies": {
     "babel-core": "^6.7.2",
     "babel-polyfill": "^6.7.2",

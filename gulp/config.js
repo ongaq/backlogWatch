@@ -27,19 +27,22 @@ module.exports = {
 		},
 		notify: {
 			uglify: {
-				message: 'Watch Uglify finished running',
+				title: 'Gulp notifitication: Uglify',
+				message: 'Generated file: <%= file.relative %> @ <%= options.date %>',
+				templateOptions: {
+					date: null
+				},
 				onLast: true,
-				icon: './node_modules/gulp-notify/assets/gulp.png'
+				icon: `${root}/node_modules/gulp-notify/assets/gulp.png`
 			},
 			css: {
-				message: 'CSS Compiled finished running',
+				title: 'Gulp notifitication: Sass',
+				message: 'Generated file: <%= file.relative %> @ <%= options.date %>',
+				templateOptions: {
+					date: null
+				},
 				onLast: true,
-				icon: './node_modules/gulp-notify/assets/gulp.png'
-			},
-			sprite: {
-				message: 'Generated an sprite image finished running',
-				onLast: true,
-				icon: './node_modules/gulp-notify/assets/gulp.png'
+				icon: `${root}/node_modules/gulp-notify/assets/gulp.png`
 			}
 		}
 	}
