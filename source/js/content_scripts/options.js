@@ -79,6 +79,10 @@ var WATCH_OPTIONS;
 					var key = settings.space.apiKey[i];
 					var url = `https://${name}.backlog.jp/api/v2/space?apiKey=${key}`;
 
+					if (name.indexOf('backlog.jp') !== -1 || name.indexOf('backlog.com') !== -1) {
+						url = `https://${name}/api/v2/space?apiKey=${key}`;
+					}
+
 					if(name === '') {
 						$space.addClass(e);
 						alert('スペース名を入力して下さい。');

@@ -99,6 +99,11 @@ var WATCH_NOTICE = null;
 				var issueKey = _result;
 				var issueItem = { id: issueKey };
 				var db = _issuesDB;
+				var spaceName = space[_key].name;
+
+				if (spaceName.indexOf('backlog.jp') === -1 && spaceName.indexOf('backlog.com') === -1) {
+					spaceName = `${spaceName}.backlog.jp`;
+				}
 
 				ajaxRequest(_result, _key, db)
 				.then((result) => requestReturnValue(result), (result) => {
@@ -134,9 +139,11 @@ var WATCH_NOTICE = null;
 
 							if(commentLastId > comparisonVal[issueKey]) {
 								var note = `[${issueKey}] @${res.createdUser.name}`;
+								var url = `https://${spaceName}/favicon.ico`;
+
 								var options = {
 									type: 'basic',
-									iconUrl: `https://${space[_key].name}.backlog.jp/favicon.ico`,
+									iconUrl: url,
 									title: issueKey,
 									message: res.content,
 									contextMessage: note,
@@ -157,7 +164,7 @@ var WATCH_NOTICE = null;
 						chrome.notifications.create(`backlog-${space[_key].name}-${_issueKey}`, _options, (notificationId) => {
 							var listener = () => {
 								chrome.tabs.create({
-									url: `https://${space[_key].name}.backlog.jp/view/${_issueKey}#comment-${res.id}`
+									url: `https://${spaceName}/view/${_issueKey}#comment-${res.id}`
 								});
 								chrome.notifications.onClicked.removeListener(listener);
 								chrome.notifications.clear(notificationId);
@@ -175,7 +182,7 @@ var WATCH_NOTICE = null;
 					// 課題情報を取得する
 					function getIssueInfo(_issueKey){
 						var defer = $.Deferred();
-						var path = `https://${space[_key].name}.backlog.jp/api/v2/issues/${_issueKey}?apiKey=${space[_key].apiKey}`;
+						var path = `https://${spaceName}/api/v2/issues/${_issueKey}?apiKey=${space[_key].apiKey}`;
 
 						$.ajax({
 							url: path,
@@ -226,6 +233,11 @@ var WATCH_NOTICE = null;
 				var key = _issueKey;
 				var query = '';
 				var path = '';
+				var spaceName = space[_key].name;
+
+				if (spaceName.indexOf('backlog.jp') === -1 && spaceName.indexOf('backlog.com') === -1) {
+					spaceName = `${spaceName}.backlog.jp`;
+				}
 
 				return new Promise((resolve, reject) => {
 					WATCH_STORAGE.Storage.get(_db, (items) => {
@@ -233,8 +245,7 @@ var WATCH_NOTICE = null;
 						if(comment) {
 							query = typeof comment[key] === 'undefined' ? '&minId=0' : `&minId=${comment[key]}`;
 						}
-						path = `https://${space[_key].name}.backlog.jp/api/v2`+
-						`/issues/${key}/comments?apiKey=${space[_key].apiKey+query}`;
+						path = `https://${spaceName}/api/v2/issues/${key}/comments?apiKey=${space[_key].apiKey+query}`;
 
 						$.ajax({
 							url: path,

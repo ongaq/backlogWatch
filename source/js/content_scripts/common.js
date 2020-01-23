@@ -14,10 +14,10 @@ var WATCH_COMMON;
 			return mil * sec * _int;
 		},
 		position(){
-			if(this.location.href.indexOf('backlog.jp/dashboard') > 0) {
+			if(this.location.href.indexOf('/dashboard') > 0) {
 				this.location.home = true;
 			}
-			if(this.location.href.indexOf('backlog.jp/view') > 0) {
+			if(this.location.href.indexOf('/view') > 0) {
 				this.location.issue = true;
 			}
 		},
