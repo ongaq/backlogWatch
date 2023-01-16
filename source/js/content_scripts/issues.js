@@ -214,12 +214,39 @@ var WATCH_ISSUE = null;
 				fragment.appendChild(tbodyTr);
 			}
 		},
+		observeIssueCard(callback) {
+			const rootElement = document.querySelector('#root');
+			const hasIssueArea = () => document.querySelector('#issueArea') !== null;
+			if (rootElement === null) return;
+
+			const observerHandler = (mutations, observer) => {
+				for (const mutation of mutations) {
+					const nodes = mutation.addedNodes;
+					if (!nodes.length) continue;
+
+					for (const node of nodes) {
+						if (node.id === 'issueArea') {
+							observer.disconnect();
+							callback();
+							break;
+						}
+					}
+				}
+			};
+			const observer = new MutationObserver(observerHandler);
+
+			if (hasIssueArea()) {
+				callback();
+			} else {
+				observer.observe(rootElement, { childList: true, subtree: true });
+			}
+		},
 
 		run: function(){
 			WATCH_COMMON.position();
 
 			if(WATCH_COMMON.location.issue) {
-				this.createWatchIssue();
+				this.observeIssueCard(() => this.createWatchIssue());
 			}
 			if(WATCH_COMMON.location.home) {
 				this.createWatchHome();
