@@ -1,5 +1,6 @@
 import { QUOTA_BYTES_PER_ITEM } from './text';
 import * as Storage from '../@types/storage';
+import { Resolve } from '../@types/index';
 
 export class StorageManager {
   private storage: chrome.storage.SyncStorageArea;
@@ -9,14 +10,16 @@ export class StorageManager {
     this.storage = chrome.storage.sync;
     this.db = {};
   }
-  #error() {
+  #error(resolve: Resolve<boolean>) {
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError.message);
 
       if (chrome.runtime.lastError.message === 'QUOTA_BYTES_PER_ITEM quota exceeded') {
         alert(QUOTA_BYTES_PER_ITEM);
       }
+      return resolve(false);
     }
+    return resolve(true);
   }
   /**
    * 第一引数で指定されたitemをtableに追加する
@@ -24,28 +27,30 @@ export class StorageManager {
    * @param {String} tableName - DBのテーブル名を入力します
    * @param {String} space - データを挿入するBacklogスペース名を入力します
    */
-  add: Storage.AddRemove = (item, tableName, space) => {
-    const createTable = () => {
+  add: Storage.Common = (item, tableName, space) => {
+    const createTable = (resolve: Resolve<boolean>) => {
       this.db[tableName] = {
         [space]: {
           [item.id]: item
         }
       };
-      this.storage.set(this.db, this.#error);
+      this.storage.set(this.db, () => this.#error(resolve));
     };
-    const insertTable = (value: Storage.DataBase) => {
+    const insertTable = (value: Storage.DataBase, resolve: Resolve<boolean>) => {
       this.db[tableName] = value[tableName];
       this.db[tableName][space] ??= {};
       this.db[tableName][space][item.id] = item;
-      this.storage.set(this.db, this.#error);
+      this.storage.set(this.db, () => this.#error(resolve));
     };
 
-    this.storage.get(tableName, (value) => {
-      if (Object.keys(value).length === 0) {
-        createTable();
-      } else {
-        insertTable(value);
-      }
+    return new Promise((resolve) => {
+      this.storage.get(tableName, (value) => {
+        if (Object.keys(value).length === 0) {
+          createTable(resolve);
+        } else {
+          insertTable(value, resolve);
+        }
+      });
     });
   }
   /**
@@ -54,13 +59,19 @@ export class StorageManager {
    * @param {String} tableName - DBのテーブル名を入力します
    * @param {String} space - データを挿入するBacklogスペース名を入力します
    */
-  remove: Storage.AddRemove = (item, tableName, space) => {
-    const removeTable = (value: Storage.DataBase) => {
+  remove: Storage.Common = (item, tableName, space) => {
+    const removeTable = async (value: Storage.DataBase, resolve: Resolve<true>) => {
       this.db[tableName] = value[tableName];
       delete this.db[tableName][space][item.id];
-      this.storage.set(this.db);
+      await this.storage.set(this.db);
+      return resolve(true);
     };
-    this.storage.get(tableName, removeTable);
+
+    return new Promise((resolve) => {
+      this.storage.get(tableName, async (value: Storage.DataBase) => {
+        await removeTable(value, resolve);
+      });
+    });
   }
   /**
    * 第一引数で指定されたitemをtableから取得する
@@ -70,7 +81,7 @@ export class StorageManager {
    * @param {String} space - データを挿入するBacklogスペース名を入力します
    * @return {Boolean}
    */
-  hasIssue: Storage.HasIssue = (item, tableName, space) => {
+  hasIssue: Storage.Common = (item, tableName, space) => {
     return new Promise((resolve) => {
       this.storage.get(tableName, (value: Storage.DataBase) => {
         const spaceData = value[tableName][space];
@@ -96,10 +107,8 @@ export class StorageManager {
    * @return {Storage.issueItem[] | false}
    */
   throwItem: Storage.ThrowItem = (tableName, space) => {
-    type Resolve = (value: false | any[] | PromiseLike<false | any[]>) => void;
-
     const res: Storage.issueItem[] = [];
-    const createItemArray = (spaceData: Storage.ItemId, resolve: Resolve) => {
+    const createItemArray = (spaceData: Storage.ItemId, resolve: Resolve<false | Storage.issueItem[]>) => {
       const itemIds = Object.keys(spaceData);
       const len = itemIds.length;
 

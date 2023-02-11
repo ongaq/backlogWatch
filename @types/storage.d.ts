@@ -11,17 +11,11 @@ export type ThrowItem = (
   space: string
 ) => Promise<issueItem[] | false>;
 
-export type HasIssue = (
+export type Common = (
   item: issueItem,
   tableName: string,
   space: string
 ) => Promise<Boolean>;
-
-export type AddRemove = (
-  item: issueItem,
-  tableName: string,
-  space: string
-) => void;
 
 export type ItemId = {
   [itemId: string]: issueItem;
