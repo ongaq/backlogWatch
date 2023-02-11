@@ -1,15 +1,9 @@
-﻿root = true
+root = true
 
 [*]
+indent_style = space
 end_of_line = lf
-insert_final_newline = true
-
-[*.{js,scss,css,html}]
-indent_style = tab
-indent_size = 2
-
-[*.{js,scss,css}]
-trim_trailing_whitespace = true
-
-[*.html]
 charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+indent_size = 2

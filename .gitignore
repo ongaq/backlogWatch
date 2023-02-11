@@ -1,12 +1,5 @@
-/.git
-/.sass-cache
-/.svn
-/_bk
-/node_modules
-*.css
-*.bat
-*.db
-*.dll
-*.svn-base
-*.md
-*.mno
+node_modules
+dist
+.vscode
+*.map
+test.js

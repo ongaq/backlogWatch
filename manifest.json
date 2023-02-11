@@ -1,8 +1,8 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "Backlog watch",
 	"description": "Backlog上でチェックした課題に更新があった際に通知ウィンドウを表示します",
-	"version": "1.3.0.17",
+	"version": "2.0.0",
 	"icons": {
 		"16": "source/images/icon16.png",
 		"48": "source/images/icon48.png",
@@ -31,13 +31,9 @@
 		}
 	],
 	"background": {
-		"scripts": [
-			"source/js/jquery-2.1.1.min.js",
-			"source/js/content_scripts/storage.js",
-			"source/js/content_scripts/common.js",
+		"service_worker": [
 			"source/js/content_scripts/event.js"
-		],
-		"persistent": false
+		]
 	},
 	"permissions": [
 		"alarms",

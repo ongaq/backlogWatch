@@ -1,38 +1,30 @@
 {
-  "name": "backlogWatch",
-  "version": "1.3.0.17",
+  "name": "backlog-watch",
+  "version": "2.0.0",
+  "scripts": {
+    "dev": "ts-node tasks/watcher.ts",
+    "ts": "npx swc main.user.ts -o main.user.js -w",
+    "check": "npx tsc --noEmit"
+  },
+  "volta": {
+    "node": "18.14.0"
+  },
+  "engines": {
+    "node": "18.x"
+  },
   "devDependencies": {
-    "babel-core": "^6.7.2",
-    "babel-polyfill": "^6.7.2",
-    "babel-preset-es2015": "^6.6.0",
-    "browser-sync": "^2.11.2",
-    "del": "^2.2.0",
-    "eslint-plugin-ejs": "0.0.2",
-    "eslint-plugin-html": "^1.4.0",
-    "gulp": "^3.9.0",
-    "gulp-babel": "^6.1.0",
-    "gulp-cached": "^1.1.0",
-    "gulp-changed": "^1.3.0",
-    "gulp-compass": "^2.1.0",
-    "gulp-concat": "^2.6.0",
-    "gulp-consolidate": "^0.2.0",
-    "gulp-cssnano": "^2.0.0",
-    "gulp-header": "^1.7.1",
-    "gulp-if": "^2.0.1",
-    "gulp-load-plugins": "^1.2.0",
-    "gulp-newer": "^1.1.0",
-    "gulp-notify": "^2.2.0",
-    "gulp-pleeease": "^2.0.2",
-    "gulp-plumber": "^1.1.0",
-    "gulp-remember": "^0.3.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^2.2.0",
-    "gulp-shell": "^0.5.1",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-uglify": "^1.5.3",
-    "gulp-watch": "^4.3.5",
-    "lodash": "^4.6.1",
-    "merge-stream": "^1.0.0",
-    "require-dir": "^0.3.0"
+    "@parcel/watcher": "^2.1.0",
+    "@swc/cli": "^0.1.61",
+    "@swc/core": "^1.3.35",
+    "@swc/helpers": "^0.4.14",
+    "@types/chrome": "^0.0.212",
+    "@types/fs-extra": "^11.0.1",
+    "@types/prettier": "^2.7.2",
+    "chalk": "4.1.2",
+    "dayjs": "^1.11.7",
+    "fs-extra": "^11.1.0",
+    "prettier": "^2.8.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
   }
 }
