@@ -1,24 +1,21 @@
-export type issueItem = {
-  id: string;
-  title: string;
-  assigner: string;
-  description: string;
-  time: Date;
-};
+import { IssueItem } from 'index';
 
 export type ThrowItem = (
+  tableName: string
+) => Promise<IssueItem[] | false>;
+
+export type Add = (
+  item: IssueItem,
   tableName: string,
-  space: string
-) => Promise<issueItem[] | false>;
+) => Promise<Boolean>;
 
 export type Common = (
-  item: issueItem,
+  itemId: string,
   tableName: string,
-  space: string
 ) => Promise<Boolean>;
 
 export type ItemId = {
-  [itemId: string]: issueItem;
+  [itemId: string]: IssueItem;
 }
 export type Space = {
   [space: string]: ItemId;
