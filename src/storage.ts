@@ -33,6 +33,9 @@ class StorageManager {
       });
     });
   }
+  async set(key: Record<string, any>): Promise<void> {
+    await this.storage.set(key);
+  }
   /**
    * 第一引数で指定されたitemをtableに追加する
    * @param {Object<string, string>} item - objectを指定します。objectにidは必ず含めて下さい

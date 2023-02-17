@@ -1,10 +1,18 @@
 import storageManager from './storage';
-import { SpaceName, Options } from '../@types/index';
-import { Issues } from '../@types/issues';
+import { Options, GetOptions } from '../@types/index';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (text: string) => console.log('[BacklogWatch]', text);
-export const spaceName = window.location.hostname.split('.')[0];
+export const spaceName = (() => {
+  const name = window.location.hostname.split('.')[0];
+  const overwriteSpaceName = (spaceName: string) => {
+    if (spaceName.indexOf('backlog.jp') === -1 && spaceName.indexOf('backlog.com') === -1) {
+      spaceName = `${spaceName}.backlog.jp`;
+    }
+    return spaceName;
+  };
+  return overwriteSpaceName(name);
+})();
 export const spaceDomain = window.location.hostname;
 export const backlogLocation = {
   home: window.location.href.includes('/dashboard'),
@@ -52,7 +60,7 @@ export const watchControl = (element: HTMLElement, state: string) => {
   }
   setTimeout(() => element.classList.add('is-running'), timer);
 };
-export const getOptions = (target: string): Promise<string | SpaceName | false> => {
+export const getOptions: GetOptions = (target) => {
   return new Promise(async(resolve) => {
     const items = await storageManager.get('options') as Options | false;
 
@@ -71,10 +79,9 @@ export const getOptions = (target: string): Promise<string | SpaceName | false> 
     return resolve(false);
   });
 };
-// export const fetchIssueAPI = async (issueKey: string) => {
-//   const apiKey = 'BWqhjHCUW7HzQhAIA3AuiPrICqhfBgK0tRIP9NhgT4ORtadqsO06Lpx5F6fv1D1B';
-//   const endpoint = `https://${spaceDomain}/api/v2/issues/${issueKey}?apiKey=${apiKey}`;
-//   const result: Issues = await (await fetch(endpoint)).json();
-
-//   return result;
-// };
+export const overwriteSpaceName = (spaceName: string) => {
+  if (spaceName.indexOf('backlog.jp') === -1 && spaceName.indexOf('backlog.com') === -1) {
+    spaceName = `${spaceName}.backlog.jp`;
+  }
+  return spaceName;
+};

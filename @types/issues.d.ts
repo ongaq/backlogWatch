@@ -1,33 +1,4 @@
-export type Issues = {
-  id: number;
-  projectId: number;
-  issueKey: string;
-  keyId: number;
-  issueType: IssueType;
-  summary: string;
-  description: string;
-  resolution: null;
-  priority: Priority;
-  status: IssueType;
-  assignee: Assignee;
-  category: Category[];
-  versions: any[];
-  milestone: any[];
-  startDate: null;
-  dueDate: Date;
-  estimatedHours: null;
-  actualHours: null;
-  parentIssueId: null;
-  createdUser: Assignee;
-  created: Date;
-  updatedUser: Assignee;
-  updated: Date;
-  customFields: any[];
-  attachments: any[];
-  sharedFiles: any[];
-  stars: any[];
-};
-export type Assignee = {
+export type CreatedUser = {
   id: number;
   userId: string;
   name: string;
@@ -59,3 +30,42 @@ export type Priority = {
   id: number;
   name: string;
 };
+export type Issues = {
+  id: number;
+  projectId: number;
+  issueKey: string;
+  keyId: number;
+  issueType: IssueType;
+  summary: string;
+  description: string;
+  resolution: null;
+  priority: Priority;
+  status: IssueType;
+  assignee: CreatedUser;
+  category: Category[];
+  versions: any[];
+  milestone: any[];
+  startDate: null;
+  dueDate: Date;
+  estimatedHours: null;
+  actualHours: null;
+  parentIssueId: null;
+  createdUser: CreatedUser;
+  created: Date;
+  updatedUser: CreatedUser;
+  updated: Date;
+  customFields: any[];
+  attachments: any[];
+  sharedFiles: any[];
+  stars: any[];
+};
+export type IssueComments = {
+  id: number;
+  content: string;
+  changeLog: any[];
+  createdUser: CreatedUser;
+  created: Date;
+  updated: Date;
+  stars: any[];
+  notifications: any[];
+}[];

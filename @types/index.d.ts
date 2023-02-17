@@ -6,11 +6,12 @@ export type IssueItem = {
   description?: string;
   time?: Date;
 };
+export type SpaceData = {
+  name: string;
+  apiKey: string;
+};
 export type SpaceName = {
-  [spaceName: string]: {
-    name: string;
-    apiKey: string;
-  };
+  [spaceName: string]: SpaceData;
 };
 export type Options = {
   options: {
@@ -21,3 +22,11 @@ export type Options = {
     };
   };
 };
+export type GetOptionsResult = string | false | SpaceName;
+export type GetOptions = (
+  target: 'space' | 'close' | 'watch'
+) => Promise<GetOptionsResult>
+export type FetchAPI = ({ apiPath, query }: {
+  apiPath: string,
+  query?: string,
+}) => Promise<unknown>
