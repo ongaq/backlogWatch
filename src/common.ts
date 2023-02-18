@@ -1,19 +1,19 @@
-import type { Options, GetOptionsArg, GetOptionsReturn, BacklogResource } from '../@types/index';
+import type { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
 import storageManager from './storage';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (text: string) => console.log('[BacklogWatch]', text);
 export const spaceUrl = (() => {
   const hostname = window.location.hostname;
-  const subdomain = window.location.hostname.split('.')[0];
+  const subdomain = hostname.split('.')[0];
   return { hostname, subdomain };
 })();
 /** サイト側でグローバルに登録されたBacklogデータを参照する */
 export const backlogResource = (() => {
-  const backlog = window?.Backlog || {};
+  const backlog = window.Backlog || {};
 
   if (backlog?.resource) {
-    return backlog.resource as BacklogResource
+    return backlog.resource;
   }
   return null;
 })();
