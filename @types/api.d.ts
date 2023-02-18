@@ -1,12 +1,20 @@
-import { IssueComments } from './issues';
+import { Issues, IssueComments } from './issues';
+import { Watchings, WatchingsList } from './watch';
 
-export type FetchAPI = (props: {
-  apiPath: string;
-  query?: string;
-  method?: 'GET' | 'POST' | 'DELETE';
-}) => Promise<unknown>
+export type FetchApiArg =
+  `issues/${string}/comments` |
+  `issues/${string}` |
+  `watchings/${string}` |
+  'watchings' |
+  `users/${string}/watchings`;
 
-export type FetchIssueCommentAPI = (
-  issueId: string,
-  issuesDBName: string
-) => Promise<IssueComments | false>;
+export type FetchApiReturn<T> =
+  T extends `issues/${string}/comments`
+  ? IssueComments | false
+  : T extends `issues/${string}`
+  ? Issues | false
+  : T extends (`watchings/${string}` | 'watchings')
+  ? Watchings | false
+  : T extends `users/${string}/watchings`
+  ? WatchingsList | false
+  : never;

@@ -1,6 +1,6 @@
-import type { Issues, IssueComment } from '../@types/issues';
+import type { IssueComment } from '../@types/issues';
 import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/events';
-import { fetchAPI, fetchIssueCommentAPI } from './api';
+import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api';
 import { getOptions, consoleLog, spaceUrl } from './common';
 import storageManager from './storage';
 
@@ -86,7 +86,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     backlogCompletedWhenCancel(res);
   };
   const popupNotification = async ({ issueId, issuesDBName }: PopupNotification) => {
-    const result = await fetchIssueCommentAPI(issueId, issuesDBName);
+    const result = await getIssueCommentFetchAPI(issueId, issuesDBName);
     if (!result) return;
 
     const [res] = result;
@@ -110,7 +110,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     if (commentLastId > compareValue[issueId]) {
       const note = `[${issueId}] @${res.createdUser.name}`;
       const iconUrl = `https://${spaceUrl.hostname}/favicon.ico`;
-      const issues = await fetchAPI({ apiPath: `issues/${issueId}` }) as Issues | false;
+      const issues = await getIssueFetchAPI(issueId);
 
       createNotifications({
         type: 'basic',
@@ -138,16 +138,17 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
 };
 const intervalCheck = async () => {
   const [space,close,watch] = await getAllOptions();
-  checkWatchIssues({ space, close, watch });
+  await checkWatchIssues({ space, close, watch });
 };
 const runChromeFunctions = () => {
   const alarmName = 'backlog';
   // オプション保存時に発火
   chrome.storage.onChanged.addListener((changes) => {
-    Object.keys(changes).forEach((key) => {
+    Object.keys(changes).forEach(async (key) => {
+      console.log('key:', key);
       if (key === 'options') {
         console.log('storage:', new Date());
-        intervalCheck();
+        await intervalCheck();
       }
     });
   });
