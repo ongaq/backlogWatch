@@ -1,5 +1,5 @@
 import storageManager from './storage';
-import { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
+import { Options, GetOptionsArg, GetOptionsReturn, BacklogResource } from '../@types/index';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (text: string) => console.log('[BacklogWatch]', text);
@@ -8,10 +8,19 @@ export const spaceUrl = (() => {
   const subdomain = window.location.hostname.split('.')[0];
   return { hostname, subdomain };
 })();
+/** サイト側でグローバルに登録されたBacklogデータを参照する */
+export const backlogResource = (() => {
+  const backlog = window?.Backlog || {};
+
+  if (backlog?.resource) {
+    return backlog.resource as BacklogResource
+  }
+  return null;
+})();
 export const spaceDomain = window.location.hostname;
 export const backlogLocation = {
-  home: window.location.href.includes('/dashboard'),
-  issue: window.location.href.includes('/view'),
+  isHome: window.location.href.includes('/dashboard'),
+  isIssue: window.location.href.includes('/view'),
 };
 export const returnMsec = (number: number) => {
   const millisecond = 1000;
@@ -73,10 +82,4 @@ export const getOptions = <T extends GetOptionsArg>(target: T) => {
     }
     return resolve(false as unknown as GetOptionsReturn<T>);
   });
-};
-export const overwriteSpaceName = (spaceName: string) => {
-  if (spaceName.indexOf('backlog.jp') === -1 && spaceName.indexOf('backlog.com') === -1) {
-    spaceName = `${spaceName}.backlog.jp`;
-  }
-  return spaceName;
 };

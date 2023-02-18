@@ -195,9 +195,9 @@ const observeIssueCard = (callback: Function) => {
 };
 
 const exec = () => {
-  if (backlogLocation.home) {
+  if (backlogLocation.isHome) {
     createWatchHome();
-  } else if (backlogLocation.issue) {
+  } else if (backlogLocation.isIssue) {
     observeIssueCard(() => createWatchIssue());
   }
 };

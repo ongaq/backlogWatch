@@ -30,7 +30,42 @@ export type GetOptionsReturn<T> = T extends 'space'
   ? string | false
   : never;
 
-export type FetchAPI = ({ apiPath, query }: {
-  apiPath: string,
-  query?: string,
-}) => Promise<unknown>
+export type BacklogResource = {
+  "project.id": number;
+  "project.key": string;
+  "project.name": string;
+  "project.icon": string;
+  "loginUser.id": number;
+  "loginUser.name": string;
+  "loginUser.mailAddress": string;
+  "loginUser.hasNulabAccount": boolean;
+  "space.id": number;
+  "space.spaceKey": string;
+  "btn.star": string;
+  "lbl.emoticon.people": string;
+  "lbl.emoticon.nature": string;
+  "lbl.emoticon.objects": string;
+  "lbl.emoticon.places": string;
+  naiSpaceIsWithinUserLimit: boolean;
+  canInviteNulabAccount: boolean;
+  isJustCreated: boolean;
+  isAdmin: boolean;
+  isContractorAdmin: boolean;
+  "lbl.assignMe": string;
+  "lbl.chosen.noResultsMatch": string;
+  "lbl.a11y.reset": string;
+  "lbl.globalbar.filter.board.noitem": string;
+  "lbl.globalbar.filter.list.noitem": string;
+  "lbl.globalbar.filter.search.placeholder.board": string;
+  "lbl.globalbar.filter.search.placeholder.list": string;
+  "lbl.globalbar.filter.user": string;
+  "lbl.globalbar.issue.search.placeholder": string;
+  "lbl.globalbar.recent.issue.noitem": string;
+  "lbl.globalbar.recent.wiki.noitem": string;
+  "lbl.globalbar.search.filter.deleteConfirm": string;
+  "lbl.globalbar.wiki.search.placeholder": string;
+  "msg.issue.store.filter.condition.invalid.argument": string;
+  "loginUser.userSetting.useShortcutKey": boolean;
+  projectKey: string;
+  isProjectAdmin: boolean;
+}
