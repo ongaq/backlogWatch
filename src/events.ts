@@ -1,4 +1,3 @@
-import type { SpaceName } from '../@types/index';
 import type { Issues, IssueComment } from '../@types/issues';
 import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/events';
 import { fetchAPI, fetchIssueCommentAPI } from './api';
@@ -41,8 +40,6 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
   if (!space || !close || !watch) {
     return consoleLog('オプション取得失敗');
   }
-  const autoReleaseWatch = Boolean(watch);
-  const spaceIds = Object.keys(space);
   /** n秒後に通知を閉じる */
   const closeNotificationAfterSeconds = (notificationId: string) => {
     const msec = 1000;
@@ -58,7 +55,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
   /** 課題完了時にウォッチを解除する */
   const backlogCompletedWhenCancel = async (res: IssueComment) => {
     const changeLogs = res.changeLog || [];
-    if (!autoReleaseWatch || !changeLogs.length) {
+    if (!Boolean(watch) || !changeLogs.length) {
       return;
     }
     for (const changeLog of changeLogs) {
@@ -128,7 +125,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     backlogCompletedWhenCancel(res);
   };
 
-  for (const spaceId of spaceIds) {
+  for (const spaceId of Object.keys(space)) {
     const results = await storageManager.throwItem('issues');
     const issuesDBName = `${spaceId}_comments_count`;
 
@@ -141,12 +138,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
 };
 const intervalCheck = async () => {
   const [space,close,watch] = await getAllOptions();
-
-  checkWatchIssues({
-    space: space as SpaceName,
-    close: close as string,
-    watch: watch as string
-  });
+  checkWatchIssues({ space, close, watch });
 };
 const runChromeFunctions = () => {
   const alarmName = 'backlog';
