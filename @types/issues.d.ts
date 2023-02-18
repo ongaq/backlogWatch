@@ -59,13 +59,19 @@ export type Issues = {
   sharedFiles: any[];
   stars: any[];
 };
-export type IssueComments = {
+export type ChangeLog = {
+  field: string;
+  newValue: string;
+  originalValue: null;
+};
+export type IssueComment = {
   id: number;
   content: string;
-  changeLog: any[];
+  changeLog: ChangeLog[] | null;
   createdUser: CreatedUser;
   created: Date;
   updated: Date;
   stars: any[];
   notifications: any[];
-}[];
+};
+export type IssueComments = IssueComment[];

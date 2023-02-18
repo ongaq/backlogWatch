@@ -9,7 +9,6 @@ export type CheckWatchIssues = {
 };
 export type PopupNotification = {
   issueId: string;
-  spaceId: string;
   issuesDBName: string;
 };
 export type IssueCommentsCount = {
