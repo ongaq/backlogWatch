@@ -14,6 +14,7 @@ class StorageManager {
     this.db = {};
   }
   #error(resolve: Resolve<boolean>) {
+    console.log('chrome.runtime:', chrome.runtime);
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError.message);
 

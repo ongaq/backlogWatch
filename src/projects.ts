@@ -1,5 +1,6 @@
 import type { IssueItem } from '../@types/index';
-import { spaceUrl, backlogLocation } from './common';
+import type { ProjectItem } from '../@types/projects';
+import { spaceUrl, backlogLocation, watchControl } from './common';
 import storageManager from './storage';
 const { subdomain } = spaceUrl;
 
@@ -30,47 +31,11 @@ const createStar = (issueItems: IssueItem[] | false) => {
     }
   }
 };
-const createWatchProject = (_object, _bool) => {
-  var projectsFav = document.querySelectorAll('[data-id="projects-fav"]');
-  var obj = _object;
-  var item = null;
-  var section,
-    html1 = '',
-    html2 = '';
-
-  if(projectsFav.length === 0) {
-    section = document.createElement('section');
-    section.classList.add('title-group', '_mg-b-10', 'see-all-wrapper');
-    section.setAttribute('data-id', 'projects-fav');
-    html1 += `
-    <h3 class="title title--thirdly watch-title title-group__inline-title js_folding-handle">
-      <span>
-        ウォッチ中のプロジェクト
-      </span>
-    </h3>
-    <ul class="project-list -list-view"></ul>`;
-    section.innerHTML = html1;
-
-    var primary = document.querySelector('.dashboard-contents__left');
-    primary.insertBefore(section, primary.childNodes[0]);
-  }
-  projectsFav = document.querySelectorAll('[data-id="projects-fav"]');
-
-  if(projectsFav.length > 0) {
-    html2 = document.querySelector('[data-id="projects-fav"] .project-list').innerHTML;
-
-    for(var i=0; i < (obj.length+1); i++) {
-      if(i === obj.length) break;
-      createProjectsList(i);
-    }
-    projectsFav[0].querySelector('.project-list').innerHTML = html2;
-  }
-
-  function createProjectsList(_i){
-    item = _bool ? obj[_i] : obj[0];
-
-    html2 += `
-    <li class="project-list__item js-project-list-item watch-item theme-default" data-id="${item.id}">
+const createWatchProject = (projectItem: ProjectItem[], isInit: boolean) => {
+  const getProjectsFavElm = () => document.querySelector<HTMLElement>('[data-id="projects-fav"]');
+  const createProjectsList = (index: number) => {
+    const item = isInit ? projectItem[index] : projectItem[0];
+    return `<li class="project-list__item js-project-list-item watch-item theme-default" data-id="${item.id}">
       <div class="project-list__wrapper watch-item-wrapper">
         <span class="project-list__info">
           <a href="/projects/${item.id}">
@@ -90,11 +55,54 @@ const createWatchProject = (_object, _bool) => {
       <i class="fa fa-star is-watch"></i>
     </li>`;
   }
+
+  if (!getProjectsFavElm()) {
+    const html = `<section data-id="projects-fav" class="title-group _mg-b-10 see-all-wrapper">
+      <h3 class="title title--thirdly watch-title title-group__inline-title js_folding-handle">
+        <span>ウォッチ中のプロジェクト</span>
+      </h3>
+      <ul class="project-list -list-view"></ul>
+    </section>`;
+
+    const primary = document.querySelector('.dashboard-contents__left');
+    primary?.insertAdjacentHTML('afterbegin', html);
+  }
+  const projectsFavElm = getProjectsFavElm();
+
+  if (projectsFavElm) {
+    let html = document.querySelector('[data-id="projects-fav"] .project-list')?.innerHTML || '';
+
+    for(var i=0; i < (projectItem.length+1); i++) {
+      if (i === projectItem.length) break;
+      html += createProjectsList(i);
+    }
+    const projectListElm = projectsFavElm.querySelector<HTMLElement>('.project-list');
+
+    if (projectListElm) {
+      projectListElm.innerHTML = html;
+    }
+  }
 };
 const createFavoriteProject = async () => {
   const timer = 250;
   // chrome.storageに課題キーが存在するか確認
   const issueItems = await storageManager.throwItem('projects');
+  const favStarAnimation = (projectItemId: string) => {
+    const speed = 300;
+    const projectFav = document.querySelector('[data-id="projects-fav"]');
+    const projectItemElm = document.querySelector<HTMLElement>(`[data-id="${projectItemId}"]`);
+
+    if (projectItemElm) {
+      projectItemElm.style.transition = `opacity ${speed}ms`;
+      projectItemElm.style.opacity = '0';
+
+      setTimeout(() => {
+        const faStar = projectItemElm.querySelector('.fa-star');
+        faStar?.classList.remove('is-watch');
+        projectFav?.removeChild(projectItemElm);
+      }, speed);
+    }
+  };
 
   if (issueItems) {
     createStar(issueItems);
@@ -114,31 +122,27 @@ const createFavoriteProject = async () => {
   });
 
   // プロジェクトをお気に入りに追加/削除する。
-  $('body').on('click', '.fa-star', (e) => {
-    var $this = $(e.currentTarget);
-    var $parent = $this.parent();
-    var projectItem = [{
-      id: $parent.find('a:first-of-type').attr('href').split('/').pop(),
-      title: $parent.find('.project-list__name').text(),
-      icon: $parent.find('.project-list__icon img').attr('src'),
-    }];
-    var target = projectItem[0];
+  document.body.addEventListener('click', async (event) => {
+    const target = <HTMLElement>event.target;
+    const starElm = target.closest('.fa-star');
+    const self = <HTMLElement>event.currentTarget;
+    const parent = self.parentElement;
+    if (!starElm || !parent) return;
 
-    if($this.is('.is-watch')) {
-      WATCH_COMMON.watchControl(e.currentTarget, 'remove');
-      WATCH_STORAGE.remove(target, 'projects', subdomain);
+    const projectItem: ProjectItem = {
+      id: parent.querySelector<HTMLAnchorElement>('a:first-of-type')?.href.split('/').pop() || '',
+      title: parent.querySelector('.project-list__name')?.textContent || '',
+      icon: parent.querySelector<HTMLImageElement>('.project-list__icon img')?.src || '',
+    };
 
-      var speed = 300;
-      $('[data-id="projects-fav"]').find(`[data-id="${target.id}"]`).stop().animate({
-        'opacity':'0'
-      }, speed, () => {
-        $(`[data-id="${target.id}"]`).find('.fa-star').removeClass('is-watch').end()
-        .remove();
-      });
+    if (self.classList.contains('is-watch')) {
+      watchControl(self, 'remove');
+      void storageManager.remove(projectItem.id, 'projects');
+      favStarAnimation(projectItem.id);
     } else {
-      WATCH_COMMON.watchControl(e.currentTarget, 'add');
-      WATCH_STORAGE.add(target, 'projects', subdomain);
-      this.createWatchProject(projectItem, false);
+      watchControl(self, 'add');
+      await storageManager.add(target, 'projects');
+      createWatchProject([projectItem], false);
     }
   });
 };
