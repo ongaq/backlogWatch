@@ -18,3 +18,4 @@ export type IssueCommentsCount = {
 export type SpaceComments = {
   [spaceId: string]: IssueCommentsCount | undefined;
 }
+

@@ -1,17 +1,12 @@
 import storageManager from './storage';
-import { Options, GetOptions } from '../@types/index';
+import { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (text: string) => console.log('[BacklogWatch]', text);
-export const spaceName = (() => {
-  const name = window.location.hostname.split('.')[0];
-  const overwriteSpaceName = (spaceName: string) => {
-    if (spaceName.indexOf('backlog.jp') === -1 && spaceName.indexOf('backlog.com') === -1) {
-      spaceName = `${spaceName}.backlog.jp`;
-    }
-    return spaceName;
-  };
-  return overwriteSpaceName(name);
+export const spaceUrl = (() => {
+  const hostname = window.location.hostname;
+  const subdomain = window.location.hostname.split('.')[0];
+  return { hostname, subdomain };
 })();
 export const spaceDomain = window.location.hostname;
 export const backlogLocation = {
@@ -60,8 +55,8 @@ export const watchControl = (element: HTMLElement, state: string) => {
   }
   setTimeout(() => element.classList.add('is-running'), timer);
 };
-export const getOptions: GetOptions = (target) => {
-  return new Promise(async(resolve) => {
+export const getOptions = <T extends GetOptionsArg>(target: T) => {
+  return new Promise<GetOptionsReturn<T>>(async(resolve) => {
     const items = await storageManager.get('options') as Options | false;
 
     if (items && items.options) {
@@ -69,14 +64,14 @@ export const getOptions: GetOptions = (target) => {
       const options = items.options.options;
 
       if (target === 'close') {
-        return resolve(options.close);
+        return resolve(options.close as unknown as GetOptionsReturn<T>);
       } else if (target === 'watch') {
-        return resolve(options.watch);
+        return resolve(options.watch as unknown as GetOptionsReturn<T>);
       } else if (target === 'space' && Object.keys(space).length) {
-        return resolve(space);
+        return resolve(space as unknown as GetOptionsReturn<T>);
       }
     }
-    return resolve(false);
+    return resolve(false as unknown as GetOptionsReturn<T>);
   });
 };
 export const overwriteSpaceName = (spaceName: string) => {

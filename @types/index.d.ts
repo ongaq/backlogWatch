@@ -22,10 +22,14 @@ export type Options = {
     };
   };
 };
-export type GetOptionsResult = string | false | SpaceName;
-export type GetOptions = (
-  target: 'space' | 'close' | 'watch'
-) => Promise<GetOptionsResult>
+
+export type GetOptionsArg = 'space' | 'close' | 'watch';
+export type GetOptionsReturn<T> = T extends 'space'
+  ? SpaceName | false
+  : T extends ('close' | 'watch')
+  ? string | false
+  : never;
+
 export type FetchAPI = ({ apiPath, query }: {
   apiPath: string,
   query?: string,
