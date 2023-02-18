@@ -1,8 +1,8 @@
+import type { FetchApiArg, FetchApiReturn } from '../@types/api';
 import { spaceUrl, consoleLog, getOptions, backlogResource } from './common';
 import storageManager from './storage';
-import { FetchApiArg, FetchApiReturn } from '../@types/api';
 
-export const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method }: {
+const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method }: {
   apiPath: T;
   query?: string;
   method: 'GET' | 'POST' | 'DELETE';

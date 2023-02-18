@@ -1,4 +1,4 @@
-import { IssueItem } from 'index';
+import type { IssueItem } from 'index';
 
 export type ThrowItem = (
   tableName: string

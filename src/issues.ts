@@ -1,6 +1,6 @@
+import type { IssueItem } from '../@types/index';
 import { backlogLocation, locationObserver, watchControl, consoleLog } from './common';
 import storageManager from './storage';
-import { IssueItem } from '../@types/index';
 
 const createHTML = (issues: IssueItem[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';

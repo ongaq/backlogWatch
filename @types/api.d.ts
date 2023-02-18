@@ -1,5 +1,5 @@
-import { Issues, IssueComments } from './issues';
-import { Watchings, WatchingsList } from './watch';
+import type { Issues, IssueComments } from './issues';
+import type { Watchings, WatchingsList } from './watch';
 
 export type FetchApiArg =
   `issues/${string}/comments` |

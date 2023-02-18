@@ -1,7 +1,9 @@
-import { spaceName } from './common';
+import type * as Storage from '../@types/storage';
+import type { Resolve, IssueItem } from '../@types/index';
+import { spaceUrl } from './common';
 import { QUOTA_BYTES_PER_ITEM } from './text';
-import * as Storage from '../@types/storage';
-import { Resolve, IssueItem } from '../@types/index';
+
+const spaceName = spaceUrl.subdomain;
 
 class StorageManager {
   private storage: chrome.storage.SyncStorageArea;
