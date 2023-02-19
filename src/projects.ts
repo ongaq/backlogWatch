@@ -1,8 +1,7 @@
 import type { IssueItem } from '../@types/index';
 import type { ProjectItem } from '../@types/projects';
-import { spaceUrl, backlogLocation, watchControl } from './common';
+import { backlogLocation, watchControl } from './common';
 import storageManager from './storage';
-const { subdomain } = spaceUrl;
 
 const createStar = (issueItems: IssueItem[] | false) => {
   const project = document.querySelector('#project-list');

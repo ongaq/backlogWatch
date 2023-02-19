@@ -22,10 +22,13 @@ const compileTs = async (filePath: string) => {
   try {
     console.time('ts');
     const data = await swc.transformFile(filePath, swcOptions);
-    const formatted = prettier.format(data.code, { ...prettierOptions, parser: 'babel' });
     const fileName = path.basename(filePath).replace('.ts', '.js');
     const distPath = path.resolve(dist, fileName);
-    await fs.writeFile(distPath, formatted, 'utf8');
+    await fs.writeFile(
+      distPath,
+      prettier.format(data.code, { ...prettierOptions, parser: 'babel' }),
+      'utf8'
+    );
   } catch (e) {
     log(e);
   } finally {

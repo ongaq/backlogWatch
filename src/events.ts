@@ -4,7 +4,6 @@ import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api';
 import { getOptions, consoleLog, spaceUrl } from './common';
 import storageManager from './storage';
 
-const global = {};
 const getAllOptions = async () => await Promise.all([
   getOptions('space'),
   getOptions('close'),

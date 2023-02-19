@@ -1,4 +1,5 @@
 import type { FetchApiArg, FetchApiReturn } from '../@types/api';
+import type { SpaceComments } from '../@types/events';
 import { spaceUrl, consoleLog, getOptions, backlogResource } from './common';
 import storageManager from './storage';
 
@@ -36,7 +37,7 @@ export const getIssueFetchAPI = async (issueId: string) => {
   }
 };
 export const getIssueCommentFetchAPI = async (issueId: string, issuesDBName: string) => {
-  const items = await storageManager.get(issuesDBName);
+  const items = await storageManager.get(issuesDBName) as SpaceComments | false;
   if (!items) return false;
 
   const comment = items[issuesDBName];
