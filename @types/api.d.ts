@@ -1,5 +1,6 @@
 import type { Issues, IssueComments } from './issues';
 import type { Watchings, WatchingsList } from './watch';
+import type { Space } from './index';
 
 export type FetchApiArg =
   `issues/${string}/comments` |

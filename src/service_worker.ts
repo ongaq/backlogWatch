@@ -1,8 +1,10 @@
 import type { IssueComment } from '../@types/issues';
 import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/events';
-import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api';
-import { getOptions, consoleLog, spaceUrl } from './common';
-import storageManager from './storage';
+import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api.js';
+import { getOptions, consoleLog, spaceUrl } from './common.js';
+import storageManager from './storage.js';
+
+console.log('test');
 
 const getAllOptions = async () => await Promise.all([
   getOptions('space'),
@@ -137,6 +139,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
 };
 const intervalCheck = async () => {
   const [space,close,watch] = await getAllOptions();
+  console.log(space,close,watch);
   await checkWatchIssues({ space, close, watch });
 };
 const runChromeFunctions = () => {

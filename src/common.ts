@@ -1,26 +1,21 @@
 import type { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
-import storageManager from './storage';
+import storageManager from './storage.js';
 
 /** BacklogWatch用コンソールログ */
-export const consoleLog = (text: string) => console.log('[BacklogWatch]', text);
-export const spaceUrl = (() => {
-  const hostname = window.location.hostname;
-  const subdomain = hostname.split('.')[0];
-  return { hostname, subdomain };
-})();
+export const consoleLog = (log: any) => console.log('[BacklogWatch]', log);
 /** サイト側でグローバルに登録されたBacklogデータを参照する */
 export const backlogResource = (() => {
-  const backlog = window.Backlog || {};
+  const backlog = (typeof window !== 'undefined' && window.Backlog) || {};
 
   if (backlog?.resource) {
     return backlog.resource;
   }
   return null;
 })();
-export const spaceDomain = window.location.hostname;
+export const spaceDomain = typeof window !== 'undefined' && window.location.hostname;
 export const backlogLocation = {
-  isHome: window.location.href.includes('/dashboard'),
-  isIssue: window.location.href.includes('/view'),
+  isHome: typeof window !== 'undefined' && window.location.href.includes('/dashboard'),
+  isIssue: typeof window !== 'undefined' && window.location.href.includes('/view'),
 };
 export const returnMsec = (number: number) => {
   const millisecond = 1000;
@@ -65,6 +60,7 @@ export const watchControl = (element: HTMLElement, state: string) => {
   setTimeout(() => element.classList.add('is-running'), timer);
 };
 export const getOptions = <T extends GetOptionsArg>(target: T) => {
+  console.log(target);
   return new Promise<GetOptionsReturn<T>>(async(resolve) => {
     const items = await storageManager.get('options') as Options | false;
 
@@ -83,3 +79,13 @@ export const getOptions = <T extends GetOptionsArg>(target: T) => {
     return resolve(false as unknown as GetOptionsReturn<T>);
   });
 };
+export const spaceUrl = (async () => {
+  const result = await getOptions('space');
+
+  if (result) {
+    console.log('result:', result);
+  }
+  // const hostname = window.location.hostname;
+  // const subdomain = hostname.split('.')[0];
+  // return { hostname, subdomain };
+})();

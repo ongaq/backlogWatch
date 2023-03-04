@@ -1,9 +1,9 @@
 import type * as Storage from '../@types/storage';
 import type { Resolve, IssueItem } from '../@types/index';
-import { spaceUrl } from './common';
-import { QUOTA_BYTES_PER_ITEM } from './text';
+import { spaceUrl } from './common.js';
+import { QUOTA_BYTES_PER_ITEM } from './text.js';
 
-const spaceName = spaceUrl.subdomain;
+const spaceName = async () => (await spaceUrl).subdomain;
 
 class StorageManager {
   private storage: chrome.storage.SyncStorageArea;

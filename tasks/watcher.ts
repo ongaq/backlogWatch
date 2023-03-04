@@ -21,9 +21,10 @@ const compileTs = async (filePath: string) => {
 
   try {
     console.time('ts');
-    const data = await swc.transformFile(filePath, swcOptions);
+    const tsFileData = await fs.readFile(filePath, { encoding: 'utf8' });
+    const data = await swc.transform(tsFileData, swcOptions);
     const fileName = path.basename(filePath).replace('.ts', '.js');
-    const distPath = path.resolve(dist, fileName);
+    const distPath = path.resolve(`${dist}/js`, fileName);
     await fs.writeFile(
       distPath,
       prettier.format(data.code, { ...prettierOptions, parser: 'babel' }),

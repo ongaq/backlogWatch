@@ -1,5 +1,6 @@
 import type { FetchApiArg, FetchApiReturn } from '../@types/api';
 import type { SpaceComments } from '../@types/events';
+import type { Space, SpaceInfo } from '../@types/index';
 import { spaceUrl, consoleLog, getOptions, backlogResource } from './common';
 import storageManager from './storage';
 
@@ -86,4 +87,15 @@ export const deleteWatchFetchAPI = async (watchingId: number) => {
     consoleLog(String(e));
     return false;
   }
+};
+export const getSpaceInfoFetchAPI = async (hostname: string, apiKey: string) => {
+  const url = `https://${hostname}/api/v2/space?apiKey=${apiKey}`;
+
+  return await fetch(url).then(async(response): Promise<SpaceInfo | (Space & SpaceInfo)> => {
+    if (response.ok) {
+      return { status: response.status, result: true, ...response.json() };
+    } else {
+      return { status: response.status, result: false } as unknown as Promise<SpaceInfo>;
+    }
+  });
 };

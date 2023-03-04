@@ -1,49 +1,53 @@
 {
-	"manifest_version": 3,
-	"name": "Backlog watch",
-	"description": "Backlog上でチェックした課題に更新があった際に通知ウィンドウを表示します",
-	"version": "2.0.0",
-	"icons": {
-		"16": "source/images/icon16.png",
-		"48": "source/images/icon48.png",
-		"128": "source/images/icon128.png"
-	},
-	"options_page": "source/options.html",
-	"content_scripts": [
-		{
-			"matches": [
-				"http://*.backlog.jp/*",
-				"https://*.backlog.jp/*",
-				"http://*.backlog.com/*",
-				"https://*.backlog.com/*"
-			],
-			"css": [
-				"source/css/font-awesome.min.css",
-				"source/css/contents_style.css"
-			],
-			"js": [
-				"source/js/jquery-2.1.1.min.js",
-				"source/js/content_scripts/storage.js",
-				"source/js/content_scripts/common.js",
-				"source/js/content_scripts/issues.js",
-				"source/js/content_scripts/projects.js"
-			]
-		}
-	],
-	"background": {
-		"service_worker": [
-			"source/js/content_scripts/event.js"
-		]
-	},
-	"permissions": [
-		"alarms",
-		"notifications",
-		"https://*.backlog.jp/*",
-		"http://*.backlog.jp/*",
-		"https://*.backlog.com/*",
-		"http://*.backlog.com/*",
-		"storage",
-		"unlimitedStorage",
-		"background"
-	]
+  "manifest_version": 3,
+  "minimum_chrome_version": "90.0",
+  "name": "Backlog watch",
+  "description": "Backlog上でチェックした課題に更新があった際に通知ウィンドウを表示します",
+  "version": "2.0.0",
+  "icons": {
+    "16": "dist/images/icon16.png",
+    "48": "dist/images/icon48.png",
+    "128": "dist/images/icon128.png"
+  },
+  "options_ui": {
+    "page": "dist/options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*.backlog.jp/*",
+        "https://*.backlog.jp/*",
+        "http://*.backlog.com/*",
+        "https://*.backlog.com/*"
+      ],
+      "css": [
+        "dist/css/font-awesome.min.css",
+        "dist/css/contents_style.css"
+      ],
+      "js": [
+        "dist/js/storage.js",
+        "dist/js/common.js",
+        "dist/js/issues.js",
+        "dist/js/projects.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "dist/js/service_worker.js",
+    "type": "module"
+  },
+  "permissions": [
+    "alarms",
+    "storage",
+    "notifications",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://*.backlog.jp/*",
+    "http://*.backlog.jp/*",
+    "https://*.backlog.com/*",
+    "http://*.backlog.com/*"
+  ]
 }
