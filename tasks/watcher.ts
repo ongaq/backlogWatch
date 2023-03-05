@@ -38,6 +38,8 @@ const compileTs = async (filePath: string) => {
   }
 };
 const compileScss = async (filePath: string) => {
+  if (path.basename(filePath).startsWith('_')) return;
+
   log('Starting scss ...');
 
   try {
