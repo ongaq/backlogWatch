@@ -7,6 +7,7 @@ const error = 'is-error';
 const visible = 'is-visible';
 const ok = 'is-ok';
 
+/** 入力フィールドをスペースごとに複製する */
 const addCloneFieldList = (spaceFieldULElm: HTMLUListElement, fieldListLen: number) => {
   const cloneFieldUlElm = spaceFieldULElm.cloneNode(true) as HTMLUListElement;
 
@@ -20,7 +21,9 @@ const addCloneFieldList = (spaceFieldULElm: HTMLUListElement, fieldListLen: numb
   });
   document.querySelector('.js-field')?.insertAdjacentElement('beforeend', cloneFieldUlElm);
 };
+/** 引数にdata-name属性の値を入れ対象のdata属性のvalueを全て取得する */
 const getFieldValues = (dataName: string) => [...document.querySelectorAll<HTMLInputElement>(`[data-name="${dataName}"]`)].map((elm) => elm.value);
+/** 入力したスペース情報やAPIKEYが正確だったかどうか結果をDOM上に反映する */
 const authResult = ({ status, result, index }: { status: number; result: boolean; index: number }) => {
   const noticeElm = document.querySelector('#js-options-notice');
   const notFound = 404;
@@ -55,6 +58,7 @@ const authResult = ({ status, result, index }: { status: number; result: boolean
   noticeElm.classList.add(visible);
   setTimeout(() => noticeElm.classList.remove(visible), visibleTime);
 };
+/** chrome.storageにスペース情報を保存する */
 const waitPromise = async (settings: Record<string, any>, promises: Promise<SpaceInfo | (Space & SpaceInfo)>[]) => {
   const spaceOptions: Options = {
     options: {
@@ -80,6 +84,7 @@ const waitPromise = async (settings: Record<string, any>, promises: Promise<Spac
   await storageManager.set(spaceOptions);
   consoleLog(spaceOptions);
 };
+/** $('body').on('click', targetClass, () => {}) の代用 */
 const onEventHandler = (targetClass: string, callback: (self: HTMLElement) => void) => {
   document.body.addEventListener('click', (e) => {
     const self = <HTMLElement>e.target;
@@ -88,10 +93,66 @@ const onEventHandler = (targetClass: string, callback: (self: HTMLElement) => vo
     }
   });
 };
+const addSpaceInputField = () => {
+  const fieldList = document.querySelectorAll<HTMLUListElement>('.js-field-list');
+  const fieldListLen = fieldList.length;
+  const lastFieldList = fieldList[fieldListLen-1];
+  lastFieldList && addCloneFieldList(lastFieldList, fieldListLen);
+};
+const removeSpaceInputField = (self: HTMLElement) => {
+  const fieldListElm = self.closest('.js-field-list');
+  fieldListElm?.remove();
+};
+const editSpaceInputField = (self: HTMLElement) => {
+  const fieldListElm = self.closest('.js-field-list');
+  const disabledElm = fieldListElm?.querySelector('[disabled]');
+  if (!disabledElm) return;
+  disabledElm.removeAttribute('disabled');
+  disabledElm.classList.remove(ok);
+};
+const saveSettings = () => {
+  const promises: Promise<SpaceInfo | (Space & SpaceInfo)>[] = [];
+  const autoCloseElm = document.querySelector('#js-options-autoClose');
+  const releaseWatchElm = document.querySelector('#js-options-releaseWatch');
+  const settings = {
+    space: {
+      name: getFieldValues('space'),
+      apiKey: getFieldValues('key'),
+    },
+    options: {
+      close: autoCloseElm?.querySelector<HTMLOptionElement>('option:checked')?.value || '0',
+      watch: releaseWatchElm?.querySelector<HTMLOptionElement>('option:checked')?.value || '0',
+    },
+  };
+  const apiLength = 64;
+  const arrayAPIKeyLength = settings.space.apiKey.length;
 
-(async () => {
+  for (let i=0; i < arrayAPIKeyLength; i++) {
+    const spaceElm = document.querySelector(`[data-name="space"][data-id="${i}"]`);
+    const keyElm = document.querySelector(`[data-name="key"][data-id="${i}"]`);
+    const name = settings.space.name[i];
+    const key = settings.space.apiKey[i];
+
+    if (name === '') {
+      spaceElm?.classList.add(error);
+      alert('スペース名を入力して下さい。');
+    }
+    if ([...key].length !== apiLength) {
+      keyElm?.classList.add(error);
+      alert('API Keyが入力されていないか、桁数が正しくありません。');
+    }
+    if (name && key.length === apiLength) {
+      spaceElm?.classList.remove(error);
+      keyElm?.classList.remove(error);
+      promises.push(getSpaceInfoFetchAPI(name, key));
+    }
+  }
+
+  waitPromise(settings, promises);
+};
+const setInitialDisplay = async () => {
   const items = await storageManager.get('options') as Options | false;
-  if (!items) return;
+  if (!items || !Object.keys(items).length) return;
 
   const { options, space } = items.options;
   const fieldListElm = document.querySelectorAll<HTMLUListElement>('.js-field-list');
@@ -129,67 +190,18 @@ const onEventHandler = (targetClass: string, callback: (self: HTMLElement) => vo
     autoCloseOptionElm.selected = true;
     releaseWatchOptionElm.selected = true;
   }
+};
+
+(() => {
+  setInitialDisplay();
 
   // スペース入力フィールドの追加
-  onEventHandler('fa-plus-circle', (self) => {
-    const fieldList = document.querySelectorAll('.js-field-list');
-    const fieldListLen = fieldList.length;
-    addCloneFieldList(self.closest('.js-field-list'), fieldListLen);
-  });
+  onEventHandler('fa-plus-circle', addSpaceInputField);
   // スペース入力フィールドの削除
-  onEventHandler('fa-minus-circle', (self) => {
-    const fieldListElm = self.closest('.js-field-list');
-    fieldListElm?.remove();
-  });
+  onEventHandler('fa-minus-circle', removeSpaceInputField);
   // スペース入力フィールドの編集
-  onEventHandler('fa-pencil', (self) => {
-    const fieldListElm = self.closest('.js-field-list');
-    const disabledElm = fieldListElm?.querySelector('[disabled]');
-    if (!disabledElm) return;
-    disabledElm.removeAttribute('disabled');
-    disabledElm.classList.remove(ok);
-  });
-
+  onEventHandler('fa-pencil', editSpaceInputField);
   // 入力、オプションデータの保存
-  document.querySelector('#js-options-spaceSubmit')?.addEventListener('click', () => {
-    const promises: Promise<SpaceInfo | (Space & SpaceInfo)>[] = [];
-    const autoCloseElm = document.querySelector('#js-options-autoClose');
-    const releaseWatchElm = document.querySelector('#js-options-releaseWatch');
-    const settings = {
-      space: {
-        name: getFieldValues('space'),
-        apiKey: getFieldValues('key'),
-      },
-      options: {
-        close: autoCloseElm?.querySelector<HTMLOptionElement>('option:selected')?.value || '0',
-        watch: releaseWatchElm?.querySelector<HTMLOptionElement>('option:selected')?.value || '0',
-      },
-    };
-    const apiLength = 64;
-    const arrayAPIKeyLength = settings.space.apiKey.length;
-
-    for (let i=0; i < arrayAPIKeyLength; i++) {
-      const spaceElm = document.querySelector(`[data-name="space"][data-id="${i}"]`);
-      const keyElm = document.querySelector(`[data-name="key"][data-id="${i}"]`);
-      const name = settings.space.name[i];
-      const key = settings.space.apiKey[i];
-
-      if (name === '') {
-        spaceElm?.classList.add(error);
-        alert('スペース名を入力して下さい。');
-      }
-      if ([...key].length !== apiLength) {
-        keyElm?.classList.add(error);
-        alert('API Keyが入力されていないか、桁数が正しくありません。');
-      }
-      if (name && key.length === apiLength) {
-        spaceElm?.classList.remove(error);
-        keyElm?.classList.remove(error);
-        promises.push(getSpaceInfoFetchAPI(name, key));
-      }
-    }
-
-    waitPromise(settings, promises);
-  });
+  document.querySelector('#js-options-spaceSubmit')?.addEventListener('click', saveSettings);
 })();
 

@@ -11,6 +11,7 @@ export type SpaceData = {
   apiKey: string;
 };
 export type SpaceName = {
+  /** spaceNameには *.backlog.jp の * 部分が入る */
   [spaceName: string]: SpaceData;
 };
 export type Options = {
@@ -72,6 +73,7 @@ export type BacklogResource = {
 
 export type SpaceInfo = { status: number, result: boolean };
 export type Space = {
+  /** spaceKeyには *.backlog.jp の * 部分が入る */
   spaceKey: string;
   name: string;
   ownerId: number;

@@ -1,10 +1,10 @@
 import type { IssueComment } from '../@types/issues';
-import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/events';
+import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/service_worker';
 import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api.js';
-import { getOptions, consoleLog, spaceUrl } from './common.js';
+import { getOptions, consoleLog } from './common.js';
 import storageManager from './storage.js';
 
-console.log('test');
+console.log('running service_worker ...');
 
 const getAllOptions = async () => await Promise.all([
   getOptions('space'),
@@ -66,8 +66,8 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     }
   };
   /** 通知を作成する */
-  const createNotifications = (options: chrome.notifications.NotificationOptions<true>, issueId: string, res: IssueComment) => {
-    const { hostname, subdomain } = spaceUrl;
+  const createNotifications = (options: chrome.notifications.NotificationOptions<true>, hostname: string, issueId: string, res: IssueComment) => {
+    const subdomain = hostname?.split('.')?.[0] || '';
     chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
       const listener = () => {
         chrome.tabs.create({
@@ -86,7 +86,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     });
     backlogCompletedWhenCancel(res);
   };
-  const popupNotification = async ({ issueId, issuesDBName }: PopupNotification) => {
+  const popupNotification = async ({ hostname, issueId, issuesDBName }: PopupNotification) => {
     const result = await getIssueCommentFetchAPI(issueId, issuesDBName);
     if (!result) return;
 
@@ -110,7 +110,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
 
     if (commentLastId > compareValue[issueId]) {
       const note = `[${issueId}] @${res.createdUser.name}`;
-      const iconUrl = `https://${spaceUrl.hostname}/favicon.ico`;
+      const iconUrl = `https://${hostname}/favicon.ico`;
       const issues = await getIssueFetchAPI(issueId);
 
       createNotifications({
@@ -120,7 +120,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
         message: res.content,
         contextMessage: note,
         requireInteraction: true
-      }, issueId, res);
+      }, hostname, issueId, res);
     }
     await storageManager.set(useStorageValue);
     backlogCompletedWhenCancel(res);
@@ -133,7 +133,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     if (!results) continue;
 
     for (const result of results) {
-      popupNotification({ issueId: result.id, issuesDBName });
+      popupNotification({ hostname: space[spaceId].name, issueId: result.id, issuesDBName });
     }
   }
 };

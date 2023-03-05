@@ -6,6 +6,7 @@ export type CheckWatchIssues = {
   watch: string | false;
 };
 export type PopupNotification = {
+  hostname: string;
   issueId: string;
   issuesDBName: string;
 };

@@ -5,9 +5,10 @@ import storageManager from './storage.js';
 export const consoleLog = (log: any) => console.log('[BacklogWatch]', log);
 /** サイト側でグローバルに登録されたBacklogデータを参照する */
 export const backlogResource = (() => {
-  const backlog = (typeof window !== 'undefined' && window.Backlog) || {};
+  const hasWindow = typeof window !== 'undefined';
+  const backlog = (hasWindow && window.Backlog) || false;
 
-  if (backlog?.resource) {
+  if (backlog && backlog.resource) {
     return backlog.resource;
   }
   return null;
@@ -60,7 +61,7 @@ export const watchControl = (element: HTMLElement, state: string) => {
   setTimeout(() => element.classList.add('is-running'), timer);
 };
 export const getOptions = <T extends GetOptionsArg>(target: T) => {
-  console.log(target);
+  console.log('getOptions:', target);
   return new Promise<GetOptionsReturn<T>>(async(resolve) => {
     const items = await storageManager.get('options') as Options | false;
 
@@ -79,13 +80,11 @@ export const getOptions = <T extends GetOptionsArg>(target: T) => {
     return resolve(false as unknown as GetOptionsReturn<T>);
   });
 };
-export const spaceUrl = (async () => {
-  const result = await getOptions('space');
-
-  if (result) {
-    console.log('result:', result);
+export const spaceUrl = (() => {
+  if (typeof window === 'undefined') {
+    return false;
   }
-  // const hostname = window.location.hostname;
-  // const subdomain = hostname.split('.')[0];
-  // return { hostname, subdomain };
+  const hostname = window.location.hostname;
+  const subdomain = hostname.split('.')[0];
+  return { hostname, subdomain };
 })();
