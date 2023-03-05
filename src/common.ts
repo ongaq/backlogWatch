@@ -1,5 +1,5 @@
-import type { Options, GetOptionsArg, GetOptionsReturn } from '../../@types/index';
-import storageManager from './storage.js';
+import type { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
+import storageManager from './storage';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (log: any) => console.log('[BacklogWatch]', log);

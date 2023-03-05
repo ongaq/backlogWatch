@@ -76,11 +76,12 @@ watcher.subscribe(src, async (err, events) => {
 
     if (nowProcessingFile.includes(filePath)) continue;
 
-    if (/\.ts$/.test(filePath)) {
-      nowProcessingFile.push(filePath);
-      await compileTs(filePath);
-      clearProcessingPath(filePath);
-    } else if (/\.scss$/.test(filePath)) {
+    // if (/\.ts$/.test(filePath)) {
+    //   nowProcessingFile.push(filePath);
+    //   await compileTs(filePath);
+    //   clearProcessingPath(filePath);
+    // } else
+    if (/\.scss$/.test(filePath)) {
       nowProcessingFile.push(filePath);
       await compileScss(filePath);
       clearProcessingPath(filePath);

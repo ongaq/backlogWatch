@@ -1,5 +1,5 @@
-import type { IssueItem } from '../../@types/index';
-import type { ProjectItem } from '../../@types/projects';
+import type { IssueItem } from '../@types/index';
+import type { ProjectItem } from '../@types/projects';
 import { spaceUrl, backlogLocation, watchControl } from './common';
 import storageManager from './storage';
 
@@ -30,9 +30,9 @@ const createStar = (issueItems: IssueItem[] | false) => {
     }
   }
 };
-const createWatchProject = (projectItem: ProjectItem[], isInit: boolean) => {
+const createWatchProject = (isInit: boolean, projectItem?: ProjectItem[]) => {
   const getProjectsFavElm = () => document.querySelector<HTMLElement>('[data-id="projects-fav"]');
-  const createProjectsList = (index: number) => {
+  const createProjectsList = (index: number, projectItem: ProjectItem[]) => {
     const item = isInit ? projectItem[index] : projectItem[0];
     return `<li class="project-list__item js-project-list-item watch-item theme-default" data-id="${item.id}">
       <div class="project-list__wrapper watch-item-wrapper">
@@ -68,12 +68,12 @@ const createWatchProject = (projectItem: ProjectItem[], isInit: boolean) => {
   }
   const projectsFavElm = getProjectsFavElm();
 
-  if (projectsFavElm) {
+  if (projectsFavElm && projectItem) {
     let html = document.querySelector('[data-id="projects-fav"] .project-list')?.innerHTML || '';
 
     for(var i=0; i < (projectItem.length+1); i++) {
       if (i === projectItem.length) break;
-      html += createProjectsList(i);
+      html += createProjectsList(i, projectItem);
     }
     const projectListElm = projectsFavElm.querySelector<HTMLElement>('.project-list');
 
@@ -109,7 +109,7 @@ const createFavoriteProject = async () => {
 
   if (issueItems) {
     createStar(issueItems);
-    createWatchProject(issueItems, true);
+    createWatchProject(true);
   } else {
     createStar(false);
   }
@@ -145,7 +145,7 @@ const createFavoriteProject = async () => {
     } else {
       watchControl(self, 'add');
       await storageManager.add(subdomain, target, 'projects');
-      createWatchProject([projectItem], false);
+      createWatchProject(false, [projectItem]);
     }
   });
 };

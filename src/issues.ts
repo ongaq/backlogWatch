@@ -1,6 +1,6 @@
-import type { IssueItem } from '../../@types/index';
-import { spaceUrl, backlogLocation, locationObserver, watchControl, consoleLog } from './common.js';
-import storageManager from './storage.js';
+import type { IssueItem } from '../@types/index';
+import { spaceUrl, backlogLocation, locationObserver, watchControl, consoleLog } from './common';
+import storageManager from './storage';
 
 const createHTML = (issues: IssueItem[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
@@ -210,7 +210,12 @@ const exec = () => {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState !== 'loading') {
   exec();
   locationObserver(exec);
-});
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    exec();
+    locationObserver(exec);
+  });
+}

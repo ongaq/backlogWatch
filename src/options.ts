@@ -1,7 +1,7 @@
-import type { Options, Space, SpaceInfo } from '../../@types/index';
-import { consoleLog } from './common.js';
-import storageManager from './storage.js';
-import { getSpaceInfoFetchAPI } from './api.js';
+import type { Options, Space, SpaceInfo } from '../@types/index';
+import { consoleLog } from './common';
+import storageManager from './storage';
+import { getSpaceInfoFetchAPI } from './api';
 
 const error = 'is-error';
 const visible = 'is-visible';

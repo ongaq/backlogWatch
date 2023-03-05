@@ -1,8 +1,8 @@
-import type { IssueComment } from '../../@types/issues';
-import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../../@types/service_worker';
-import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api.js';
-import { getOptions, consoleLog } from './common.js';
-import storageManager from './storage.js';
+import type { IssueComment } from '../@types/issues';
+import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/service_worker';
+import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api';
+import { getOptions, consoleLog } from './common';
+import storageManager from './storage';
 
 console.log('running service_worker ...');
 

@@ -1,6 +1,6 @@
-import type * as Storage from '../../@types/storage';
-import type { Resolve, IssueItem } from '../../@types/index';
-import { QUOTA_BYTES_PER_ITEM } from './text.js';
+import type * as Storage from '../@types/storage';
+import type { Resolve, IssueItem } from '../@types/index';
+import { QUOTA_BYTES_PER_ITEM } from './text';
 
 class StorageManager {
   private storage: chrome.storage.SyncStorageArea;
@@ -99,7 +99,7 @@ class StorageManager {
   hasIssue: Storage.Common = (spaceId, itemId, tableName) => {
     return new Promise((resolve) => {
       this.storage.get(tableName, (value: Storage.DataBase) => {
-        const spaceData = value[tableName][spaceId];
+        const spaceData = value?.[tableName]?.[spaceId];
         const isNoIssue = Object.keys(value).length === 0;
         const isNoSpace = typeof spaceData === 'undefined';
 

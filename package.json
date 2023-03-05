@@ -2,6 +2,8 @@
   "name": "backlog-watch",
   "version": "2.0.0",
   "scripts": {
+    "build": "rollup -c",
+    "start": "rollup -c -w",
     "dev": "ts-node tasks/watcher.ts",
     "ts": "npx swc main.user.ts -o main.user.js -w",
     "check": "npx tsc --noEmit"
@@ -12,8 +14,12 @@
   "engines": {
     "node": "18.x"
   },
+  "type": "module",
   "devDependencies": {
     "@parcel/watcher": "^2.1.0",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@swc/cli": "^0.1.61",
     "@swc/core": "^1.3.35",
     "@swc/helpers": "^0.4.14",
@@ -24,6 +30,9 @@
     "dayjs": "^1.11.7",
     "fs-extra": "^11.1.0",
     "prettier": "^2.8.4",
+    "rollup": "^3.18.0",
+    "rollup-plugin-chrome-extension": "^3.6.10",
+    "rollup-plugin-sass": "^1.12.18",
     "sass": "^1.58.3",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
