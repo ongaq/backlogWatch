@@ -5,6 +5,7 @@ import prettier from 'prettier';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import dayjs from 'dayjs';
+import sass from 'sass';
 
 const src = path.resolve(process.cwd(), 'src');
 const dist = path.resolve(process.cwd(), 'dist');
@@ -36,6 +37,26 @@ const compileTs = async (filePath: string) => {
     console.timeEnd('ts');
   }
 };
+const compileScss = async (filePath: string) => {
+  log('Starting scss ...');
+
+  try {
+    console.time('scss');
+    const result = sass.compile(filePath);
+    const fileName = path.basename(filePath).replace('.scss', '.css');
+    const distPath = path.resolve(`${dist}/css`, fileName);
+
+    await fs.writeFile(
+      distPath,
+      prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
+      'utf8'
+    );
+  } catch (e) {
+    log(e);
+  } finally {
+    console.timeEnd('scss');
+  }
+}
 
 console.log('Starting watch ...');
 let nowProcessingFile: string[] = [];
@@ -56,6 +77,10 @@ watcher.subscribe(src, async (err, events) => {
     if (/\.ts$/.test(filePath)) {
       nowProcessingFile.push(filePath);
       await compileTs(filePath);
+      clearProcessingPath(filePath);
+    } else if (/\.scss$/.test(filePath)) {
+      nowProcessingFile.push(filePath);
+      await compileScss(filePath);
       clearProcessingPath(filePath);
     }
   }
