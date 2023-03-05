@@ -1,6 +1,6 @@
-import type { IssueItem } from '../@types/index';
-import type { ProjectItem } from '../@types/projects';
-import { backlogLocation, watchControl } from './common';
+import type { IssueItem } from '../../@types/index';
+import type { ProjectItem } from '../../@types/projects';
+import { spaceUrl, backlogLocation, watchControl } from './common';
 import storageManager from './storage';
 
 const createStar = (issueItems: IssueItem[] | false) => {
@@ -83,9 +83,13 @@ const createWatchProject = (projectItem: ProjectItem[], isInit: boolean) => {
   }
 };
 const createFavoriteProject = async () => {
+  const spaceInfo = spaceUrl;
+  if (!spaceInfo) return;
+  const subdomain = spaceInfo.subdomain;
+
   const timer = 250;
   // chrome.storageに課題キーが存在するか確認
-  const issueItems = await storageManager.throwItem('projects');
+  const issueItems = await storageManager.throwItem(subdomain, 'projects');
   const favStarAnimation = (projectItemId: string) => {
     const speed = 300;
     const projectFav = document.querySelector('[data-id="projects-fav"]');
@@ -136,11 +140,11 @@ const createFavoriteProject = async () => {
 
     if (self.classList.contains('is-watch')) {
       watchControl(self, 'remove');
-      void storageManager.remove(projectItem.id, 'projects');
+      void storageManager.remove(subdomain, projectItem.id, 'projects');
       favStarAnimation(projectItem.id);
     } else {
       watchControl(self, 'add');
-      await storageManager.add(target, 'projects');
+      await storageManager.add(subdomain, target, 'projects');
       createWatchProject([projectItem], false);
     }
   });

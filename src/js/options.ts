@@ -1,4 +1,4 @@
-import type { Options, Space, SpaceInfo } from '../@types/index';
+import type { Options, Space, SpaceInfo } from '../../@types/index';
 import { consoleLog } from './common.js';
 import storageManager from './storage.js';
 import { getSpaceInfoFetchAPI } from './api.js';
@@ -44,9 +44,9 @@ const authResult = ({ status, result, index }: { status: number; result: boolean
     if (spaceElm && keyElm && targetListElm) {
       targetListElm.classList.add(ok);
       spaceElm.classList.add(ok)
-      spaceElm.disabled = false;
+      spaceElm.disabled = true;
       keyElm.classList.add(ok)
-      keyElm.disabled = false;
+      keyElm.disabled = true;
     }
   } else {
     mes = '保存出来ませんでした。<br>';
@@ -93,23 +93,30 @@ const onEventHandler = (targetClass: string, callback: (self: HTMLElement) => vo
     }
   });
 };
+/** スペース入力フィールドの追加 */
 const addSpaceInputField = () => {
   const fieldList = document.querySelectorAll<HTMLUListElement>('.js-field-list');
   const fieldListLen = fieldList.length;
   const lastFieldList = fieldList[fieldListLen-1];
   lastFieldList && addCloneFieldList(lastFieldList, fieldListLen);
 };
+/** スペース入力フィールドの削除 */
 const removeSpaceInputField = (self: HTMLElement) => {
   const fieldListElm = self.closest('.js-field-list');
   fieldListElm?.remove();
 };
+/** スペース入力フィールドの編集 */
 const editSpaceInputField = (self: HTMLElement) => {
   const fieldListElm = self.closest('.js-field-list');
-  const disabledElm = fieldListElm?.querySelector('[disabled]');
-  if (!disabledElm) return;
-  disabledElm.removeAttribute('disabled');
-  disabledElm.classList.remove(ok);
+  const disabledElms = fieldListElm?.querySelectorAll('[disabled]');
+  if (!disabledElms || !disabledElms.length) return;
+
+  for (const disabledElm of disabledElms) {
+    disabledElm.removeAttribute('disabled');
+    disabledElm.classList.remove(ok);
+  }
 };
+/** 入力、オプションデータの保存 */
 const saveSettings = () => {
   const promises: Promise<SpaceInfo | (Space & SpaceInfo)>[] = [];
   const autoCloseElm = document.querySelector('#js-options-autoClose');
@@ -150,8 +157,10 @@ const saveSettings = () => {
 
   waitPromise(settings, promises);
 };
+/** 初期表示設定 */
 const setInitialDisplay = async () => {
   const items = await storageManager.get('options') as Options | false;
+  console.log('items:', items);
   if (!items || !Object.keys(items).length) return;
 
   const { options, space } = items.options;
@@ -174,10 +183,10 @@ const setInitialDisplay = async () => {
 
     spaceFieldElm.value = space[spaceName].name;
     spaceFieldElm.classList.add(ok);
-    spaceFieldElm.disabled = false;
+    spaceFieldElm.disabled = true;
     keyFieldElm.value = space[spaceName].apiKey;
     keyFieldElm.classList.add(ok);
-    keyFieldElm.disabled = false;
+    keyFieldElm.disabled = true;
   }
 
   // 機能オプションの初期選択設定

@@ -1,6 +1,6 @@
-import type { IssueItem } from '../@types/index';
-import { backlogLocation, locationObserver, watchControl, consoleLog } from './common';
-import storageManager from './storage';
+import type { IssueItem } from '../../@types/index';
+import { spaceUrl, backlogLocation, locationObserver, watchControl, consoleLog } from './common.js';
+import storageManager from './storage.js';
 
 const createHTML = (issues: IssueItem[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
@@ -52,8 +52,12 @@ const createHomeTheIssueUnderWatch = (issues: IssueItem[]) => {
   }
 };
 const createWatchHome = async () => {
+  const spaceInfo = spaceUrl;
+  if (!spaceInfo) return;
+  const subdomain = spaceInfo.subdomain;
+
   // Storageに課題キーが存在するか確認
-  const result = await storageManager.throwItem('issues');
+  const result = await storageManager.throwItem(subdomain, 'issues');
   if (result === false) return;
   if (result.length) {
     createHomeTheIssueUnderWatch(result);
@@ -70,7 +74,7 @@ const createWatchHome = async () => {
 
     if (self.classList.contains('is-watch')) {
       watchControl(self, 'remove');
-      await storageManager.remove(issueItem.id, 'issues');
+      await storageManager.remove(subdomain, issueItem.id, 'issues');
       trElement.style.opacity = '0';
       setTimeout(() => trElement.remove(), speed);
     }
@@ -108,6 +112,10 @@ const createWatchHome = async () => {
 };
 /** 課題ページでウォッチボタンの作成 */
 const createWatchIssue = async () => {
+  const spaceInfo = spaceUrl;
+  if (!spaceInfo) return;
+  const subdomain = spaceInfo.subdomain;
+
   const issueCard = document.querySelector<HTMLElement>('#issueArea');
   if (issueCard === null) {
     return consoleLog('ウォッチボタンの作成失敗');
@@ -125,7 +133,7 @@ const createWatchIssue = async () => {
   });
   const changeWatchState = async (event: Event, issueItem: IssueItem) => {
     const self = <HTMLElement>event.currentTarget;
-    const isWatching = await storageManager.hasIssue(issueItem.id, 'issues');
+    const isWatching = await storageManager.hasIssue(subdomain, issueItem.id, 'issues');
     const heartElement = self.querySelector<HTMLElement>('.fa-heart');
     const textElement = self.querySelector<HTMLElement>('span');
 
@@ -134,7 +142,7 @@ const createWatchIssue = async () => {
     }
     if (isWatching) {
       watchControl(heartElement, 'remove');
-      void storageManager.remove(issueItem.id, 'issues');
+      void storageManager.remove(subdomain, issueItem.id, 'issues');
       textElement.textContent = watchText.notWatch;
     } else {
       const limitedBytes = 100;
@@ -143,7 +151,7 @@ const createWatchIssue = async () => {
         issueItem.description = `${description.slice(0, limitedBytes)}...`;
       }
       watchControl(heartElement, 'add');
-      void storageManager.add(issueItem, 'issues');
+      void storageManager.add(subdomain, issueItem, 'issues');
       textElement.textContent = watchText.watching;
     }
   };
@@ -158,7 +166,7 @@ const createWatchIssue = async () => {
     </div>`;
 
     // Storageに課題キーが存在するか確認
-    const isWatching = await storageManager.hasIssue(issueItemId, 'issues');
+    const isWatching = await storageManager.hasIssue(subdomain, issueItemId, 'issues');
 
     if (isWatching) {
       document.body.insertAdjacentHTML('beforeend', html(watchText.watching));

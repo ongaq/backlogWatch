@@ -1,5 +1,5 @@
-import type { IssueComment } from '../@types/issues';
-import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../@types/service_worker';
+import type { IssueComment } from '../../@types/issues';
+import type { CheckWatchIssues, PopupNotification, IssueCommentsCount, SpaceComments } from '../../@types/service_worker';
 import { getIssueFetchAPI, getIssueCommentFetchAPI } from './api.js';
 import { getOptions, consoleLog } from './common.js';
 import storageManager from './storage.js';
@@ -54,14 +54,14 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     chrome.alarms.onAlarm.addListener((alarm) => alarm && alarm.name === alermName && chrome.notifications.clear(notificationId));
   };
   /** 課題完了時にウォッチを解除する */
-  const backlogCompletedWhenCancel = async (res: IssueComment) => {
+  const backlogCompletedWhenCancel = async (subdomain: string, res: IssueComment) => {
     const changeLogs = res.changeLog || [];
     if (!Boolean(watch) || !changeLogs.length) {
       return;
     }
     for (const changeLog of changeLogs) {
       if (changeLog.field === 'status' && changeLog.newValue === '完了') {
-        await storageManager.remove(String(res.id), 'issues');
+        await storageManager.remove(subdomain, String(res.id), 'issues');
       }
     }
   };
@@ -84,7 +84,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
       // 機能オプション
       closeNotificationAfterSeconds(notificationId);
     });
-    backlogCompletedWhenCancel(res);
+    backlogCompletedWhenCancel(subdomain, res);
   };
   const popupNotification = async ({ hostname, issueId, issuesDBName }: PopupNotification) => {
     const result = await getIssueCommentFetchAPI(issueId, issuesDBName);
@@ -122,12 +122,13 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
         requireInteraction: true
       }, hostname, issueId, res);
     }
+    const subdomain = hostname?.split('.')?.[0] || '';
     await storageManager.set(useStorageValue);
-    backlogCompletedWhenCancel(res);
+    backlogCompletedWhenCancel(subdomain, res);
   };
 
   for (const spaceId of Object.keys(space)) {
-    const results = await storageManager.throwItem('issues');
+    const results = await storageManager.throwItem(spaceId, 'issues');
     const issuesDBName = `${spaceId}_comments_count`;
 
     if (!results) continue;

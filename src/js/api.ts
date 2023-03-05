@@ -1,6 +1,6 @@
-import type { FetchApiArg, FetchApiReturn } from '../@types/api';
-import type { SpaceComments } from '../@types/service_worker';
-import type { Space, SpaceInfo } from '../@types/index';
+import type { FetchApiArg, FetchApiReturn } from '../../@types/api';
+import type { SpaceComments } from '../../@types/service_worker';
+import type { Space, SpaceInfo } from '../../@types/index';
 import { spaceUrl, consoleLog, getOptions, backlogResource } from './common.js';
 import storageManager from './storage.js';
 
@@ -11,9 +11,11 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method }: {
 }): Promise<FetchApiReturn<T> | false> => {
   const res = await getOptions('space');
   if (!res) return false;
-  const { hostname, subdomain } = spaceUrl;
-  const apiKey = res[subdomain].apiKey;
-  const url = `https://${hostname}/api/v2/${apiPath}?apiKey=${apiKey+query}`;
+  const result = spaceUrl;
+  if (!result) return false;
+
+  const apiKey = res[result.subdomain].apiKey;
+  const url = `https://${result.hostname}/api/v2/${apiPath}?apiKey=${apiKey+query}`;
   const options = {
     method,
   };
@@ -93,7 +95,7 @@ export const getSpaceInfoFetchAPI = async (hostname: string, apiKey: string) => 
 
   return await fetch(url).then(async(response): Promise<SpaceInfo | (Space & SpaceInfo)> => {
     if (response.ok) {
-      return { status: response.status, result: true, ...response.json() };
+      return { status: response.status, result: true, ...await response.json() };
     } else {
       return { status: response.status, result: false } as unknown as Promise<SpaceInfo>;
     }

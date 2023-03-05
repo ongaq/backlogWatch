@@ -1,9 +1,6 @@
-import type * as Storage from '../@types/storage';
-import type { Resolve, IssueItem } from '../@types/index';
-import { spaceUrl } from './common.js';
+import type * as Storage from '../../@types/storage';
+import type { Resolve, IssueItem } from '../../@types/index';
 import { QUOTA_BYTES_PER_ITEM } from './text.js';
-
-const spaceName = async () => (await spaceUrl).subdomain;
 
 class StorageManager {
   private storage: chrome.storage.SyncStorageArea;
@@ -41,13 +38,14 @@ class StorageManager {
   }
   /**
    * 第一引数で指定されたitemをtableに追加する
+   * @param {String} spaceId - spaceの名前を入力します
    * @param {Object<string, string>} item - objectを指定します。objectにidは必ず含めて下さい
    * @param {String} tableName - DBのテーブル名を入力します
    */
-  add: Storage.Add = (item, tableName) => {
+  add: Storage.Add = (spaceId, item, tableName) => {
     const createTable = (resolve: Resolve<boolean>) => {
       this.db[tableName] = {
-        [spaceName]: {
+        [spaceId]: {
           [item.id]: item
         }
       };
@@ -55,8 +53,8 @@ class StorageManager {
     };
     const insertTable = (value: Storage.DataBase, resolve: Resolve<boolean>) => {
       this.db[tableName] = value[tableName];
-      this.db[tableName][spaceName] ??= {};
-      this.db[tableName][spaceName][item.id] = item;
+      this.db[tableName][spaceId] ??= {};
+      this.db[tableName][spaceId][item.id] = item;
       this.storage.set(this.db, () => this.#error(resolve));
     };
 
@@ -72,13 +70,14 @@ class StorageManager {
   }
   /**
    * 第一引数で指定されたitemをtableから削除する
+   * @param {String} spaceId - spaceの名前を入力します
    * @param {String} itemId - IssueのIDを文字列で指定
    * @param {String} tableName - DBのテーブル名を入力します
    */
-  remove: Storage.Common = (itemId, tableName) => {
+  remove: Storage.Common = (spaceId, itemId, tableName) => {
     const removeTable = async (value: Storage.DataBase, resolve: Resolve<true>) => {
       this.db[tableName] = value[tableName];
-      delete this.db[tableName][spaceName][itemId];
+      delete this.db[tableName][spaceId][itemId];
       await this.storage.set(this.db);
       return resolve(true);
     };
@@ -92,14 +91,15 @@ class StorageManager {
   /**
    * 第一引数で指定されたitemをtableから取得する
    * 課題キーが存在するかどうかを確認に用いる
+   * @param {String} spaceId - spaceの名前を入力します
    * @param {String} itemId - IssueのIDを文字列で指定
    * @param {String} tableName - DBのテーブル名を入力します
    * @return {Boolean}
    */
-  hasIssue: Storage.Common = (itemId, tableName) => {
+  hasIssue: Storage.Common = (spaceId, itemId, tableName) => {
     return new Promise((resolve) => {
       this.storage.get(tableName, (value: Storage.DataBase) => {
-        const spaceData = value[tableName][spaceName];
+        const spaceData = value[tableName][spaceId];
         const isNoIssue = Object.keys(value).length === 0;
         const isNoSpace = typeof spaceData === 'undefined';
 
@@ -117,10 +117,11 @@ class StorageManager {
   }
   /**
    * 第一引数で指定されたtableに格納されているitemを全て配列で返す。
+   * @param {String} spaceId - spaceの名前を入力します
    * @param {String} tableName - DBのテーブル名を入力します
    * @return {IssueItem[] | false}
    */
-  throwItem: Storage.ThrowItem = (tableName) => {
+  throwItem: Storage.ThrowItem = (spaceId, tableName) => {
     const res: IssueItem[] = [];
     const createItemArray = (spaceData: Storage.ItemId, resolve: Resolve<false | IssueItem[]>) => {
       const itemIds = Object.keys(spaceData);
@@ -146,7 +147,7 @@ class StorageManager {
         if (typeof value[tableName] === 'undefined') {
           resolve(false);
         }
-        const spaceData = value[tableName][spaceName];
+        const spaceData = value[tableName][spaceId];
 
         if (typeof spaceData === 'undefined') {
           resolve(false);

@@ -1,4 +1,4 @@
-import type { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
+import type { Options, GetOptionsArg, GetOptionsReturn } from '../../@types/index';
 import storageManager from './storage.js';
 
 /** BacklogWatch用コンソールログ */
