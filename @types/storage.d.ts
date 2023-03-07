@@ -7,7 +7,7 @@ export type ThrowItem = (
 
 export type Add = (
   spaceId: string,
-  item: IssueItem,
+  item: IssueItem | CommentCount,
   tableName: string,
 ) => Promise<Boolean>;
 

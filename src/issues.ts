@@ -52,7 +52,7 @@ const createHomeTheIssueUnderWatch = (issues: IssueItem[]) => {
   }
 };
 const createWatchHome = async () => {
-  const spaceInfo = spaceUrl;
+  const spaceInfo = spaceUrl();
   if (!spaceInfo) return;
   const subdomain = spaceInfo.subdomain;
 
@@ -112,7 +112,7 @@ const createWatchHome = async () => {
 };
 /** 課題ページでウォッチボタンの作成 */
 const createWatchIssue = async () => {
-  const spaceInfo = spaceUrl;
+  const spaceInfo = spaceUrl();
   if (!spaceInfo) return;
   const subdomain = spaceInfo.subdomain;
 
@@ -150,9 +150,17 @@ const createWatchIssue = async () => {
       if ([...description].length > limitedBytes) {
         issueItem.description = `${description.slice(0, limitedBytes)}...`;
       }
-      watchControl(heartElement, 'add');
-      void storageManager.add(subdomain, issueItem, 'issues');
-      textElement.textContent = watchText.watching;
+
+      const commentCount = {
+        [issueItem.id]: 0,
+      };
+      const issuesDB = await storageManager.add(subdomain, issueItem, 'issues');
+      const commentCountDB = await storageManager.add(subdomain, commentCount, `${subdomain}_comments_count`);
+
+      if (issuesDB && commentCountDB) {
+        watchControl(heartElement, 'add');
+        textElement.textContent = watchText.watching;
+      }
     }
   };
   const createWatchButton = async (issueItemId: string) => {

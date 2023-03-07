@@ -6,6 +6,9 @@ export type IssueItem = {
   description?: string;
   time?: Date;
 };
+export type CommentCount = {
+  [issueId: string]: number;
+};
 export type SpaceData = {
   name: string;
   apiKey: string;

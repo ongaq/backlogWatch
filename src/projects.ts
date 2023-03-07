@@ -83,7 +83,7 @@ const createWatchProject = (isInit: boolean, projectItem?: ProjectItem[]) => {
   }
 };
 const createFavoriteProject = async () => {
-  const spaceInfo = spaceUrl;
+  const spaceInfo = spaceUrl();
   if (!spaceInfo) return;
   const subdomain = spaceInfo.subdomain;
 

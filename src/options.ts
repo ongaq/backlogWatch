@@ -157,6 +157,9 @@ const saveSettings = () => {
 
   waitPromise(settings, promises);
 };
+const deleteDB = async () => {
+  await storageManager.deleteDB();
+};
 /** 初期表示設定 */
 const setInitialDisplay = async () => {
   const items = await storageManager.get('options') as Options | false;
@@ -212,5 +215,7 @@ const setInitialDisplay = async () => {
   onEventHandler('fa-pencil', editSpaceInputField);
   // 入力、オプションデータの保存
   document.querySelector('#js-options-spaceSubmit')?.addEventListener('click', saveSettings);
+  // deleteDB
+  document.querySelector('#js-options-deleteDB')?.addEventListener('click', deleteDB);
 })();
 

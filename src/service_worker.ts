@@ -68,27 +68,30 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
   /** 通知を作成する */
   const createNotifications = (options: chrome.notifications.NotificationOptions<true>, hostname: string, issueId: string, res: IssueComment) => {
     const subdomain = hostname?.split('.')?.[0] || '';
-    chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
+    const noti = chrome.notifications;
+    noti.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
       const listener = () => {
         chrome.tabs.create({
           url: `https://${hostname}/view/${issueId}#comment-${res.id}`
         });
-        chrome.notifications.onClicked.removeListener(listener);
-        chrome.notifications.clear(notificationId);
+        noti.onClicked.removeListener(listener);
+        noti.clear(notificationId);
       };
-      chrome.notifications.onClicked.addListener(listener);
-      chrome.notifications.onClosed.addListener(() => {
-        chrome.notifications.onClicked.removeListener(listener);
-        chrome.notifications.clear(notificationId);
+      noti.onClicked.addListener(listener);
+      noti.onClosed.addListener(() => {
+        noti.onClicked.removeListener(listener);
+        noti.clear(notificationId);
       });
       // 機能オプション
       closeNotificationAfterSeconds(notificationId);
     });
     backlogCompletedWhenCancel(subdomain, res);
   };
-  const popupNotification = async ({ hostname, issueId, issuesDBName }: PopupNotification) => {
-    const result = await getIssueCommentFetchAPI(issueId, issuesDBName);
+  const popupNotification = async ({ hostname, spaceId, issueId, commentCountDbName }: PopupNotification) => {
+    const result = await getIssueCommentFetchAPI(issueId, commentCountDbName, hostname);
     if (!result) return;
+
+    console.log('popupNotification_result:', result);
 
     const [res] = result;
     const { id: commentLastId } = res;
@@ -96,9 +99,9 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     let useStorageValue: SpaceComments = {};
 
     // storageからデータを取得
-    const items = await storageManager.get(issuesDBName) as SpaceComments | false;
+    const items = await storageManager.get(commentCountDbName) as SpaceComments | false;
     if (!items) return;
-    const spaceComments = items[issuesDBName];
+    const spaceComments = items[commentCountDbName][spaceId];
 
     // compareValueにデータを追加
     compareValue[issueId] = spaceComments?.[issueId] ?? 0;
@@ -106,7 +109,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     if (spaceComments) {
       useStorageValue = items;
     }
-    useStorageValue[issuesDBName] = { [issueId]: commentLastId };
+    useStorageValue[commentCountDbName][spaceId] = { [issueId]: commentLastId };
 
     if (commentLastId > compareValue[issueId]) {
       const note = `[${issueId}] @${res.createdUser.name}`;
@@ -122,25 +125,30 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
         requireInteraction: true
       }, hostname, issueId, res);
     }
-    const subdomain = hostname?.split('.')?.[0] || '';
     await storageManager.set(useStorageValue);
-    backlogCompletedWhenCancel(subdomain, res);
+    backlogCompletedWhenCancel(spaceId, res);
   };
 
   for (const spaceId of Object.keys(space)) {
     const results = await storageManager.throwItem(spaceId, 'issues');
-    const issuesDBName = `${spaceId}_comments_count`;
+    const commentCountDbName = `${spaceId}_comments_count`;
 
     if (!results) continue;
 
+    console.log('results:', results);
+
     for (const result of results) {
-      popupNotification({ hostname: space[spaceId].name, issueId: result.id, issuesDBName });
+      popupNotification({
+        hostname: space[spaceId].name,
+        spaceId,
+        issueId: result.id,
+        commentCountDbName,
+      });
     }
   }
 };
 const intervalCheck = async () => {
   const [space,close,watch] = await getAllOptions();
-  console.log(space,close,watch);
   await checkWatchIssues({ space, close, watch });
 };
 const runChromeFunctions = () => {
@@ -169,5 +177,21 @@ chrome.notifications.getPermissionLevel(async(response) => {
     runChromeFunctions();
   } else if (response === 'denied') {
     throw new Error('notification request false.');
+  }
+});
+// インストールとアップデート時に検知
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    if (chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage();
+    } else {
+      chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+    }
+  } else if (details.reason === 'update') {
+    const thisVersion = chrome.runtime.getManifest().version;
+
+    if (thisVersion !== details.previousVersion) {
+      chrome.tabs.create({ url: chrome.runtime.getURL('history.html') });
+    }
   }
 });

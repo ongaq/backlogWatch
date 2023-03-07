@@ -47,9 +47,16 @@ const compileScss = async (filePath: string) => {
     const result = sass.compile(filePath);
     const fileName = path.basename(filePath).replace('.scss', '.css');
     const distPath = path.resolve(`${dist}/css`, fileName);
+    const srcPath = path.resolve(`${src}/css`, fileName);
 
     await fs.writeFile(
       distPath,
+      prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
+      'utf8'
+    );
+    // rollupの都合上srcにも吐き出す必要がある
+    await fs.writeFile(
+      srcPath,
       prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
       'utf8'
     );

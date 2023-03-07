@@ -672,3 +672,9 @@ a {
 .notice.is-error:before {
   border-color: transparent transparent #d70000 transparent;
 }
+
+/* ====================================== */
+/* history */
+.history {
+  list-style: disc;
+}

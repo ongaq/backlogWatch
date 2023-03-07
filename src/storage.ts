@@ -34,6 +34,7 @@ class StorageManager {
     });
   }
   async set(key: Record<string, any>): Promise<void> {
+    console.log('set:', key);
     await this.storage.set(key);
   }
   /**
@@ -43,23 +44,28 @@ class StorageManager {
    * @param {String} tableName - DBのテーブル名を入力します
    */
   add: Storage.Add = (spaceId, item, tableName) => {
+    const tableKey = tableName === 'issues' ? item.id : Object.keys(item)[0];
+    const tableValue = tableName === 'issues' ? item : Object.values(item)[0];
     const createTable = (resolve: Resolve<boolean>) => {
       this.db[tableName] = {
         [spaceId]: {
-          [item.id]: item
+          [tableKey]: tableValue,
         }
       };
+      console.log('createTable:', this.db);
       this.storage.set(this.db, () => this.#error(resolve));
     };
     const insertTable = (value: Storage.DataBase, resolve: Resolve<boolean>) => {
       this.db[tableName] = value[tableName];
       this.db[tableName][spaceId] ??= {};
-      this.db[tableName][spaceId][item.id] = item;
+      this.db[tableName][spaceId][tableKey] = tableValue;
+      console.log('insertTable:', this.db);
       this.storage.set(this.db, () => this.#error(resolve));
     };
 
     return new Promise((resolve) => {
       this.storage.get(tableName, (value) => {
+        console.log('Storage.add:', value);
         if (Object.keys(value).length === 0) {
           createTable(resolve);
         } else {
@@ -144,10 +150,10 @@ class StorageManager {
 
     return new Promise((resolve) => {
       this.storage.get(tableName, (value: Storage.DataBase) => {
-        if (typeof value[tableName] === 'undefined') {
+        if (typeof value?.[tableName] === 'undefined') {
           resolve(false);
         }
-        const spaceData = value[tableName][spaceId];
+        const spaceData = value?.[tableName]?.[spaceId];
 
         if (typeof spaceData === 'undefined') {
           resolve(false);

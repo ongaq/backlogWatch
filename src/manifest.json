@@ -32,22 +32,29 @@
       "run_at": "document_idle"
     }
   ],
-  "web_accessible_resources": [{
-    "matches": [
-      "*://*.backlog.jp/*",
-      "*://*.backlog.com/*"
-    ],
-    "resources": [
-      "storage.ts",
-      "common.ts",
-      "issues.ts",
-      "projects.ts"
-    ]
-  }],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "*://*.backlog.jp/*",
+        "*://*.backlog.com/*"
+      ],
+      "resources": [
+        "storage.ts",
+        "common.ts",
+        "issues.ts",
+        "projects.ts"
+      ]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["history.html"]
+    }
+  ],
   "background": {
     "service_worker": "service_worker.ts"
   },
   "permissions": [
+    "tabs",
     "alarms",
     "storage",
     "notifications",

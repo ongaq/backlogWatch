@@ -61,7 +61,6 @@ export const watchControl = (element: HTMLElement, state: string) => {
   setTimeout(() => element.classList.add('is-running'), timer);
 };
 export const getOptions = <T extends GetOptionsArg>(target: T) => {
-  console.log('getOptions:', target);
   return new Promise<GetOptionsReturn<T>>(async(resolve) => {
     const items = await storageManager.get('options') as Options | false;
 
@@ -80,11 +79,17 @@ export const getOptions = <T extends GetOptionsArg>(target: T) => {
     return resolve(false as unknown as GetOptionsReturn<T>);
   });
 };
-export const spaceUrl = (() => {
+export const spaceUrl = (argHostname?: string) => {
+  if (argHostname) {
+    return {
+      subdomain: argHostname.split('.')[0],
+      hostname: argHostname,
+    };
+  }
   if (typeof window === 'undefined') {
     return false;
   }
   const hostname = window.location.hostname;
   const subdomain = hostname.split('.')[0];
   return { hostname, subdomain };
-})();
+};

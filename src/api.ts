@@ -4,17 +4,20 @@ import type { Space, SpaceInfo } from '../@types/index';
 import { spaceUrl, consoleLog, getOptions, backlogResource } from './common';
 import storageManager from './storage';
 
-const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method }: {
+const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method, hostname }: {
   apiPath: T;
   query?: string;
   method: 'GET' | 'POST' | 'DELETE';
+  hostname?: string;
 }): Promise<FetchApiReturn<T> | false> => {
-  const res = await getOptions('space');
-  if (!res) return false;
-  const result = spaceUrl;
-  if (!result) return false;
+  const space = await getOptions('space');
+  const result = spaceUrl(hostname);
+  if (!space || !result) {
+    console.log('fetchAPI failed:', space, result);
+    return false;
+  }
 
-  const apiKey = res[result.subdomain].apiKey;
+  const apiKey = space[result.subdomain].apiKey;
   const url = `https://${result.hostname}/api/v2/${apiPath}?apiKey=${apiKey+query}`;
   const options = {
     method,
@@ -39,17 +42,19 @@ export const getIssueFetchAPI = async (issueId: string) => {
     return false;
   }
 };
-export const getIssueCommentFetchAPI = async (issueId: string, issuesDBName: string) => {
-  const items = await storageManager.get(issuesDBName) as SpaceComments | false;
-  if (!items) return false;
+export const getIssueCommentFetchAPI = async (issueId: string, commentCountDbName: string, hostname: string) => {
+  const items = await storageManager.get(commentCountDbName) as SpaceComments | false;
+  if (!items || !Object.keys(items).length) return false;
 
-  const comment = items[issuesDBName];
+  const comment = items[commentCountDbName];
+  console.log('comment:', comment, issueId);
   const query = comment && comment?.[issueId] ? `&minId=${comment[issueId]}` : '&minId=0';
+  // const query = '&minId=0';
   const apiPath = `issues/${issueId}/comments` as const;
   const method = 'GET';
 
   try {
-    return await fetchAPI({ apiPath, query, method });
+    return await fetchAPI({ apiPath, query, method, hostname });
   } catch (e) {
     consoleLog(String(e));
     return false;

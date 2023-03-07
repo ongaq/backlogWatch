@@ -7,13 +7,16 @@ export type CheckWatchIssues = {
 };
 export type PopupNotification = {
   hostname: string;
+  spaceId: string;
   issueId: string;
-  issuesDBName: string;
+  commentCountDbName: string;
 };
 export type IssueCommentsCount = {
   [issueId: string]: number;
 }
 export type SpaceComments = {
-  [spaceId: string]: IssueCommentsCount | undefined;
+  [issueDBName: string]: {
+    [spaceId: string]: IssueCommentsCount | undefined;
+  };
 }
 
