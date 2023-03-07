@@ -45,7 +45,6 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
   const closeNotificationAfterSeconds = (notificationId: string) => {
     const msec = 1000;
     const alermName = 'autoClose';
-    console.log('notificationId:', notificationId, '->', new Date());
 
     if (typeof close !== 'undefined' && Number(close) > 0) {
       const when = Date.now() + (msec * Number(close));
@@ -89,12 +88,15 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
   };
   const popupNotification = async ({ hostname, spaceId, issueId, commentCountDbName }: PopupNotification) => {
     const result = await getIssueCommentFetchAPI(issueId, commentCountDbName, hostname);
-    if (!result) return;
+    if (!result || !result.length) return;
 
     console.log('popupNotification_result:', result);
 
     const [res] = result;
     const { id: commentLastId } = res;
+
+    console.log('commentLastId_res:', res, commentLastId);
+
     const compareValue: IssueCommentsCount = {};
     let useStorageValue: SpaceComments = {};
 
@@ -114,7 +116,7 @@ const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
     if (commentLastId > compareValue[issueId]) {
       const note = `[${issueId}] @${res.createdUser.name}`;
       const iconUrl = `https://${hostname}/favicon.ico`;
-      const issues = await getIssueFetchAPI(issueId);
+      const issues = await getIssueFetchAPI(issueId, hostname);
 
       createNotifications({
         type: 'basic',

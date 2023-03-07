@@ -4,7 +4,7 @@ import type { Space, SpaceInfo } from '../@types/index';
 import { spaceUrl, consoleLog, getOptions, backlogResource } from './common';
 import storageManager from './storage';
 
-const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method, hostname }: {
+const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, hostname = '' }: {
   apiPath: T;
   query?: string;
   method: 'GET' | 'POST' | 'DELETE';
@@ -13,7 +13,7 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method, hostnam
   const space = await getOptions('space');
   const result = spaceUrl(hostname);
   if (!space || !result) {
-    console.log('fetchAPI failed:', space, result);
+    console.log('fetchAPI failed:', space, result, hostname, apiPath);
     return false;
   }
 
@@ -31,12 +31,12 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query, method, hostnam
   }
 };
 
-export const getIssueFetchAPI = async (issueId: string) => {
+export const getIssueFetchAPI = async (issueId: string, hostname: string) => {
   const apiPath = `issues/${issueId}` as const;
   const method = 'GET';
 
   try {
-    return await fetchAPI({ apiPath, method });
+    return await fetchAPI({ apiPath, method, hostname });
   } catch (e) {
     consoleLog(String(e));
     return false;
@@ -44,12 +44,12 @@ export const getIssueFetchAPI = async (issueId: string) => {
 };
 export const getIssueCommentFetchAPI = async (issueId: string, commentCountDbName: string, hostname: string) => {
   const items = await storageManager.get(commentCountDbName) as SpaceComments | false;
-  if (!items || !Object.keys(items).length) return false;
+  const url = spaceUrl(hostname);
+  if (!items || !Object.keys(items).length || !url) return false;
 
-  const comment = items[commentCountDbName];
-  console.log('comment:', comment, issueId);
+  const subdomain = url.subdomain;
+  const comment = items[commentCountDbName][subdomain];
   const query = comment && comment?.[issueId] ? `&minId=${comment[issueId]}` : '&minId=0';
-  // const query = '&minId=0';
   const apiPath = `issues/${issueId}/comments` as const;
   const method = 'GET';
 
