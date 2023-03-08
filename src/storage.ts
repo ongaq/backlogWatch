@@ -22,14 +22,14 @@ class StorageManager {
     }
     return resolve(true);
   }
-  get(key: string): Promise<Record<string, any> | false> {
-    return new Promise((resolve) => {
+  get<T extends Storage.GetArg>(key: T) {
+    return new Promise<Storage.GetReturn<T>>((resolve) => {
       this.storage.get(key, (result) => {
         if (chrome.runtime.lastError) {
           console.error(chrome.runtime.lastError.message);
-          return resolve(false);
+          return resolve(false as unknown as Storage.GetReturn<T>);
         }
-        return resolve(result);
+        return resolve(result as unknown as Storage.GetReturn<T>);
       });
     });
   }

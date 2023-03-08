@@ -1,4 +1,4 @@
-import type { IssueItem } from 'index';
+import type { IssueItem, Options } from 'index';
 
 export type ThrowItem = (
   spaceId: string,
@@ -25,4 +25,39 @@ export type Space = {
 };
 export type DataBase = {
   [tableName: string]: Space;
+};
+
+export type GetArg = 'issues' | 'watching' | 'projects' | 'options' | string;
+export type GetReturn<T> = T extends 'issues'
+  ? IssuesDB | false
+  : T extends 'watching'
+  ? WatchingDB | false
+  : T extends 'projects'
+  ? ProjectsDB | false
+  : T extends 'options'
+  ? Options | false
+  : T extends string
+  ? Record<string, any> | false
+  : never;
+
+export type IssuesDB = {
+  [tableName: string]: {
+    [spaceName: string]: {
+      [issueId: string]: IssueItem;
+    }
+  }
+};
+export type WatchingDB = {
+  [tableName: string]: {
+    [spaceName: string]: {
+      [issueId: string]: number;
+    }
+  }
+};
+export type ProjectsDB = {
+  [tableName: string]: {
+    [spaceName: string]: {
+      [issueId: string]: IssueItem;
+    }
+  }
 };

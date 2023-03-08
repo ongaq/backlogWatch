@@ -1,18 +1,18 @@
-import type { Options, GetOptionsArg, GetOptionsReturn } from '../@types/index';
+import type { GetOptionsArg, GetOptionsReturn } from '../@types/index';
+import type { WatchStyle, WatchState } from '../@types/issues';
+import { addWatchFetchAPI, deleteWatchFetchAPI, getWatchListFetchAPI } from './api';
 import storageManager from './storage';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (log: any) => console.log('[BacklogWatch]', log);
 /** サイト側でグローバルに登録されたBacklogデータを参照する */
-export const backlogResource = (() => {
-  const hasWindow = typeof window !== 'undefined';
-  const backlog = (hasWindow && window.Backlog) || false;
-
-  if (backlog && backlog.resource) {
-    return backlog.resource;
-  }
-  return null;
-})();
+export const getBacklogUserId = () => {
+  const userProfileLinkImageElm = document.querySelector<HTMLImageElement>('#userProfileLink > img');
+  if (!userProfileLinkImageElm) return null;
+  const url = new URL(userProfileLinkImageElm.src);
+  const params = new URLSearchParams(url.search);
+  return params.get('userId');
+};
 export const spaceDomain = typeof window !== 'undefined' && window.location.hostname;
 export const backlogLocation = {
   isHome: typeof window !== 'undefined' && window.location.href.includes('/dashboard'),
@@ -62,7 +62,7 @@ export const watchControl = (element: HTMLElement, state: string) => {
 };
 export const getOptions = <T extends GetOptionsArg>(target: T) => {
   return new Promise<GetOptionsReturn<T>>(async(resolve) => {
-    const items = await storageManager.get('options') as Options | false;
+    const items = await storageManager.get('options');
 
     if (items && items.options) {
       const space = items.options.space;
@@ -86,10 +86,85 @@ export const spaceUrl = (argHostname?: string) => {
       hostname: argHostname,
     };
   }
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  const hostname = window.location.hostname;
-  const subdomain = hostname.split('.')[0];
+  const hostname = window?.location?.hostname || '';
+  const subdomain = hostname?.split('.')?.[0] || '';
   return { hostname, subdomain };
+};
+
+const watchText = {
+  watching: 'ウォッチ中',
+  notWatch: 'ウォッチリストに入れる',
+};
+export const removeWatchStyle = ({ heartElement, textElement }: WatchStyle) => {
+  watchControl(heartElement, 'remove');
+  textElement.textContent = watchText.notWatch;
+};
+export const addWatchStyle = ({ heartElement, textElement }: WatchStyle) => {
+  watchControl(heartElement, 'add');
+  textElement.textContent = watchText.watching;
+};
+export const addWatch = async ({ heartElement, textElement, issueId, watchingId }: WatchStyle & WatchState) => {
+  addWatchStyle({ heartElement, textElement });
+  const { subdomain } = spaceUrl();
+  const setValue = {
+    [issueId]: 0,
+  };
+
+  if (watchingId && subdomain) {
+    setValue[issueId] = watchingId;
+  } else if (subdomain) {
+    const watching = await addWatchFetchAPI(issueId);
+
+    if (watching) {
+      if (typeof watching?.errors !== 'undefined') {
+        if (heartElement && textElement) {
+          removeWatchStyle({ heartElement, textElement });
+        }
+        return;
+      }
+      setValue[issueId] = watching.id;
+    }
+  }
+  if (setValue[issueId]) {
+    void storageManager.add(subdomain, setValue, 'watching');
+  }
+};
+export const removeWatch = async ({ heartElement, textElement, issueId }: WatchStyle & WatchState) => {
+  removeWatchStyle({ heartElement, textElement });
+  const { subdomain } = spaceUrl();
+
+  const watching = await storageManager.get('watching');
+  if (!watching || !subdomain) {
+    addWatchStyle({ heartElement, textElement });
+    return;
+  }
+  const watchingId = watching['watching'][subdomain][issueId];
+  void deleteWatchFetchAPI(watchingId);
+  void storageManager.remove(subdomain, issueId, 'watching');
+};
+/** Chrome.Storageにウォッチが保存されているか */
+export const hasStorageWatchItem = async (issueId: string) => {
+  const watching = await storageManager.get('watching');
+  if (!watching) return;
+  const { subdomain } = spaceUrl();
+  const domainStorage = watching['watching']?.[subdomain] || {};
+
+  return Object.keys(domainStorage).includes(issueId);
+};
+/** ウォッチ中の課題を保存する */
+export const saveIssueWatching = async ({ heartElement, textElement, issueId }: WatchStyle & WatchState) => {
+  const isWatching = document.querySelector('.title-group__edit-actions button[aria-label="ウォッチ中"]') !== null;
+
+  // Backlogとしてはウォッチ中だがChrome.Storageにウォッチが保存されていない
+  if (!(await hasStorageWatchItem(issueId)) && isWatching) {
+    const watchingIssues = await getWatchListFetchAPI();
+    if (!watchingIssues || !watchingIssues.length) return;
+
+    for (const { issue } of watchingIssues) {
+      if (issue.issueKey === issueId) {
+        addWatch({ heartElement, textElement, issueId, watchingId: issue.id });
+        break;
+      }
+    }
+  }
 };

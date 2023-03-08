@@ -1,7 +1,7 @@
 import type { FetchApiArg, FetchApiReturn } from '../@types/api';
 import type { SpaceComments } from '../@types/service_worker';
 import type { Space, SpaceInfo } from '../@types/index';
-import { spaceUrl, consoleLog, getOptions, backlogResource } from './common';
+import { spaceUrl, consoleLog, getOptions, getBacklogUserId } from './common';
 import storageManager from './storage';
 
 const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, hostname = '' }: {
@@ -11,7 +11,7 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, ho
   hostname?: string;
 }): Promise<FetchApiReturn<T> | false> => {
   const space = await getOptions('space');
-  const result = spaceUrl(hostname);
+  const result = hostname ? spaceUrl(hostname) : spaceUrl();
   if (!space || !result) {
     console.log('fetchAPI failed:', space, result, hostname, apiPath);
     return false;
@@ -66,14 +66,15 @@ export const addWatchFetchAPI = async (issueId: string) => {
   const method = 'POST';
 
   try {
-    return await fetchAPI({ apiPath, query, method });
+    return await fetchAPI({ apiPath, query, method, });
   } catch (e) {
     consoleLog(String(e));
     return false;
   }
 };
 export const getWatchListFetchAPI = async () => {
-  const userId = backlogResource?.['loginUser.id'] || '';
+  const userId = getBacklogUserId();
+  if (!userId) return false;
   const apiPath = `users/${userId}/watchings` as const;
   const method = 'GET';
 

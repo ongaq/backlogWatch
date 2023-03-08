@@ -75,3 +75,12 @@ export type IssueComment = {
   notifications: any[];
 };
 export type IssueComments = IssueComment[];
+
+export type WatchStyle = {
+  heartElement: HTMLElement;
+  textElement: HTMLElement;
+};
+export type WatchState = {
+  issueId: string;
+  watchingId?: number;
+};

@@ -1,20 +1,31 @@
-import type { IssueItem } from '../@types/index';
-import { spaceUrl, backlogLocation, locationObserver, watchControl, consoleLog } from './common';
+import type { Watchings } from '../@types/watch';
+import type { WatchStyle, WatchState } from '../@types/issues';
+import {
+  spaceUrl,
+  backlogLocation,
+  locationObserver,
+  watchControl,
+  consoleLog,
+  addWatch,
+  removeWatch,
+  saveIssueWatching,
+  hasStorageWatchItem,
+} from './common';
 import storageManager from './storage';
+import { getWatchListFetchAPI } from './api';
 
-const createHTML = (issues: IssueItem[]) => {
+const createHTML = (watchings: Watchings[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
-  const createTR = (data: IssueItem, evenOdd: string) => {
-    if (!data.id || !data.title || !data.assigner || !data.description) {
-      return '';
-    }
+  const createTR = (data: Watchings, evenOdd: string) => {
+    const { issueKey, summary, assignee, description } = data.issue;
+
     return `<tr class="Issue watch-issue-list watch-issue-list_new ${evenOdd}">
       <td class="Key">
-        <p><a href="/view/${data.id}" class="watch-issue-anchor" title="${data.id}">${data.id}</a></p>
+        <p><a href="/view/${issueKey}" class="watch-issue-anchor" title="${issueKey}">${issueKey}</a></p>
       </td>
-      <td class="Title"><p>${data.title}</p></td>
-      <td class="Assigner">${data.assigner}</td>
-      <td class="Description" title="aaaa"><p>${data.description.slice(0, 60)}...</p></td>
+      <td class="Title"><p>${summary}</p></td>
+      <td class="Assigner">${assignee.name}</td>
+      <td class="Description" title="aaaa"><p>${description.slice(0, 60)}...</p></td>
       <td class="Watch"><i class="fa fa-heart is-watch"></i></td>
     </tr>`;
   };
@@ -37,14 +48,14 @@ const createHTML = (issues: IssueItem[]) => {
   </section>`;
 
   let tr = '';
-  for (let i=0; i < issues.length; i++) {
+  for (let i=0; i < watchings.length; i++) {
     const evenOdd = i % 2 ? 'odd' : 'even';
-    tr += createTR(issues[i], evenOdd);
+    tr += createTR(watchings[i], evenOdd);
   }
   return html(tr);
 };
-const createHomeTheIssueUnderWatch = (issues: IssueItem[]) => {
-  const html = createHTML(issues);
+const createHomeTheIssueUnderWatch = (watchings: Watchings[]) => {
+  const html = createHTML(watchings);
   const projects = document.querySelector<HTMLElement>('#project-list:not([data-id="projects-fav"])');
 
   if (projects !== null) {
@@ -56,12 +67,10 @@ const createWatchHome = async () => {
   if (!spaceInfo) return;
   const subdomain = spaceInfo.subdomain;
 
-  // Storageに課題キーが存在するか確認
-  const result = await storageManager.throwItem(subdomain, 'issues');
-  if (result === false) return;
-  if (result.length) {
-    createHomeTheIssueUnderWatch(result);
-  }
+  const result = await getWatchListFetchAPI();
+  if (!result || !result.length) return;
+  createHomeTheIssueUnderWatch(result);
+
   const watchingElements = document.querySelectorAll<HTMLElement>('.watch-issue .fa-heart');
   const watchRemoveHandler = async (event: MouseEvent) => {
     const self = <HTMLElement>event.currentTarget;
@@ -112,6 +121,10 @@ const createWatchHome = async () => {
 };
 /** 課題ページでウォッチボタンの作成 */
 const createWatchIssue = async () => {
+  const officialWatchBtnElement = document.querySelector('.icon-button.icon-button--default.-watch-button.title-group__edit-actions-item.-with-text[aria-label]');
+  if (officialWatchBtnElement) {
+    officialWatchBtnElement.classList.add('is-hidden');
+  }
   const spaceInfo = spaceUrl();
   if (!spaceInfo) return;
   const subdomain = spaceInfo.subdomain;
@@ -131,50 +144,33 @@ const createWatchIssue = async () => {
     description: issueCard.querySelector<HTMLElement>('.ticket__description')?.textContent || '',
     time: new Date()
   });
-  const changeWatchState = async (event: Event, issueItem: IssueItem) => {
-    const self = <HTMLElement>event.currentTarget;
-    const isWatching = await storageManager.hasIssue(subdomain, issueItem.id, 'issues');
-    const heartElement = self.querySelector<HTMLElement>('.fa-heart');
-    const textElement = self.querySelector<HTMLElement>('span');
+  const changeWatchState = async ({ heartElement, textElement, issueId }: WatchStyle & WatchState) => {
+    const watching = await storageManager.get('watching');
+    if (!watching) return;
+    const issueIds = watching?.['watching']?.[subdomain] || {};
+    const isWatching = Object.keys(issueIds).includes(issueItem.id);
 
     if (!textElement || !heartElement) {
       return consoleLog('ウォッチ状態変更の失敗');
     }
     if (isWatching) {
-      watchControl(heartElement, 'remove');
-      void storageManager.remove(subdomain, issueItem.id, 'issues');
-      textElement.textContent = watchText.notWatch;
+      removeWatch({ heartElement, textElement, issueId });
     } else {
-      const limitedBytes = 100;
-      const description = issueItem.description || '';
-      if ([...description].length > limitedBytes) {
-        issueItem.description = `${description.slice(0, limitedBytes)}...`;
-      }
-
-      const commentCount = {
-        [issueItem.id]: 0,
-      };
-      const issuesDB = await storageManager.add(subdomain, issueItem, 'issues');
-      const commentCountDB = await storageManager.add(subdomain, commentCount, `${subdomain}_comments_count`);
-
-      if (issuesDB && commentCountDB) {
-        watchControl(heartElement, 'add');
-        textElement.textContent = watchText.watching;
-      }
+      addWatch({ heartElement, textElement, issueId });
     }
   };
-  const createWatchButton = async (issueItemId: string) => {
+  const createWatchButton = async (issueId: string) => {
     const watchIconWrap = document.querySelector('.watchIconWrap');
     if (watchIconWrap) {
       watchIconWrap.remove();
     }
-    const html = (text: string) => `<div class="watchIconWrap watchIconWrap_new">
-      <span>${text}</span>
-      <i class="fa fa-heart" title="${text}"></i>
+    const html = (text: string) => `<div id="extension-btn" class="watchIconWrap watchIconWrap_new">
+      <span id="extension-text">${text}</span>
+      <i id="extension-heartIcon" class="fa fa-heart" title="${text}"></i>
     </div>`;
 
     // Storageに課題キーが存在するか確認
-    const isWatching = await storageManager.hasIssue(subdomain, issueItemId, 'issues');
+    const isWatching = await hasStorageWatchItem(issueId);
 
     if (isWatching) {
       document.body.insertAdjacentHTML('beforeend', html(watchText.watching));
@@ -187,10 +183,18 @@ const createWatchIssue = async () => {
   };
 
   const issueItem = getIssueItem(issueCard);
-  await createWatchButton(issueItem.id);
+  const issueId = issueItem.id;
+  await createWatchButton(issueId);
   const watchBtnElement = document.querySelector('.watchIconWrap');
   if (watchBtnElement === null) return;
-  watchBtnElement.addEventListener('click', (e) => changeWatchState(e, issueItem));
+  const heartElement = document.querySelector<HTMLElement>('#extension-heartIcon');
+  const textElement = document.querySelector<HTMLElement>('#extension-text');
+
+  if (heartElement && textElement && issueId) {
+    const items = { heartElement, textElement, issueId };
+    await saveIssueWatching(items);
+    watchBtnElement.addEventListener('click', () => changeWatchState(items));
+  }
 };
 const observeIssueCard = (callback: Function) => {
   const rootElement = document.querySelector('#root');

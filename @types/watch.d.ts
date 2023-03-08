@@ -10,6 +10,7 @@ export type Watchings = {
   lastContentUpdated: Date;
   created: Date;
   updated: Date;
+  errors?: {};
 }
 /** response: /api/v2/users/:userId/watchings */
 export type WatchingsList = Watchings[];

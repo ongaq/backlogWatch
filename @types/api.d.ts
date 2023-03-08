@@ -1,5 +1,5 @@
 import type { Issues, IssueComments } from './issues';
-import type { Watchings, WatchingsList } from './watch';
+import type { Watchings } from './watch';
 import type { Space } from './index';
 
 export type FetchApiArg =
@@ -17,5 +17,5 @@ export type FetchApiReturn<T> =
   : T extends (`watchings/${string}` | 'watchings')
   ? Watchings | false
   : T extends `users/${string}/watchings`
-  ? WatchingsList | false
+  ? Watchings[] | false
   : never;

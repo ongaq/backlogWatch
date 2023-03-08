@@ -162,7 +162,7 @@ const deleteDB = async () => {
 };
 /** 初期表示設定 */
 const setInitialDisplay = async () => {
-  const items = await storageManager.get('options') as Options | false;
+  const items = await storageManager.get('options');
   console.log('items:', items);
   if (!items || !Object.keys(items).length) return;
 
