@@ -2,11 +2,24 @@ import type { Watchings } from '../@types/watch';
 import { getWatchListFetchAPI } from './api';
 import storageManager from './storage';
 
-const createTag = (name: string, value: string) => {
+const createTag = (name: string, value: string, date?: Date) => {
+  let addClass = '';
+  if (date && new Date().getTime() > new Date(date).getTime()) {
+    addClass = ' is-danger';
+  }
+  if (name === 'ステータス') {
+    if (value === '処理中') {
+      addClass = ' is-info';
+    } else if (value === '処理済み') {
+      addClass = ' is-success';
+    } else if (value === '完了') {
+      addClass = ' is-primary';
+    }
+  }
   return `<div class="control">
     <div class="tags has-addons">
       <span class="tag is-dark">${name}</span>
-      <span class="tag is-light">${value}</span>
+      <span class="tag is-light${addClass}">${value}</span>
     </div>
   </div>`;
 };
@@ -26,9 +39,9 @@ const createHTML = (watching: Watchings, hostname: string) => {
       <p class="watchList__li__desc subtitle is-7">${issue.description}</p>
       <div class="field is-grouped is-grouped-multiline">
         ${issue.startDate ? createTag('開始日', dateConvert(issue.startDate)) : ''}
-        ${issue.dueDate ? createTag('期限日', dateConvert(issue.dueDate)) : ''}
-        ${issue?.priority?.name ? createTag('優先度', issue.priority.name) : ''}
+        ${issue.dueDate ? createTag('期限日', dateConvert(issue.dueDate), issue.dueDate) : ''}
         ${issue?.status?.name ? createTag('ステータス', issue.status.name) : ''}
+        ${issue?.priority?.name ? createTag('優先度', issue.priority.name) : ''}
         ${issue?.assignee?.name ? createTag('担当', issue.assignee.name) : ''}
         ${issue?.createdUser?.name ? createTag('課題作成者', issue.createdUser.name) : ''}
         ${watching.lastContentUpdated ? createTag('最終更新日時', dateConvert(watching.lastContentUpdated)) : ''}
@@ -38,7 +51,7 @@ const createHTML = (watching: Watchings, hostname: string) => {
 };
 const createHTMLFromAPI = async () => {
   const options = await storageManager.get('options');
-  if (!options) return [];
+  if (!options || !Object.keys(options).length) return [];
   const spaceNames = Object.keys(options.options.space);
   const htmlArray = [];
 
@@ -66,12 +79,17 @@ const createTabs = (htmlArray: { spaceName: string, html: string; }[]) => {
     </ul>
   </div>`;
 };
+const createNotWatchHTML = () => {
+  return '<div class="notWatch">現在ウォッチしてる課題が無いか、オプションでスペース情報の入力がありません</div>';
+};
 const setHTML = async () => {
   const appElm = document.querySelector('#app');
   if (!appElm) return;
   const htmlArray = await createHTMLFromAPI();
 
-  if (htmlArray.length === 1) {
+  if (htmlArray.length === 0) {
+    appElm.insertAdjacentHTML('afterbegin', createNotWatchHTML());
+  } else if (htmlArray.length === 1) {
     appElm.insertAdjacentHTML('afterbegin', htmlArray[0].html);
   } else if (htmlArray.length > 1) {
     for (const data of htmlArray) {

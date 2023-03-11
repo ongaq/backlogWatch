@@ -44,6 +44,10 @@ body {
   color: hsl(171, 100%, 41%) !important;
 }
 
+.notWatch {
+  padding: 16px;
+}
+
 .field.is-grouped.is-grouped-multiline > .control:not(:last-child) {
   margin-bottom: 4px;
 }
