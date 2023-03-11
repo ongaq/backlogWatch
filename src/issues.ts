@@ -63,15 +63,11 @@ const createHomeTheIssueUnderWatch = (watchings: Watchings[]) => {
   }
 };
 const createWatchHome = async () => {
-  const spaceInfo = spaceUrl();
-  if (!spaceInfo) return;
-  const subdomain = spaceInfo.subdomain;
-
-  const result = await getWatchListFetchAPI();
+  const { subdomain, hostname } = spaceUrl();
+  const result = await getWatchListFetchAPI(hostname);
   if (!result || !result.length) return;
   createHomeTheIssueUnderWatch(result);
 
-  const watchingElements = document.querySelectorAll<HTMLElement>('.watch-issue .fa-heart');
   const watchRemoveHandler = async (event: MouseEvent) => {
     const self = <HTMLElement>event.currentTarget;
     const trElement = self.closest('tr');
@@ -88,11 +84,6 @@ const createWatchHome = async () => {
       setTimeout(() => trElement.remove(), speed);
     }
   };
-  for (const watchingElement of watchingElements) {
-    watchingElement.addEventListener('click', (event) => void watchRemoveHandler(event));
-  }
-
-  const watchIssueElements = document.querySelectorAll<HTMLElement>('.watch-issue-list');
   const mouseEnterHandler = (e: MouseEvent) => {
     const self = <HTMLElement>e.currentTarget;
     self?.classList.add('is-hover');
@@ -113,6 +104,13 @@ const createWatchHome = async () => {
       location.href = href;
     }
   };
+
+  const watchIssueElements = document.querySelectorAll<HTMLElement>('.watch-issue-list');
+  const watchingElements = document.querySelectorAll<HTMLElement>('.watch-issue .fa-heart');
+
+  for (const watchingElement of watchingElements) {
+    watchingElement.addEventListener('click', (event) => void watchRemoveHandler(event));
+  }
   for (const watchIssueElement of watchIssueElements) {
     watchIssueElement.addEventListener('mouseenter', mouseEnterHandler);
     watchIssueElement.addEventListener('mouseleave', mouseLeaveHandler);

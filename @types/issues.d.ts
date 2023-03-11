@@ -74,7 +74,6 @@ export type IssueComment = {
   stars: any[];
   notifications: any[];
 };
-export type IssueComments = IssueComment[];
 
 export type WatchStyle = {
   heartElement: HTMLElement;

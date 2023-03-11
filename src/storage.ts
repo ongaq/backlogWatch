@@ -3,11 +3,11 @@ import type { Resolve, IssueItem } from '../@types/index';
 import { QUOTA_BYTES_PER_ITEM } from './text';
 
 class StorageManager {
-  private storage: chrome.storage.SyncStorageArea;
+  private storage: chrome.storage.LocalStorageArea;
   private db: Storage.DataBase;
 
   constructor() {
-    this.storage = chrome.storage.sync;
+    this.storage = chrome.storage.local;
     this.db = {};
   }
   #error(resolve: Resolve<boolean>) {
@@ -77,13 +77,13 @@ class StorageManager {
   /**
    * 第一引数で指定されたitemをtableから削除する
    * @param {String} spaceId - spaceの名前を入力します
-   * @param {String} itemId - IssueのIDを文字列で指定
+   * @param {String} issueId - IssueのIDを文字列で指定
    * @param {String} tableName - DBのテーブル名を入力します
    */
-  remove: Storage.Common = (spaceId, itemId, tableName) => {
+  remove: Storage.Common = (spaceId, issueId, tableName) => {
     const removeTable = async (value: Storage.DataBase, resolve: Resolve<true>) => {
       this.db[tableName] = value[tableName];
-      delete this.db[tableName][spaceId][itemId];
+      delete this.db[tableName][spaceId][issueId];
       await this.storage.set(this.db);
       return resolve(true);
     };

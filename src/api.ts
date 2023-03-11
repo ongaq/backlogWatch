@@ -1,8 +1,8 @@
 import type { FetchApiArg, FetchApiReturn } from '../@types/api';
-import type { SpaceComments } from '../@types/service_worker';
+// import type { SpaceComments } from '../@types/service_worker';
 import type { Space, SpaceInfo } from '../@types/index';
 import { spaceUrl, consoleLog, getOptions, getBacklogUserId } from './common';
-import storageManager from './storage';
+// import storageManager from './storage';
 
 const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, hostname = '' }: {
   apiPath: T;
@@ -12,8 +12,8 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, ho
 }): Promise<FetchApiReturn<T> | false> => {
   const space = await getOptions('space');
   const result = hostname ? spaceUrl(hostname) : spaceUrl();
-  if (!space || !result) {
-    console.log('fetchAPI failed:', space, result, hostname, apiPath);
+  if (!space || !result.subdomain || !result.hostname) {
+    console.log('fetchAPI failed:', { space, result, hostname, apiPath });
     return false;
   }
 
@@ -42,14 +42,8 @@ export const getIssueFetchAPI = async (issueId: string, hostname: string) => {
     return false;
   }
 };
-export const getIssueCommentFetchAPI = async (issueId: string, commentCountDbName: string, hostname: string) => {
-  const items = await storageManager.get(commentCountDbName) as SpaceComments | false;
-  const url = spaceUrl(hostname);
-  if (!items || !Object.keys(items).length || !url) return false;
-
-  const subdomain = url.subdomain;
-  const comment = items[commentCountDbName][subdomain];
-  const query = comment && comment?.[issueId] ? `&minId=${comment[issueId]}` : '&minId=0';
+export const getIssueCommentFetchAPI = async (issueId: string, hostname: string) => {
+  const query = '&minId=0';
   const apiPath = `issues/${issueId}/comments` as const;
   const method = 'GET';
 
@@ -72,14 +66,15 @@ export const addWatchFetchAPI = async (issueId: string) => {
     return false;
   }
 };
-export const getWatchListFetchAPI = async () => {
-  const userId = getBacklogUserId();
+export const getWatchListFetchAPI = async (hostname: string) => {
+  const userId = await getBacklogUserId(hostname);
   if (!userId) return false;
   const apiPath = `users/${userId}/watchings` as const;
   const method = 'GET';
+  const query = '&count=100';
 
   try {
-    return await fetchAPI({ apiPath, method });
+    return await fetchAPI({ apiPath, method, query, hostname });
   } catch (e) {
     consoleLog(String(e));
     return false;
@@ -106,4 +101,15 @@ export const getSpaceInfoFetchAPI = async (hostname: string, apiKey: string) => 
       return { status: response.status, result: false } as unknown as Promise<SpaceInfo>;
     }
   });
+};
+export const getUserInfoFetchAPI = async () => {
+  const apiPath = 'users/myself' as const;
+  const method = 'GET';
+
+  try {
+    return await fetchAPI({ apiPath, method });
+  } catch (e) {
+    consoleLog(String(e));
+    return false;
+  }
 };

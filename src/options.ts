@@ -160,6 +160,16 @@ const saveSettings = () => {
 const deleteDB = async () => {
   await storageManager.deleteDB();
 };
+const addWatch = async () => {
+  await storageManager.add('watchtest', { 'TEST-1': 100 }, 'watching');
+  await storageManager.add('watchtest', { 'TEST-2': 100 }, 'watching');
+  await storageManager.add('watchtest', { 'TEST-3': 100 }, 'watching');
+  console.log('add:', await storageManager.get('watching'));
+};
+const removeWatch = async () => {
+  await storageManager.remove('watchtest', 'TEST-2', 'watching');
+  console.log('remove:', await storageManager.get('watching'));
+};
 /** 初期表示設定 */
 const setInitialDisplay = async () => {
   const items = await storageManager.get('options');
@@ -217,5 +227,8 @@ const setInitialDisplay = async () => {
   document.querySelector('#js-options-spaceSubmit')?.addEventListener('click', saveSettings);
   // deleteDB
   document.querySelector('#js-options-deleteDB')?.addEventListener('click', deleteDB);
+
+  document.querySelector('#js-options-addWatch')?.addEventListener('click', addWatch);
+  document.querySelector('#js-options-removeWatch')?.addEventListener('click', removeWatch);
 })();
 

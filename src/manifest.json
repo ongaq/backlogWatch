@@ -26,8 +26,7 @@
       "js": [
         "storage.ts",
         "common.ts",
-        "issues.ts",
-        "projects.ts"
+        "issues.ts"
       ],
       "run_at": "document_idle"
     }
@@ -41,8 +40,7 @@
       "resources": [
         "storage.ts",
         "common.ts",
-        "issues.ts",
-        "projects.ts"
+        "issues.ts"
       ]
     },
     {
