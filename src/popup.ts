@@ -101,13 +101,15 @@ const selectInitialActive = () => {
     }
   };
 
-  if (lists.length && tabs.length) {
+  if (lists.length > 1 && tabs.length > 1) {
     lists[0].classList.add('is-active');
     tabs[0].classList.add('is-active');
 
     for (const tab of tabs) {
       tab.addEventListener('click', (e) => selectTab(e, tabs, lists));
     }
+  } else if (lists.length === 1) {
+    lists[0].classList.add('is-active');
   }
 };
 const setHTML = async () => {
@@ -119,6 +121,7 @@ const setHTML = async () => {
     appElm.insertAdjacentHTML('afterbegin', createNotWatchHTML());
   } else if (htmlArray.length === 1) {
     appElm.insertAdjacentHTML('afterbegin', htmlArray[0].html);
+    selectInitialActive();
   } else if (htmlArray.length > 1) {
     for (const data of htmlArray) {
       appElm.insertAdjacentHTML('afterbegin', data.html);
