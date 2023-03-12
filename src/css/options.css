@@ -283,29 +283,16 @@ progress {
 
 /* ====================================== */
 /* Global */
-:root {
-  --font: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Arial, 'BIZ UDPGothic', Meiryo, sans-serif;
-}
-
 html,
 body {
   min-height: 100%;
   height: 100%;
 }
 
-html {
-  font-size: 62.5%;
-}
-
 body {
-  font-family: var(--font);
-  font-size: 1.6rem;
-  background-color: rgba(147, 196, 0, 0.1);
+  color: #363636;
+  font-family: 'M PLUS Rounded 1c';
   backface-visibility: hidden;
-}
-
-h1 {
-  font-size: 18px;
 }
 
 ul {
@@ -313,53 +300,11 @@ ul {
 }
 
 a {
-  color: #42791b;
+  text-decoration: underline !important;
 }
 
 /* ====================================== */
 /* parts */
-.di_block {
-  display: block;
-}
-
-.di_iblock {
-  display: inline-block;
-}
-
-.mt5 {
-  margin-top: 8px;
-}
-
-.mr10 {
-  margin-right: 16px;
-}
-
-.mb5 {
-  margin-bottom: 8px;
-}
-
-.mb10 {
-  margin-bottom: 16px;
-}
-
-.mb20 {
-  margin-bottom: 24px;
-}
-
-.mb30 {
-  margin-bottom: 32px;
-}
-
-.fs_small {
-  font-size: 1.3rem;
-}
-.fs_middle {
-  font-size: 1.6rem;
-}
-.fs_large {
-  font-size: 2.4rem;
-}
-
 .fa {
   position: relative;
   display: inline-block;
@@ -373,20 +318,20 @@ a {
 .fa-pencil {
   width: 24px;
   height: 24px;
-  color: #93c400;
-  font-size: 2.4rem;
+  color: #00d1b2;
+  font-size: 24px;
 }
 .fa-plus-circle:hover,
 .fa-minus-circle:hover,
 .fa-pencil:hover {
-  color: #6d9100;
+  color: #009e87;
 }
 
 .fa-pencil {
   width: 18px;
   height: 18px;
   color: #333;
-  font-size: 1.8rem;
+  font-size: 18px;
 }
 
 /* ====================================== */
@@ -395,20 +340,10 @@ a {
   margin: 0 auto;
   padding: 24px;
   min-width: 1024px;
-  width: 90vw;
+  width: 96vw;
   min-height: 100%;
   background-color: #fff;
   z-index: 10;
-}
-
-.heading01 {
-  margin-top: -16px;
-  margin-bottom: 24px;
-  letter-spacing: -1px;
-  color: rgba(147, 196, 0, 0.3);
-  font-family: Verdana;
-  font-size: 50px;
-  z-index: 1;
 }
 
 .field {
@@ -418,7 +353,6 @@ a {
   margin-bottom: 16px;
   padding: 16px;
   width: calc(100% - 60px);
-  background-color: #f0f0f0;
   border-radius: 4px;
 }
 .field-list {
@@ -529,20 +463,16 @@ a {
 .field-list-li_plus .icon_pencil:before {
   content: 'スペースを編集したい場合は✎をクリック';
 }
+.field-list-li strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
 
-.section {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #e5e5e5;
-  backface-visibility: hidden;
-}
-.section p {
-  line-height: 1.6;
-}
-.section:first-of-type {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
+.optionWrap {
+  margin: 40px -24px 0;
+  padding: 24px 24px 0;
+  border-top: 1px solid #e0e0e0;
 }
 
 .optionList {
@@ -553,33 +483,13 @@ a {
 }
 .optionList-li {
   display: flex;
+  align-items: center;
   gap: 16px;
 }
 
-.select,
-.input,
-.button {
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  outline: none;
-}
-
 .buttonArea {
-  position: relative;
-  display: block;
-  margin: 30px -24px 0;
-  padding-top: 24px;
+  margin-top: 64px;
   text-align: center;
-  border-top: 1px solid #f0f0f0;
-}
-.buttonArea .input-spaceSubmit {
-  width: 150px;
-}
-
-.select {
-  padding: 0 8px;
-  height: 26px;
 }
 
 .input {
@@ -588,10 +498,6 @@ a {
 }
 .input::placeholder {
   color: #ccc;
-}
-.input:focus {
-  border-color: #93c400;
-  box-shadow: 0 0 5px rgba(147, 196, 0, 0.7);
 }
 .input.is-error {
   border-width: 2px;
@@ -602,30 +508,8 @@ a {
 }
 .input.is-ok {
   padding: 5px 0;
-  background-color: #f0f0f0;
+  background-color: #eff5fb;
   border: 0;
-}
-
-.button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  padding: 8px 0 10px;
-  width: 150px;
-  height: 37px;
-  background-color: #eee;
-  cursor: pointer;
-  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1), -1px 0 2px rgba(0, 0, 0, 0.1), 0 3px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-.button:hover {
-  background-color: #fff;
-}
-.button:active {
-  top: 1px;
-  box-shadow: none;
 }
 
 .notice {
@@ -671,10 +555,4 @@ a {
 }
 .notice.is-error:before {
   border-color: transparent transparent #d70000 transparent;
-}
-
-/* ====================================== */
-/* history */
-.history {
-  list-style: disc;
 }

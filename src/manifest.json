@@ -19,7 +19,7 @@
       "48": "images/icon48.png",
       "128": "images/icon128.png"
     },
-    "default_title": "ウォッチ中の課題",
+    "default_title": "Backlog watch",
     "default_popup": "popup.html"
   },
   "content_scripts": [

@@ -4,49 +4,24 @@
 
 /* ====================================== */
 /* Global */
-
-:root {
-  --font: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Arial, "BIZ UDPGothic", Meiryo, sans-serif;
-}
-
 html,body {
   min-height: 100%;
   height: 100%;
 }
-html {
-  font-size: 62.5%;
-}
 body {
-  font-family: var(--font);
-  font-size: 1.6rem;
-  background-color: rgba(#93c400, 0.1);
+  color: #363636;
+  font-family: "M PLUS Rounded 1c";
   backface-visibility: hidden;
-}
-h1 {
-  font-size: 18px;
 }
 ul {
   list-style: none;
 }
-a { color: #42791b;}
+a {
+  text-decoration: underline !important;
+}
 
 /* ====================================== */
 /* parts */
-.di_block { display: block;}
-.di_iblock { display: inline-block;}
-.mt5 { margin-top: 8px;}
-.mr10 { margin-right: 16px;}
-.mb5 { margin-bottom: 8px;}
-.mb10 { margin-bottom: 16px;}
-.mb20 { margin-bottom: 24px;}
-.mb30 { margin-bottom: 32px;}
-
-.fs {
-  &_small { font-size: 1.3rem;}
-  &_middle { font-size: 1.6rem;}
-  &_large { font-size: 2.4rem;}
-}
-
 .fa {
   position: relative;
   display: inline-block;
@@ -59,18 +34,18 @@ a { color: #42791b;}
 .fa-pencil {
   width: 24px;
   height: 24px;
-  color: #93c400;
-  font-size: 2.4rem;
+  color: #00d1b2;
+  font-size: 24px;
 
   &:hover {
-    color: darken(#93c400, 10%);
+    color: darken(#00d1b2, 10%);
   }
 }
 .fa-pencil {
   width: 18px;
   height: 18px;
   color: #333;
-  font-size: 1.8rem;
+  font-size: 18px;
 }
 
 /* ====================================== */
@@ -79,20 +54,12 @@ a { color: #42791b;}
   margin: 0 auto;
   padding: 24px;
   min-width: 1024px;
-  width: 90vw;
+  width: 96vw;
   min-height: 100%;
   background-color: #fff;
   z-index: 10;
 }
-.heading01 {
-  margin-top: -16px;
-  margin-bottom: 24px;
-  letter-spacing: -1px;
-  color: rgba(#93c400, 0.3);
-  font-family: Verdana;
-  font-size: 50px;
-  z-index: 1;
-}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -100,7 +67,6 @@ a { color: #42791b;}
   margin-bottom: 16px;
   padding: 16px;
   width: calc(100% - 60px);
-  background-color: #f0f0f0;
   border-radius: 4px;
 
   &-list {
@@ -218,23 +184,18 @@ a { color: #42791b;}
         }
       }
     }
+
+    strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
   }
 }
-.section {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #e5e5e5;
-  backface-visibility: hidden;
-
-  p {
-    line-height: 1.6;
-  }
-
-  &:first-of-type {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: 0;
-  }
+.optionWrap {
+  margin: 40px -24px 0;
+  padding: 24px 24px 0;
+  border-top: 1px solid #e0e0e0;
 }
 .optionList {
   display: flex;
@@ -244,30 +205,13 @@ a { color: #42791b;}
 
   &-li {
     display: flex;
+    align-items: center;
     gap: 16px;
   }
 }
-.select,
-.input,
-.button {
-  padding: 4px 8px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  outline: none;
-}
 .buttonArea {
-  position: relative;
-  display: block;
-  margin: 30px -24px 0;
-  padding-top: 24px;
+  margin-top: 64px;
   text-align: center;
-  border-top: 1px solid #f0f0f0;
-
-  .input-spaceSubmit { width: 150px;}
-}
-.select {
-  padding: 0 8px;
-  height: 26px;
 }
 .input {
   background-color: #fff;
@@ -275,11 +219,6 @@ a { color: #42791b;}
 
   &::placeholder {
     color: #ccc;
-  }
-
-  &:focus {
-    border-color: #93c400;
-    box-shadow: 0 0 5px rgba(#93c400,0.7);
   }
   &.is-error {
     border-width: 2px;
@@ -291,35 +230,11 @@ a { color: #42791b;}
   }
   &.is-ok {
     padding: 5px 0;
-    background-color: #f0f0f0;
+    background-color: #eff5fb;
     border: 0;
   }
 }
-.button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  padding: 8px 0 10px;
-  width: 150px;
-  height: 37px;
-  background-color: #eee;
-  cursor: pointer;
-  box-shadow:
-    1px 0 2px rgba(#000, 0.1),
-    -1px 0 2px rgba(#000, 0.1),
-    0 3px 4px rgba(#000, 0.1);
-  transition: all 0.3s ease;
 
-  &:hover {
-    background-color: #fff;
-  }
-  &:active {
-    top: 1px;
-    box-shadow: none;
-  }
-}
 .notice {
   position: absolute;
   bottom: -20px;
@@ -365,10 +280,4 @@ a { color: #42791b;}
       border-color: transparent transparent #d70000 transparent;
     }
   }
-}
-
-/* ====================================== */
-/* history */
-.history {
-  list-style: disc;
 }
