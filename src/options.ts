@@ -3,7 +3,7 @@ import { consoleLog } from './common';
 import storageManager from './storage';
 import { getSpaceInfoFetchAPI } from './api';
 
-const error = 'is-error';
+const error = 'is-danger';
 const visible = 'is-visible';
 const ok = 'is-ok';
 
@@ -22,7 +22,10 @@ const addCloneFieldList = (spaceFieldULElm: HTMLUListElement, fieldListLen: numb
   document.querySelector('.js-field')?.insertAdjacentElement('beforeend', cloneFieldUlElm);
 };
 /** 引数にdata-name属性の値を入れ対象のdata属性のvalueを全て取得する */
-const getFieldValues = (dataName: string) => [...document.querySelectorAll<HTMLInputElement>(`[data-name="${dataName}"]`)].map((elm) => elm.value);
+const getFieldValues = (dataName: string) => {
+  return [...document.querySelectorAll<HTMLInputElement>(`[data-name="${dataName}"]:not([disabled])`)]
+    .map((elm) => elm.value);
+};
 /** 入力したスペース情報やAPIKEYが正確だったかどうか結果をDOM上に反映する */
 const authResult = ({ status, result, index }: { status: number; result: boolean; index: number }) => {
   const noticeElm = document.querySelector('#js-options-notice');
