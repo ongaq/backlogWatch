@@ -2,5 +2,3 @@ node_modules
 dist
 .vscode
 *.map
-quokka.js
-quokka.ts
