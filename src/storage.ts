@@ -1,5 +1,5 @@
 import type * as Storage from '../@types/storage';
-import type { Resolve, IssueItem } from '../@types/index';
+import type { Resolve } from '../@types/index';
 import { QUOTA_BYTES_PER_ITEM } from './text';
 
 class StorageManager {
@@ -11,12 +11,16 @@ class StorageManager {
     this.db = {};
   }
   #error(resolve: Resolve<boolean>) {
-    console.log('chrome.runtime:', chrome.runtime);
     if (chrome.runtime.lastError) {
       console.error(chrome.runtime.lastError.message);
 
-      if (chrome.runtime.lastError.message === 'QUOTA_BYTES_PER_ITEM quota exceeded') {
-        alert(QUOTA_BYTES_PER_ITEM);
+      switch (chrome.runtime.lastError.message) {
+        case 'QUOTA_BYTES quota exceeded':
+        case 'QUOTA_BYTES_PER_ITEM quota exceeded':
+          alert(QUOTA_BYTES_PER_ITEM);
+          break;
+        default:
+          break;
       }
       return resolve(false);
     }
@@ -91,75 +95,6 @@ class StorageManager {
     return new Promise((resolve) => {
       this.storage.get(tableName, async (value: Storage.DataBase) => {
         await removeTable(value, resolve);
-      });
-    });
-  }
-  /**
-   * 第一引数で指定されたitemをtableから取得する
-   * 課題キーが存在するかどうかを確認に用いる
-   * @param {String} spaceId - spaceの名前を入力します
-   * @param {String} itemId - IssueのIDを文字列で指定
-   * @param {String} tableName - DBのテーブル名を入力します
-   * @return {Boolean}
-   */
-  hasIssue: Storage.Common = (spaceId, itemId, tableName) => {
-    return new Promise((resolve) => {
-      this.storage.get(tableName, (value: Storage.DataBase) => {
-        const spaceData = value?.[tableName]?.[spaceId];
-        const isNoIssue = Object.keys(value).length === 0;
-        const isNoSpace = typeof spaceData === 'undefined';
-
-        if (isNoIssue || isNoSpace) {
-          return resolve(false);
-        }
-        const db = spaceData[itemId];
-
-        if (db && db.id === itemId) {
-          return resolve(true);
-        }
-        return resolve(false);
-      });
-    });
-  }
-  /**
-   * 第一引数で指定されたtableに格納されているitemを全て配列で返す。
-   * @param {String} spaceId - spaceの名前を入力します
-   * @param {String} tableName - DBのテーブル名を入力します
-   * @return {IssueItem[] | false}
-   */
-  throwItem: Storage.ThrowItem = (spaceId, tableName) => {
-    const res: IssueItem[] = [];
-    const createItemArray = (spaceData: Storage.ItemId, resolve: Resolve<false | IssueItem[]>) => {
-      const itemIds = Object.keys(spaceData);
-      const len = itemIds.length;
-
-      if (!len) {
-        return resolve(false);
-      }
-      for (let i = 0; i < len; i++) {
-        const key = itemIds[i];
-        const object = spaceData[key];
-        res.push(object);
-
-        if (i === len-1) {
-          return resolve(res.length ? res : false);
-        }
-      }
-      return resolve(false);
-    };
-
-    return new Promise((resolve) => {
-      this.storage.get(tableName, (value: Storage.DataBase) => {
-        if (typeof value?.[tableName] === 'undefined') {
-          resolve(false);
-        }
-        const spaceData = value?.[tableName]?.[spaceId];
-
-        if (typeof spaceData === 'undefined') {
-          resolve(false);
-        } else {
-          createItemArray(spaceData, resolve);
-        }
       });
     });
   }

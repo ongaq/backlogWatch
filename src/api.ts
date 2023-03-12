@@ -1,8 +1,6 @@
 import type { FetchApiArg, FetchApiReturn } from '../@types/api';
-// import type { SpaceComments } from '../@types/service_worker';
 import type { Space, SpaceInfo } from '../@types/index';
 import { spaceUrl, consoleLog, getOptions, getBacklogUserId } from './common';
-// import storageManager from './storage';
 
 const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, hostname = '' }: {
   apiPath: T;

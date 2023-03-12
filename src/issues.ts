@@ -14,6 +14,7 @@ import {
 import storageManager from './storage';
 import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
+/** ダッシュボードのウォッチ一覧用HTML */
 const createHTML = (watchings: Watchings[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
   const createTR = (data: Watchings, evenOdd: string) => {
@@ -55,6 +56,7 @@ const createHTML = (watchings: Watchings[]) => {
   }
   return html(tr);
 };
+/** ダッシュボードにウォッチ一覧用のHTMLを追加する */
 const createHomeTheIssueUnderWatch = (watchings: Watchings[]) => {
   const html = createHTML(watchings);
   const projects = document.querySelector<HTMLElement>('#project-list:not([data-id="projects-fav"])');
@@ -63,6 +65,7 @@ const createHomeTheIssueUnderWatch = (watchings: Watchings[]) => {
     projects.insertAdjacentHTML('beforebegin', html);
   }
 };
+/** ダッシュボードにウォッチ一覧を作成 */
 const createWatchHome = async () => {
   const { subdomain, hostname } = spaceUrl();
   const result = await getWatchListFetchAPI(hostname);
@@ -204,6 +207,7 @@ const createWatchIssue = async () => {
     watchBtnElement.addEventListener('click', () => changeWatchState(items));
   }
 };
+/** 課題ページでDOMが構築されるのを待つ */
 const observeIssueCard = (callback: Function) => {
   const rootElement = document.querySelector('#root');
   const hasIssueArea = () => document.querySelector('#issueArea') !== null;

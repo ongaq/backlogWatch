@@ -16,6 +16,7 @@ export const returnMsec = (number: number) => {
 
   return millisecond * sec * number;
 };
+/** ローディング待機 */
 export const locationObserver = (callback: Function) => {
   const target = document.querySelector('.ticket__mask');
   if (target === null) return;
