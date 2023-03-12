@@ -12,20 +12,21 @@ import {
   hasStorageWatchItem,
 } from './common';
 import storageManager from './storage';
-import { getWatchListFetchAPI } from './api';
+import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
 const createHTML = (watchings: Watchings[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
   const createTR = (data: Watchings, evenOdd: string) => {
     const { issueKey, summary, assignee, description } = data.issue;
+    const desc = description.slice(0, 60);
 
-    return `<tr class="Issue watch-issue-list watch-issue-list_new ${evenOdd}">
+    return `<tr class="Issue watch-issue-list watch-issue-list_new ${evenOdd}" data-watch-id="${data.id}">
       <td class="Key">
         <p><a href="/view/${issueKey}" class="watch-issue-anchor" title="${issueKey}">${issueKey}</a></p>
       </td>
       <td class="Title"><p>${summary}</p></td>
       <td class="Assigner">${assignee.name}</td>
-      <td class="Description" title="aaaa"><p>${description.slice(0, 60)}...</p></td>
+      <td class="Description" title="${desc}"><p>${desc}...</p></td>
       <td class="Watch"><i class="fa fa-heart is-watch"></i></td>
     </tr>`;
   };
@@ -68,20 +69,26 @@ const createWatchHome = async () => {
   if (!result || !result.length) return;
   createHomeTheIssueUnderWatch(result);
 
-  const watchRemoveHandler = async (event: MouseEvent) => {
-    const self = <HTMLElement>event.currentTarget;
+  const watchRemoveHandler = async (e: MouseEvent) => {
+    const self = <HTMLElement>e.currentTarget;
     const trElement = self.closest('tr');
     if (trElement === null) return;
-    const issueItem = {
-      id: trElement.querySelector('.Key')?.textContent?.replace(/[\n\t\s]/g, '') || '',
+    const item = {
+      id: trElement.getAttribute('data-watch-id'),
+      issueKey: trElement.querySelector<HTMLAnchorElement>('.Key a')?.title,
     };
     const speed = 500;
+    if (!item.issueKey || !item.id) return;
 
     if (self.classList.contains('is-watch')) {
       watchControl(self, 'remove');
-      await storageManager.remove(subdomain, issueItem.id, 'issues');
-      trElement.style.opacity = '0';
-      setTimeout(() => trElement.remove(), speed);
+      const res = await deleteWatchFetchAPI(Number(item.id));
+
+      if (res) {
+        void storageManager.remove(subdomain, item.issueKey, 'watching');
+        trElement.style.opacity = '0';
+        setTimeout(() => trElement.remove(), speed);
+      }
     }
   };
   const mouseEnterHandler = (e: MouseEvent) => {
@@ -96,6 +103,9 @@ const createWatchHome = async () => {
     const self = <HTMLElement>e.currentTarget;
     const href = self.querySelector<HTMLAnchorElement>('.watch-issue-anchor')?.href;
 
+    if ((e.target as HTMLElement)?.classList.contains('fa-heart')) {
+      return;
+    }
     if (typeof href === 'undefined') return;
 
     if (e.ctrlKey || e.button === 2) {
