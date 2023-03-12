@@ -1,6 +1,6 @@
 import type { CheckWatchIssues, PopupNotification, BacklogCompletedWhenCancel } from '../@types/service_worker';
-import type { IssueComment } from '../@types/issues';
-import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI } from './api';
+import type { IssueComment, Issues } from '../@types/issues';
+import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI, deleteWatchFetchAPI } from './api';
 import { getOptions, consoleLog } from './common';
 import storageManager from './storage';
 
@@ -49,12 +49,16 @@ const closeNotificationAfterSeconds = (notificationId: string) => {
   chrome.alarms.onAlarm.addListener((alarm) => alarm && alarm.name === alermName && chrome.notifications.clear(notificationId));
 };
 /** 課題完了時にウォッチを解除する */
-const backlogCompletedWhenCancel = async ({ subdomain, watch, status, issueId }: BacklogCompletedWhenCancel) => {
-  if (!Boolean(watch) || !issueId) {
+const backlogCompletedWhenCancel = async ({ hostname, subdomain, watch, status, issueId, watchingId }: BacklogCompletedWhenCancel) => {
+  if (!Boolean(watch) || !issueId || !watchingId) {
     return;
   }
   if (status === '完了') {
-    await storageManager.remove(subdomain, issueId, 'watching');
+    const result = await deleteWatchFetchAPI(watchingId, hostname);
+
+    if (result) {
+      await storageManager.remove(subdomain, issueId, 'watching');
+    }
   }
 };
 /** 通知を作成する */
@@ -80,6 +84,19 @@ const createNotifications = async (options: chrome.notifications.NotificationOpt
     // 機能オプション
     closeNotificationAfterSeconds(notificationId);
   });
+};
+const createMessage = (comments: false | IssueComment[], issue: Issues) => {
+  if (comments && comments.length) {
+    if (comments[0].content) {
+      return comments[0].content;
+    } else {
+      const log = comments[0].changeLog;
+      if (log && log.length) {
+        return `状態: ${log[0].originalValue} → ${log[0].newValue}`;
+      }
+    }
+  }
+  return issue.description;
 };
 const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification) => {
   const watchingList = await getWatchListFetchAPI(hostname);
@@ -116,11 +133,13 @@ const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification
         getIssueFetchAPI(issueId, hostname),
         getIssueCommentFetchAPI(issueId, hostname),
       ]);
+      const message = createMessage(comments, issue);
+
       await createNotifications({
         type: 'basic',
         iconUrl,
         title: issues ? issues.summary : issueId,
-        message: comments && comments.length ? comments[0].content : issue.description,
+        message,
         contextMessage: note,
         requireInteraction: true
       }, hostname, issueId, comments);
@@ -130,7 +149,7 @@ const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification
     if (watchDB && updateTime !== updateTimeStoredInDB) {
       await storageManager.set(watchDB);
     }
-    backlogCompletedWhenCancel({ subdomain, watch, status, issueId });
+    backlogCompletedWhenCancel({ hostname, subdomain, watch, status, issueId, watchingId: watching.id });
   }
 };
 const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {

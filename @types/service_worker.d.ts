@@ -22,8 +22,10 @@ export type SpaceComments = {
   };
 }
 export type BacklogCompletedWhenCancel = {
+  hostname: string;
   subdomain: string;
   watch: string;
   status: string;
   issueId: string;
+  watchingId: number;
 };

@@ -78,12 +78,12 @@ export const getWatchListFetchAPI = async (hostname: string) => {
     return false;
   }
 };
-export const deleteWatchFetchAPI = async (watchingId: number) => {
+export const deleteWatchFetchAPI = async (watchingId: number, hostname: string) => {
   const apiPath = `watchings/${watchingId}` as const;
   const method = 'DELETE';
 
   try {
-    return await fetchAPI({ apiPath, method });
+    return await fetchAPI({ apiPath, method, hostname });
   } catch (e) {
     consoleLog(String(e));
     return false;
