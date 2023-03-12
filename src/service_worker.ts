@@ -83,16 +83,19 @@ const createNotifications = async (options: chrome.notifications.NotificationOpt
 };
 const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification) => {
   const watchingList = await getWatchListFetchAPI(hostname);
-  if (!watchingList || !watchingList.length) return;
+  if (!watchingList || !watchingList.length) return false;
 
-  const watchDB = await storageManager.get('watching');
-  if (!watchDB) return false;
+  let watchDB = await storageManager.get('watching');
+  if (!watchDB || !Object.keys(watchDB).length) {
+    await storageManager.add(spaceId, {}, 'watching');
+    watchDB = await storageManager.get('watching');
+  }
 
   for (const watching of watchingList) {
     const { issue, lastContentUpdated } = watching;
     const issueId = issue.issueKey;
     const updateTime = new Date(lastContentUpdated).getTime() / 1000;
-    const space = watchDB['watching'][spaceId];
+    const space = watchDB ? watchDB['watching'][spaceId] : {};
     if (typeof space?.[issue.issueKey] === 'undefined') {
       space[issue.issueKey] = 0;
     }
@@ -124,7 +127,7 @@ const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification
     }
     const subdomain = hostname.split('.')[0];
     const status = issue.status.name;
-    if (updateTime !== updateTimeStoredInDB) {
+    if (watchDB && updateTime !== updateTimeStoredInDB) {
       await storageManager.set(watchDB);
     }
     backlogCompletedWhenCancel({ subdomain, watch, status, issueId });

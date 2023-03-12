@@ -8,10 +8,15 @@ body {
 .watchListTitle {
   margin-bottom: 0 !important;
   padding: 16px;
+  color: #fff;
+  background-color: #2c9a7a;
 }
 
 .watchList {
   width: 100%;
+}
+.watchList.is-hidden {
+  display: none;
 }
 .watchList__li {
   display: flex;
@@ -38,10 +43,10 @@ body {
   transition: color 0.3s ease;
 }
 .watchList__li__a:hover {
-  background-color: hsl(142, 52%, 96%);
+  background-color: #fafafa;
 }
 .watchList__li__a:hover h2.title {
-  color: hsl(171, 100%, 41%) !important;
+  color: #2c9a7a !important;
 }
 
 .notWatch {

@@ -1,3 +1,5 @@
+$color: #2c9a7a;
+
 body {
   overflow: auto;
   width: 700px;
@@ -7,10 +9,15 @@ body {
 .watchListTitle {
   margin-bottom: 0 !important;
   padding: 16px;
+  color: #fff;
+  background-color: $color;
 }
 .watchList {
   width: 100%;
 
+  &.is-hidden {
+    display: none;
+  }
   &__li {
     display: flex;
     flex-direction: column;
@@ -38,10 +45,10 @@ body {
       }
 
       &:hover {
-        background-color: hsl(142, 52%, 96%);
+        background-color: #fafafa;
 
         h2.title {
-          color: hsl(171, 100%, 41%) !important;
+          color: $color !important;
         }
       }
     }

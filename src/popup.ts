@@ -58,7 +58,7 @@ const createHTMLFromAPI = async () => {
   for (const spaceName of spaceNames) {
     const hostname = options.options.space[spaceName].name;
     const watchList = await getWatchListFetchAPI(hostname);
-    if (!watchList) continue;
+    if (!watchList || !watchList.length) continue;
     let html = spaceNames.length > 1
       ? `<ul class="watchList is-hidden" data-tab="${spaceName}">`
       : '<ul class="watchList">';
@@ -66,9 +66,7 @@ const createHTMLFromAPI = async () => {
       html += createHTML(watching, hostname);
     }
     html += '</ul>';
-    if (html) {
-      htmlArray.push({ spaceName, html });
-    }
+    htmlArray.push({ spaceName, html });
   }
   return htmlArray;
 };
