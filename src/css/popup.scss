@@ -31,13 +31,20 @@ body {
     &:not(:first-child) {
       border-top: 0;
     }
-
+    &__title {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      margin-bottom: 2rem !important;
+    }
     &__desc {
       overflow: hidden;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
-      margin-bottom: 8px !important;
+      margin-bottom: 16px !important;
+      line-height: 1.6;
     }
     &__a {
       display: block;
@@ -64,9 +71,9 @@ body {
   padding: 16px;
 }
 
-.field.is-grouped.is-grouped-multiline>.control:not(:last-child) {
-  margin-bottom: 4px;
-}
-.field.is-grouped>.control:not(:last-child) {
-  margin-right: 4px;
-}
+// .field.is-grouped.is-grouped-multiline>.control:not(:last-child) {
+//   margin-bottom: 4px;
+// }
+// .field.is-grouped>.control:not(:last-child) {
+//   margin-right: 4px;
+// }

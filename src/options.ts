@@ -166,17 +166,12 @@ const saveSettings = async () => {
   }
 };
 const deleteDB = async () => {
-  await storageManager.deleteDB();
-};
-const addWatch = async () => {
-  await storageManager.add('watchtest', { 'TEST-1': 100 }, 'watching');
-  await storageManager.add('watchtest', { 'TEST-2': 100 }, 'watching');
-  await storageManager.add('watchtest', { 'TEST-3': 100 }, 'watching');
-  console.log('add:', await storageManager.get('watching'));
-};
-const removeWatch = async () => {
-  await storageManager.remove('watchtest', 'TEST-2', 'watching');
-  console.log('remove:', await storageManager.get('watching'));
+  const caution = '本当にデータベースを削除しますか？\nスペース情報や機能オプション、ウォッチ中の課題の最終更新日時チェックが削除されます。\n※ウォッチ自体の削除は行いません。';
+
+  if (window.confirm(caution)) {
+    await storageManager.deleteDB();
+    location.reload();
+  }
 };
 /** 初期表示設定 */
 const setInitialDisplay = async () => {
@@ -233,10 +228,7 @@ const setInitialDisplay = async () => {
   onEventHandler('fa-pencil', editSpaceInputField);
   // 入力、オプションデータの保存
   document.querySelector('#js-options-spaceSubmit')?.addEventListener('click', saveSettings);
-  // deleteDB
+  // データベースの削除
   document.querySelector('#js-options-deleteDB')?.addEventListener('click', deleteDB);
-
-  document.querySelector('#js-options-addWatch')?.addEventListener('click', addWatch);
-  document.querySelector('#js-options-removeWatch')?.addEventListener('click', removeWatch);
 })();
 

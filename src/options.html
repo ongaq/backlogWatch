@@ -40,18 +40,6 @@
     <p>※スペース名を含む backlog.jp もしくは backlog.com まで入力して下さい。(例: test.backlog.com)</p>
     <p>※API KeyはBacklogの個人設定にある「新しいAPIキーを発行」から登録して下さい。
     <a href="https://support-ja.backlog.com/hc/ja/articles/360035641754" target="_blank">詳しくはこちら</a></p>
-
-    <div style="margin-top:40px">
-      <button id="js-options-deleteDB" class="button" type="button">
-        <span>DBを削除する</span>
-      </button>
-      <button id="js-options-addWatch" class="button" type="button">
-        <span>ウォッチを試験的に追加</span>
-      </button>
-      <button id="js-options-removeWatch" class="button" type="button">
-        <span>ウォッチを試験的に削除</span>
-      </button>
-    </div>
   </section>
 
   <section class="optionWrap">
@@ -84,15 +72,27 @@
   </section>
 
   <div class="buttonArea">
-    <button id="js-options-spaceSubmit" class="button" type="button">
+    <button id="js-options-spaceSubmit" class="button is-primary" type="button">
       <span>設定を保存する</span>
       <span id="js-options-notice" class="notice"></span>
     </button>
   </div>
 
-  <p class="is-flex is-justify-content-flex-end">
+  <p class="content is-flex is-justify-content-flex-end">
     <a href="history.html">更新履歴を表示する</a>
   </p>
+
+  <div class="deleteDB message is-warning">
+    <div class="message-body">
+      <p class="content">バージョンアップ後や何か不具合が発生した場合、以下のボタンからデータベースを一度消去してみて下さい。<br>
+      スペース情報や機能オプション、ウォッチ中の課題の最終更新日時チェックが削除されます。<br>
+      ※ウォッチ自体の削除は行いません。</p>
+
+      <button id="js-options-deleteDB" class="button is-warning" type="button">
+        <span>データベースを削除する</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <script type="module" src="options.ts"></script>

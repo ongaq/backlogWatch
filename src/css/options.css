@@ -543,3 +543,7 @@ a {
 .notice.is-danger:before {
   border-color: transparent transparent #f03a5f transparent;
 }
+
+.deleteDB {
+  margin-top: 64px;
+}

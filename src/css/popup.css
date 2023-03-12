@@ -31,12 +31,20 @@ body {
 .watchList__li:not(:first-child) {
   border-top: 0;
 }
+.watchList__li__title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  margin-bottom: 2rem !important;
+}
 .watchList__li__desc {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  margin-bottom: 8px !important;
+  margin-bottom: 16px !important;
+  line-height: 1.6;
 }
 .watchList__li__a {
   display: block;
@@ -57,12 +65,4 @@ body {
 
 .notWatch {
   padding: 16px;
-}
-
-.field.is-grouped.is-grouped-multiline > .control:not(:last-child) {
-  margin-bottom: 4px;
-}
-
-.field.is-grouped > .control:not(:last-child) {
-  margin-right: 4px;
 }

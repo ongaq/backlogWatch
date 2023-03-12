@@ -2,12 +2,14 @@ import type { Watchings } from '../@types/watch';
 import { getWatchListFetchAPI } from './api';
 import storageManager from './storage';
 
-const createTag = (name: string, value: string, date?: Date) => {
+const createTag = (name: string, value: string | boolean, date?: Date) => {
   let addClass = '';
   if (date && new Date().getTime() > new Date(date).getTime()) {
     addClass = ' is-danger';
   }
-  if (name === 'ステータス') {
+  if (name === '未読/既読') {
+    value = value ? '既読' : '未読';
+  } else if (name === 'ステータス') {
     if (value === '処理中') {
       addClass = ' is-info';
     } else if (value === '処理済み') {
@@ -32,14 +34,16 @@ const dateConvert = (date: Date) => {
 };
 const createHTML = (watching: Watchings, hostname: string) => {
   const issue = watching.issue;
+  const hasResourceAlreadyRead = typeof watching.resourceAlreadyRead === 'boolean';
 
   return `<li class="watchList__li">
     <a href="https://${hostname}/view/${issue.issueKey}" class="watchList__li__a" target="_blank">
-      <h2 class="title is-6">[${issue.issueKey}] ${issue.summary}</h2>
+      <h2 class="watchList__li__title title is-6">[${issue.issueKey}] ${issue.summary}</h2>
       <p class="watchList__li__desc subtitle is-7">${issue.description}</p>
       <div class="field is-grouped is-grouped-multiline">
         ${issue.startDate ? createTag('開始日', dateConvert(issue.startDate)) : ''}
         ${issue.dueDate ? createTag('期限日', dateConvert(issue.dueDate), issue.dueDate) : ''}
+        ${hasResourceAlreadyRead ? createTag('未読/既読', watching.resourceAlreadyRead) : ''}
         ${issue?.status?.name ? createTag('ステータス', issue.status.name) : ''}
         ${issue?.priority?.name ? createTag('優先度', issue.priority.name) : ''}
         ${issue?.assignee?.name ? createTag('担当', issue.assignee.name) : ''}
