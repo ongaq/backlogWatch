@@ -60,7 +60,7 @@ const createHTMLFromAPI = async () => {
     const watchList = await getWatchListFetchAPI(hostname);
     if (!watchList || !watchList.length) continue;
     let html = spaceNames.length > 1
-      ? `<ul class="watchList is-hidden" data-tab="${spaceName}">`
+      ? `<ul class="watchList" data-tab="${spaceName}">`
       : '<ul class="watchList">';
     for (const watching of watchList) {
       html += createHTML(watching, hostname);
@@ -80,6 +80,36 @@ const createTabs = (htmlArray: { spaceName: string, html: string; }[]) => {
 const createNotWatchHTML = () => {
   return '<div class="notWatch">現在ウォッチしてる課題が無いか、オプションでスペース情報の入力がありません</div>';
 };
+
+const selectInitialActive = () => {
+  const lists = document.querySelectorAll<HTMLUListElement>('.watchList');
+  const tabs = document.querySelectorAll<HTMLLIElement>('.tabs li');
+  const selectTab = (e: Event, tabs: NodeListOf<HTMLLIElement>, lists: NodeListOf<HTMLUListElement>) => {
+    const self = e.currentTarget as HTMLElement;
+
+    if (self.classList.contains('is-active')) {
+      return;
+    }
+    const spaceName = self.getAttribute('data-tab');
+    const list = [...lists].find((el) => el.getAttribute('data-tab') === spaceName);
+
+    if (spaceName && list) {
+      tabs.forEach((el) => el.classList.remove('is-active'));
+      lists.forEach((el) => el.classList.remove('is-active'));
+      self.classList.add('is-active');
+      list.classList.add('is-active');
+    }
+  };
+
+  if (lists.length && tabs.length) {
+    lists[0].classList.add('is-active');
+    tabs[0].classList.add('is-active');
+
+    for (const tab of tabs) {
+      tab.addEventListener('click', (e) => selectTab(e, tabs, lists));
+    }
+  }
+};
 const setHTML = async () => {
   const appElm = document.querySelector('#app');
   if (!appElm) return;
@@ -94,6 +124,7 @@ const setHTML = async () => {
       appElm.insertAdjacentHTML('afterbegin', data.html);
     }
     appElm.insertAdjacentHTML('afterbegin', createTabs(htmlArray));
+    selectInitialActive();
   }
 };
 

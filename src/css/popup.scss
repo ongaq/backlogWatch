@@ -13,24 +13,30 @@ body {
   background-color: $color;
 }
 .watchList {
+  display: none;
   width: 100%;
 
-  &.is-hidden {
-    display: none;
+  &.is-active {
+    display: flex;
+    flex-direction: column;
   }
   &__li {
     display: flex;
-    flex-direction: column;
     width: 100%;
     color: #4a4a4a;
     background-color: #fff;
-    border: 1px solid #eee;
+    border-top: 1px solid #d0d0d0;
+    border-bottom: 1px solid #d0d0d0;
 
     &:not(:first-child) {
-      margin-top: -1px;
+      border-top: 0;
     }
 
     &__desc {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
       margin-bottom: 8px !important;
     }
     &__a {
