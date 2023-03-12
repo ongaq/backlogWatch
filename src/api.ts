@@ -9,7 +9,7 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, ho
   hostname?: string;
 }): Promise<FetchApiReturn<T> | false> => {
   const space = await getOptions('space');
-  const result = hostname ? spaceUrl(hostname) : spaceUrl();
+  const result = typeof hostname === 'string' ? spaceUrl(hostname) : spaceUrl();
   if (!space || !result.subdomain || !result.hostname) {
     console.log('fetchAPI failed:', { space, result, hostname, apiPath });
     return false;
@@ -78,7 +78,7 @@ export const getWatchListFetchAPI = async (hostname: string) => {
     return false;
   }
 };
-export const deleteWatchFetchAPI = async (watchingId: number, hostname: string) => {
+export const deleteWatchFetchAPI = async (watchingId: number, hostname?: string) => {
   const apiPath = `watchings/${watchingId}` as const;
   const method = 'DELETE';
 

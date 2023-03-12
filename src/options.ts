@@ -23,7 +23,7 @@ const addCloneFieldList = (spaceFieldULElm: HTMLUListElement, fieldListLen: numb
 };
 /** 引数にdata-name属性の値を入れ対象のdata属性のvalueを全て取得する */
 const getFieldValues = (dataName: string) => {
-  return [...document.querySelectorAll<HTMLInputElement>(`[data-name="${dataName}"]:not([disabled])`)]
+  return [...document.querySelectorAll<HTMLInputElement>(`[data-name="${dataName}"]`)]
     .map((elm) => elm.value);
 };
 /** 入力したスペース情報やAPIKEYが正確だったかどうか結果をDOM上に反映する */
@@ -120,7 +120,7 @@ const editSpaceInputField = (self: HTMLElement) => {
   }
 };
 /** 入力、オプションデータの保存 */
-const saveSettings = () => {
+const saveSettings = async () => {
   const promises: Promise<SpaceInfo | (Space & SpaceInfo)>[] = [];
   const autoCloseElm = document.querySelector('#js-options-autoClose');
   const releaseWatchElm = document.querySelector('#js-options-releaseWatch');
@@ -136,6 +136,7 @@ const saveSettings = () => {
   };
   const apiLength = 64;
   const arrayAPIKeyLength = settings.space.apiKey.length;
+  let isFailed = false;
 
   for (let i=0; i < arrayAPIKeyLength; i++) {
     const spaceElm = document.querySelector(`[data-name="space"][data-id="${i}"]`);
@@ -146,10 +147,12 @@ const saveSettings = () => {
     if (name === '') {
       spaceElm?.classList.add(error);
       alert('スペース名を入力して下さい。');
+      isFailed = true;
     }
     if ([...key].length !== apiLength) {
       keyElm?.classList.add(error);
       alert('API Keyが入力されていないか、桁数が正しくありません。');
+      isFailed = true;
     }
     if (name && key.length === apiLength) {
       spaceElm?.classList.remove(error);
@@ -157,8 +160,10 @@ const saveSettings = () => {
       promises.push(getSpaceInfoFetchAPI(name, key));
     }
   }
-
-  waitPromise(settings, promises);
+  if (isFailed) return;
+  if (promises.length) {
+    waitPromise(settings, promises);
+  }
 };
 const deleteDB = async () => {
   await storageManager.deleteDB();
@@ -176,7 +181,7 @@ const removeWatch = async () => {
 /** 初期表示設定 */
 const setInitialDisplay = async () => {
   const items = await storageManager.get('options');
-  console.log('items:', items);
+  console.log('items:', JSON.stringify(items), JSON.stringify(items) === JSON.stringify(items));
   if (!items || !Object.keys(items).length) return;
 
   const { options, space } = items.options;

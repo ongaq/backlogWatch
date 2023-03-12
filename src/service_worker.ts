@@ -38,12 +38,15 @@ const acceptNotification = async () => {
   }
 };
 /** n秒後に通知を閉じる */
-const closeNotificationAfterSeconds = (notificationId: string) => {
+const closeNotificationAfterSeconds = async (notificationId: string) => {
+  const result = await storageManager.get('options');
   const msec = 1000;
   const alermName = 'autoClose';
+  if (!result || !Object.keys(result).length) return;
+  const { options: { options } } = result;
 
-  if (typeof close !== 'undefined' && Number(close) > 0) {
-    const when = Date.now() + (msec * Number(close));
+  if (options && options.close && Number(options.close) > 0) {
+    const when = Date.now() + (msec * Number(options.close));
     chrome.alarms.create(alermName, { when });
   }
   chrome.alarms.onAlarm.addListener((alarm) => alarm && alarm.name === alermName && chrome.notifications.clear(notificationId));
@@ -205,7 +208,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     const thisVersion = chrome.runtime.getManifest().version;
 
     if (thisVersion !== details.previousVersion) {
-      chrome.tabs.create({ url: chrome.runtime.getURL('history.html') });
+      chrome.tabs.create({ url: chrome.runtime.getURL(`history.html?v=${thisVersion}`) });
     }
   }
 });
