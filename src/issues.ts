@@ -132,10 +132,6 @@ const createWatchHome = async () => {
 };
 /** 課題ページでウォッチボタンの作成 */
 const createWatchIssue = async () => {
-  const officialWatchBtnElement = document.querySelector('.icon-button.icon-button--default.-watch-button.title-group__edit-actions-item.-with-text[aria-label]');
-  if (officialWatchBtnElement) {
-    officialWatchBtnElement.classList.add('is-hidden');
-  }
   const spaceInfo = spaceUrl();
   if (!spaceInfo) return;
   const subdomain = spaceInfo.subdomain;

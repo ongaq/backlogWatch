@@ -1,4 +1,4 @@
-# backlogWatch
+# Backlog Watch
 https://chrome.google.com/webstore/detail/backlog-watch/hgbfbnmhafkhigfegihpgapnmnmlfhgd
 
 ## 主な機能
@@ -6,9 +6,9 @@ https://chrome.google.com/webstore/detail/backlog-watch/hgbfbnmhafkhigfegihpgapn
 - 拡張機能のアイコンクリックでウォッチ中の課題を一覧表示
 - ウォッチに追加された課題をデスクトップ通知
 
-### 課題お気に入り追加方法
+### 課題のウォッチ追加方法
 - 各課題にアクセスします。
-- 画面右下の黒いハートマークをクリックします。
+- 公式機能のウォッチボタンを押下、または画面右下の黒いハートマークを押下します。
 
 ## 開発
 

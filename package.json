@@ -5,14 +5,13 @@
     "build": "rollup -c",
     "start": "rollup -c -w",
     "sass": "ts-node tasks/watcher.ts",
-    "ts": "npx swc main.user.ts -o main.user.js -w",
     "check": "npx tsc --noEmit"
   },
   "volta": {
     "node": "18.14.0"
   },
   "engines": {
-    "node": "18.x"
+    "node": ">= 18"
   },
   "type": "module",
   "devDependencies": {

@@ -133,11 +133,6 @@ i {
 	.is-visible { display: block;}
 	.is-hidden { display: none;}
 }
-.icon-button.icon-button--default.-watch-button.title-group__edit-actions-item.-with-text[aria-label] {
-  &.is-hidden {
-    display: none !important;
-  }
-}
 
 @-webkit-keyframes heartBeat {
 	50% { transform: scale(2); opacity: 0.5;}
