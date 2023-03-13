@@ -41,14 +41,14 @@ const createHTML = (watching: Watchings, hostname: string) => {
       <h2 class="watchList__li__title title is-6">[${issue.issueKey}] ${issue.summary}</h2>
       <p class="watchList__li__desc subtitle is-7">${issue.description}</p>
       <div class="field is-grouped is-grouped-multiline">
-        ${issue.startDate ? createTag('開始日', dateConvert(issue.startDate)) : ''}
-        ${issue.dueDate ? createTag('期限日', dateConvert(issue.dueDate), issue.dueDate) : ''}
         ${hasResourceAlreadyRead ? createTag('未読/既読', watching.resourceAlreadyRead) : ''}
         ${issue?.status?.name ? createTag('ステータス', issue.status.name) : ''}
         ${issue?.priority?.name ? createTag('優先度', issue.priority.name) : ''}
-        ${issue?.assignee?.name ? createTag('担当', issue.assignee.name) : ''}
         ${issue?.createdUser?.name ? createTag('課題作成者', issue.createdUser.name) : ''}
         ${watching.lastContentUpdated ? createTag('最終更新日時', dateConvert(watching.lastContentUpdated)) : ''}
+        ${issue?.assignee?.name ? createTag('担当', issue.assignee.name) : ''}
+        ${issue.startDate ? createTag('開始日', dateConvert(issue.startDate)) : ''}
+        ${issue.dueDate ? createTag('期限日', dateConvert(issue.dueDate), issue.dueDate) : ''}
       </div>
     </a>
   </li>`;
