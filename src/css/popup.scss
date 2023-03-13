@@ -6,6 +6,8 @@ body {
   grid-template-columns: 1fr;
   grid-template-rows: 55px minmax(0px, 545px);
   width: 700px;
+  height: auto;
+  max-height: 600px;
   font-family: "M PLUS Rounded 1c";
 }
 .watchListTitle {
