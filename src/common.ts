@@ -4,7 +4,7 @@ import { addWatchFetchAPI, deleteWatchFetchAPI, getWatchListFetchAPI, getUserInf
 import storageManager from './storage';
 
 /** BacklogWatch用コンソールログ */
-export const consoleLog = (...log: any) => console.log('[BacklogWatch]', ...log);
+export const consoleLog = (...log: any) => console.log('[BacklogWatchNotifications]', ...log);
 export const spaceDomain = typeof window !== 'undefined' && window.location.hostname;
 export const backlogLocation = {
   isHome: typeof window !== 'undefined' && window.location.href.includes('/dashboard'),

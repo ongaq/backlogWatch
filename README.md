@@ -1,4 +1,4 @@
-# Backlog Watch
+# Backlog Watch Notifications
 https://chrome.google.com/webstore/detail/backlog-watch/hgbfbnmhafkhigfegihpgapnmnmlfhgd
 
 ## 主な機能
