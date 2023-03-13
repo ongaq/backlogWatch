@@ -63,9 +63,7 @@ const createHTMLFromAPI = async () => {
     const hostname = options.options.space[spaceName].name;
     const watchList = await getWatchListFetchAPI(hostname);
     if (!watchList || !watchList.length) continue;
-    let html = spaceNames.length > 1
-      ? `<ul class="watchList" data-tab="${spaceName}">`
-      : '<ul class="watchList">';
+    let html = `<ul class="watchList" data-tab="${spaceName}">`;
     for (const watching of watchList) {
       html += createHTML(watching, hostname);
     }
@@ -126,17 +124,16 @@ const setHTML = async () => {
 
   if (htmlArray.length === 0) {
     appElm.insertAdjacentHTML('afterbegin', createNotWatchHTML());
-  } else if (htmlArray.length === 1) {
-    appElm.insertAdjacentHTML('afterbegin', htmlArray[0].html);
-    selectInitialActive(htmlArray);
-  } else if (htmlArray.length > 1) {
+  } else if (htmlArray.length >= 1) {
     const div = document.createElement('div');
     div.classList.add('watchListWrap');
     for (const data of htmlArray) {
       div.insertAdjacentHTML('afterbegin', data.html);
     }
     appElm.insertAdjacentElement('afterbegin', div);
-    appElm.insertAdjacentHTML('afterbegin', createTabs(htmlArray));
+    if (htmlArray.length > 1) {
+      appElm.insertAdjacentHTML('afterbegin', createTabs(htmlArray));
+    }
     selectInitialActive(htmlArray);
   }
 };
