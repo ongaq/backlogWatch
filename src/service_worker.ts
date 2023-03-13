@@ -204,6 +204,9 @@ chrome.runtime.onInstalled.addListener((details) => {
     const thisVersion = chrome.runtime.getManifest().version;
 
     if (thisVersion !== details.previousVersion) {
+      if (thisVersion === '2.0.0') {
+        chrome.tabs.create({ url: chrome.runtime.getURL(`options.html?v=${thisVersion}`) });
+      }
       chrome.tabs.create({ url: chrome.runtime.getURL(`history.html?v=${thisVersion}`) });
     }
   }
