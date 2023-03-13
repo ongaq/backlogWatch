@@ -110,12 +110,15 @@ const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification
     await storageManager.add(spaceId, {}, 'watching');
     watchDB = await storageManager.get('watching');
   }
+  if (!watchDB) return false;
 
   for (const watching of watchingList) {
     const { issue, lastContentUpdated } = watching;
     const issueId = issue.issueKey;
     const updateTime = new Date(lastContentUpdated).getTime() / 1000;
-    const space = watchDB ? watchDB['watching'][spaceId] : {};
+    watchDB['watching'][spaceId] ??= {};
+    const space = watchDB['watching'][spaceId];
+
     if (typeof space?.[issue.issueKey] === 'undefined') {
       space[issue.issueKey] = 0;
     }
@@ -128,10 +131,8 @@ const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification
     // APIで取得した最終更新時間のほうが保存された時間より新しければ
     if (updateTime > updateTimeStoredInDB) {
       space[issue.issueKey] = updateTime;
-
       const note = `[${issueId}] @${issue.createdUser.name}`;
       const iconUrl = `https://${hostname}/favicon.ico`;
-
       const [issues, comments] = await Promise.all([
         getIssueFetchAPI(issueId, hostname),
         getIssueCommentFetchAPI(issueId, hostname),

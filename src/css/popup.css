@@ -1,5 +1,6 @@
 body {
-  overflow: auto;
+  overflow: hidden;
+  display: grid;
   width: 700px;
   max-height: 600px;
   font-family: 'M PLUS Rounded 1c';
@@ -8,8 +9,27 @@ body {
 .watchListTitle {
   margin-bottom: 0 !important;
   padding: 16px;
+  height: 55px;
   color: #fff;
   background-color: #2c9a7a;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 55px);
+}
+
+.tabs {
+  position: relative;
+  margin-bottom: -1px !important;
+  z-index: 10;
+}
+
+.watchListWrap {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .watchList {
@@ -30,6 +50,9 @@ body {
 }
 .watchList__li:not(:first-child) {
   border-top: 0;
+}
+.watchList__li:last-child {
+  border-bottom: 0;
 }
 .watchList__li__title {
   overflow: hidden;

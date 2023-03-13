@@ -1,7 +1,8 @@
 $color: #2c9a7a;
 
 body {
-  overflow: auto;
+  overflow: hidden;
+  display: grid;
   width: 700px;
   max-height: 600px;
   font-family: "M PLUS Rounded 1c";
@@ -9,8 +10,24 @@ body {
 .watchListTitle {
   margin-bottom: 0 !important;
   padding: 16px;
+  height: 55px;
   color: #fff;
   background-color: $color;
+}
+#app {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 55px);
+}
+.tabs {
+  position: relative;
+  margin-bottom: -1px !important;
+  z-index: 10;
+}
+.watchListWrap {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
 }
 .watchList {
   display: none;
@@ -30,6 +47,9 @@ body {
 
     &:not(:first-child) {
       border-top: 0;
+    }
+    &:last-child {
+      border-bottom: 0;
     }
     &__title {
       overflow: hidden;
@@ -70,10 +90,3 @@ body {
 .notWatch {
   padding: 16px;
 }
-
-// .field.is-grouped.is-grouped-multiline>.control:not(:last-child) {
-//   margin-bottom: 4px;
-// }
-// .field.is-grouped>.control:not(:last-child) {
-//   margin-right: 4px;
-// }

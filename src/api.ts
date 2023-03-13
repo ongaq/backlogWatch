@@ -66,6 +66,7 @@ export const addWatchFetchAPI = async (issueId: string) => {
 };
 export const getWatchListFetchAPI = async (hostname: string) => {
   const userId = await getBacklogUserId(hostname);
+  console.log('userId:', userId);
   if (!userId) return false;
   const apiPath = `users/${userId}/watchings` as const;
   const method = 'GET';
@@ -100,12 +101,12 @@ export const getSpaceInfoFetchAPI = async (hostname: string, apiKey: string) => 
     }
   });
 };
-export const getUserInfoFetchAPI = async () => {
+export const getUserInfoFetchAPI = async (hostname: string) => {
   const apiPath = 'users/myself' as const;
   const method = 'GET';
 
   try {
-    return await fetchAPI({ apiPath, method });
+    return await fetchAPI({ apiPath, method, hostname });
   } catch (e) {
     consoleLog(String(e));
     return false;

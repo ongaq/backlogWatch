@@ -171,13 +171,8 @@ export const saveIssueWatching = async ({ heartElement, textElement, issueId }: 
 export const getBacklogUserId = async (hostname: string) => {
   const { subdomain } = spaceUrl(hostname);
   const userData = await storageManager.get('user');
-
-  if (userData && Object.keys(userData).length) {
-    const userId = userData?.['user']?.[subdomain]?.user;
-    return userId ? userId : false;
-  } else {
-    const result = await getUserInfoFetchAPI();
-    console.log('result:', result);
+  const getUserInfo = async () => {
+    const result = await getUserInfoFetchAPI(hostname);
 
     if (result) {
       const userId = { user: result.id };
@@ -185,5 +180,12 @@ export const getBacklogUserId = async (hostname: string) => {
       return result.id;
     }
     return false;
+  };
+
+  if (userData && Object.keys(userData).length) {
+    const userId = userData?.['user']?.[subdomain]?.user;
+    return userId ? userId : getUserInfo();
+  } else {
+    return getUserInfo();
   }
 };

@@ -75,9 +75,9 @@ const createHTMLFromAPI = async () => {
   return htmlArray;
 };
 const createTabs = (htmlArray: { spaceName: string, html: string; }[]) => {
-  return `<div class="tabs is-toggle">
+  return `<div class="tabs">
     <ul>
-      ${htmlArray.map(({ spaceName }) => `<li data-tab="${spaceName}"><span>${spaceName}</span></li>`)}
+      ${htmlArray.map(({ spaceName }) => `<li data-tab="${spaceName}"><a><span>${spaceName}</span></a></li>`).join('')}
     </ul>
   </div>`;
 };
@@ -85,7 +85,7 @@ const createNotWatchHTML = () => {
   return '<div class="notWatch">現在ウォッチしてる課題が無いか、オプションでスペース情報の入力がありません</div>';
 };
 
-const selectInitialActive = () => {
+const selectInitialActive = (htmlArray: { spaceName: string; html: string; }[]) => {
   const lists = document.querySelectorAll<HTMLUListElement>('.watchList');
   const tabs = document.querySelectorAll<HTMLLIElement>('.tabs li');
   const selectTab = (e: Event, tabs: NodeListOf<HTMLLIElement>, lists: NodeListOf<HTMLUListElement>) => {
@@ -104,16 +104,19 @@ const selectInitialActive = () => {
       list.classList.add('is-active');
     }
   };
+  const spaceName = htmlArray[0].spaceName;
+  const list = [...lists].find((el) => el.getAttribute('data-tab') === spaceName);
 
   if (lists.length > 1 && tabs.length > 1) {
-    lists[0].classList.add('is-active');
-    tabs[0].classList.add('is-active');
+    const tab = [...tabs].find((el) => el.getAttribute('data-tab') === spaceName);
+    list?.classList.add('is-active');
+    tab?.classList.add('is-active');
 
     for (const tab of tabs) {
       tab.addEventListener('click', (e) => selectTab(e, tabs, lists));
     }
   } else if (lists.length === 1) {
-    lists[0].classList.add('is-active');
+    list?.classList.add('is-active');
   }
 };
 const setHTML = async () => {
@@ -125,13 +128,16 @@ const setHTML = async () => {
     appElm.insertAdjacentHTML('afterbegin', createNotWatchHTML());
   } else if (htmlArray.length === 1) {
     appElm.insertAdjacentHTML('afterbegin', htmlArray[0].html);
-    selectInitialActive();
+    selectInitialActive(htmlArray);
   } else if (htmlArray.length > 1) {
+    const div = document.createElement('div');
+    div.classList.add('watchListWrap');
     for (const data of htmlArray) {
-      appElm.insertAdjacentHTML('afterbegin', data.html);
+      div.insertAdjacentHTML('afterbegin', data.html);
     }
+    appElm.insertAdjacentElement('afterbegin', div);
     appElm.insertAdjacentHTML('afterbegin', createTabs(htmlArray));
-    selectInitialActive();
+    selectInitialActive(htmlArray);
   }
 };
 
