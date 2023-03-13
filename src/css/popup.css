@@ -1,11 +1,9 @@
 body {
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 55px minmax(0px, 545px);
+  display: flex;
+  flex-direction: column;
   width: 700px;
-  height: auto;
-  max-height: 600px;
+  height: 100%;
   font-family: 'M PLUS Rounded 1c';
 }
 
@@ -19,6 +17,7 @@ body {
 #app {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   height: 100%;
 }
 
