@@ -176,22 +176,22 @@ const deleteDB = async () => {
 /** 初期表示設定 */
 const setInitialDisplay = async () => {
   const items = await storageManager.get('options');
-  console.log('items:', JSON.stringify(items), JSON.stringify(items) === JSON.stringify(items));
   if (!items || !Object.keys(items).length) return;
 
   const { options, space } = items.options;
-  const fieldListElm = document.querySelectorAll<HTMLUListElement>('.js-field-list');
-  const fieldListLen = fieldListElm.length;
   const spaces = Object.keys(space);
 
   for (let i = 0; i < spaces.length; i++) {
+    let fieldListElm = document.querySelectorAll<HTMLUListElement>('.js-field-list');
+    const fieldListLen = fieldListElm.length;
     const spaceName = spaces[i];
-    const spaceFieldULElm = fieldListElm[i];
-    if (!spaceFieldULElm) continue;
 
     if ((i+1) > fieldListLen) {
-      addCloneFieldList(spaceFieldULElm, i);
+      addCloneFieldList(fieldListElm[0], i);
     }
+    fieldListElm = document.querySelectorAll<HTMLUListElement>('.js-field-list');
+    const spaceFieldULElm = fieldListElm[i];
+
     spaceFieldULElm.classList.add(ok);
     const spaceFieldElm = spaceFieldULElm.querySelector<HTMLInputElement>(`[data-id="${i}"][data-name="space"]`);
     const keyFieldElm = spaceFieldULElm.querySelector<HTMLInputElement>(`[data-id="${i}"][data-name="key"]`);
