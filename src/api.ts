@@ -11,7 +11,7 @@ const fetchAPI = async <T extends FetchApiArg>({ apiPath, query = '', method, ho
   const space = await getOptions('space');
   const result = typeof hostname === 'string' ? spaceUrl(hostname) : spaceUrl();
   if (!space || !result.subdomain || !result.hostname) {
-    console.log('fetchAPI failed:', { space, result, hostname, apiPath });
+    consoleLog('fetchAPI failed:', { space, result, hostname, apiPath });
     return false;
   }
 
@@ -66,7 +66,6 @@ export const addWatchFetchAPI = async (issueId: string) => {
 };
 export const getWatchListFetchAPI = async (hostname: string) => {
   const userId = await getBacklogUserId(hostname);
-  console.log('userId:', userId);
   if (!userId) return false;
   const apiPath = `users/${userId}/watchings` as const;
   const method = 'GET';

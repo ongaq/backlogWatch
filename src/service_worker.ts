@@ -4,8 +4,6 @@ import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI, delete
 import { getOptions, consoleLog } from './common';
 import storageManager from './storage';
 
-console.log('running service_worker ...');
-
 const getAllOptions = async () => await Promise.all([
   getOptions('space'),
   getOptions('close'),
@@ -14,7 +12,6 @@ const getAllOptions = async () => await Promise.all([
 
 const acceptNotification = async () => {
   const alarmName = 'backlogOptionsSetting';
-  console.log(new Date(), 'check acceptNotification...');
   const [space,close,watch] = await getAllOptions();
 
   if (space && close && watch) {
@@ -30,7 +27,7 @@ const acceptNotification = async () => {
     console.warn('It does not have to set the options.');
     chrome.alarms.get(alarmName, (val) => {
       if (typeof val !== 'undefined') {
-        return console.log('not undefined');
+        return;
       }
       chrome.alarms.create(alarmName, { periodInMinutes: 1 });
       chrome.alarms.onAlarm.addListener((alarm) => alarm && alarm.name === alarmName && acceptNotification());
@@ -174,9 +171,7 @@ const runChromeFunctions = () => {
   // オプション保存時に発火
   chrome.storage.onChanged.addListener((changes) => {
     Object.keys(changes).forEach(async (key) => {
-      console.log('key:', key);
       if (key === 'options') {
-        console.log('storage:', new Date());
         await intervalCheck();
       }
     });
