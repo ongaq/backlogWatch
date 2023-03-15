@@ -92,7 +92,16 @@ const createMessage = (comments: false | IssueComment[], issue: Issues) => {
     } else {
       const log = comments[0].changeLog;
       if (log && log.length) {
-        return `状態: ${log[0].originalValue} → ${log[0].newValue}`;
+        return log.reduce((temp, data) => {
+          if (data.field && data.newValue) {
+            if (data.originalValue) {
+              temp += `${data.field}: ${data.originalValue} → ${data.newValue}\n`;
+            } else {
+              temp += `${data.field}: ${data.newValue}\n`;
+            }
+          }
+          return temp;
+        }, '');
       }
     }
   }
