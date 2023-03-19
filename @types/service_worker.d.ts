@@ -1,17 +1,14 @@
-import type { SpaceName, SpaceData } from './index';
+import type { SpaceName, SpaceData, Options } from './index';
 import type { IssueComment } from './issues';
 
 export type CheckWatchIssues = {
   space: SpaceName | false;
-  close: string | false;
-  watch: string | false;
+  options: Options['options']['options'] | false;
 };
-export type PopupNotification = {
+export type WatchNotification = {
   hostname: string;
   spaceId: string;
-  // issueId: string;
-  // commentCountDbName: string;
-  watch: string;
+  options: Options['options']['options'];
 };
 export type IssueCommentsCount = {
   [issueId: string]: number;
@@ -24,7 +21,7 @@ export type SpaceComments = {
 export type BacklogCompletedWhenCancel = {
   hostname: string;
   subdomain: string;
-  watch: string;
+  watch: 1 | 0;
   status: string;
   issueId: string;
   watchingId: number;

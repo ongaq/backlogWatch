@@ -111,3 +111,15 @@ export const getUserInfoFetchAPI = async (hostname: string) => {
     return false;
   }
 };
+export const getNotificationsFetchAPI = async (hostname: string) => {
+  const query = '&count=10';
+  const apiPath = 'notifications';
+  const method = 'GET';
+
+  try {
+    return await fetchAPI({ apiPath, query, method, hostname });
+  } catch (e) {
+    consoleLog(String(e));
+    return false;
+  }
+};

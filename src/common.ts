@@ -61,10 +61,8 @@ export const getOptions = <T extends GetOptionsArg>(target: T) => {
       const space = items.options.space;
       const options = items.options.options;
 
-      if (target === 'close') {
-        return resolve(options.close as unknown as GetOptionsReturn<T>);
-      } else if (target === 'watch') {
-        return resolve(options.watch as unknown as GetOptionsReturn<T>);
+      if (target === 'options') {
+        return resolve(options as unknown as GetOptionsReturn<T>);
       } else if (target === 'space' && Object.keys(space).length) {
         return resolve(space as unknown as GetOptionsReturn<T>);
       }
@@ -188,4 +186,11 @@ export const getBacklogUserId = async (hostname: string) => {
   } else {
     return getUserInfo();
   }
+};
+
+export const isObject = (target: unknown): target is Record<any, any> => {
+  return target !== null && typeof target === 'object' && !Array.isArray(target);
+};
+export const isArray = (target: unknown): target is Record<any, any>[] => {
+  return target !== null && typeof target === 'object' && Array.isArray(target);
 };

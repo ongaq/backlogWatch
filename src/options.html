@@ -46,9 +46,27 @@
     <h1 class="title is-4">機能オプション</h1>
     <ul class="optionList">
       <li class="optionList-li">
+        <p>ウォッチした課題を通知するか:</p>
+        <div class="select">
+          <select data-options="watchNotify">
+            <option value="1">通知する(default)</option>
+            <option value="0">通知しない</option>
+          </select>
+        </div>
+      </li>
+      <li class="optionList-li">
+        <p>お知らせを通知するか:</p>
+        <div class="select">
+          <select data-options="infoNotify">
+            <option value="1">通知する(default)</option>
+            <option value="0">通知しない</option>
+          </select>
+        </div>
+      </li>
+      <li class="optionList-li">
         <p>通知ウインドウを何秒後に閉じるか:</p>
         <div class="select">
-          <select id="js-options-autoClose">
+          <select data-options="autoClose">
             <option value="0">閉じない(default)</option>
             <option value="5">5秒後</option>
             <option value="6">6秒後</option>
@@ -62,7 +80,7 @@
       <li class="optionList-li">
         <p>課題完了時にウォッチを解除するか:</p>
         <div class="select">
-          <select id="js-options-releaseWatch">
+          <select data-options="releaseWatch">
             <option value="0">解除しない(default)</option>
             <option value="1">解除する</option>
           </select>

@@ -480,6 +480,9 @@ a {
   align-items: center;
   gap: 16px;
 }
+.optionList-li > p {
+  min-width: 270px;
+}
 
 .buttonArea {
   margin-top: 64px;

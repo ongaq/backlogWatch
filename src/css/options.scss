@@ -204,6 +204,10 @@ a {
     display: flex;
     align-items: center;
     gap: 16px;
+
+    > p {
+      min-width: 270px;
+    }
   }
 }
 .buttonArea {

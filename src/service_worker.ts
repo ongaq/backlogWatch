@@ -1,24 +1,23 @@
-import type { CheckWatchIssues, PopupNotification, BacklogCompletedWhenCancel } from '../@types/service_worker';
+import type { CheckWatchIssues, WatchNotification, BacklogCompletedWhenCancel } from '../@types/service_worker';
 import type { IssueComment, Issues } from '../@types/issues';
-import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI, deleteWatchFetchAPI } from './api';
-import { getOptions, consoleLog } from './common';
+import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI, deleteWatchFetchAPI, getNotificationsFetchAPI } from './api';
+import { getOptions, consoleLog, isObject, isArray } from './common';
 import storageManager from './storage';
 
 const getAllOptions = async () => await Promise.all([
   getOptions('space'),
-  getOptions('close'),
-  getOptions('watch'),
+  getOptions('options'),
 ]);
 
 const acceptNotification = async () => {
   const alarmName = 'backlogOptionsSetting';
-  const [space,close,watch] = await getAllOptions();
+  const [space,options] = await getAllOptions();
 
-  if (space && close && watch) {
+  if (space && options) {
     chrome.alarms.get(alarmName, (val) => val && chrome.alarms.clear(alarmName));
     chrome.notifications.getPermissionLevel((response) => {
       if (response === 'granted') {
-        checkWatchIssues({ space, close, watch });
+        checkWatchIssues({ space, options });
       } else if (response === 'denied') {
         throw new Error('notification request false.');
       }
@@ -42,15 +41,15 @@ const closeNotificationAfterSeconds = async (notificationId: string) => {
   if (!result || !Object.keys(result).length) return;
   const { options: { options } } = result;
 
-  if (options && options.close && Number(options.close) > 0) {
-    const when = Date.now() + (msec * Number(options.close));
+  if (options && options.close > 0) {
+    const when = Date.now() + (msec * options.close);
     chrome.alarms.create(alermName, { when });
   }
   chrome.alarms.onAlarm.addListener((alarm) => alarm && alarm.name === alermName && chrome.notifications.clear(notificationId));
 };
 /** 課題完了時にウォッチを解除する */
 const backlogCompletedWhenCancel = async ({ hostname, subdomain, watch, status, issueId, watchingId }: BacklogCompletedWhenCancel) => {
-  if (!Boolean(watch) || !issueId || !watchingId) {
+  if (!watch || !issueId || !watchingId) {
     return;
   }
   if (status === '完了') {
@@ -61,53 +60,71 @@ const backlogCompletedWhenCancel = async ({ hostname, subdomain, watch, status, 
     }
   }
 };
+const getAllNotificationIds = (): Promise<string[]> => {
+  return new Promise((resolve) => {
+    chrome.notifications.getAll((notify) => {
+      return resolve(Object.keys(notify));
+    });
+  });
+};
 /** 通知を作成する */
-const createNotifications = async (options: chrome.notifications.NotificationOptions<true>, hostname: string, issueId: string, comments: false | IssueComment[]) => {
+const createNotifications = async (options: chrome.notifications.NotificationOptions<true>, hostname: string, issueId: string, comments: false | IssueComment | IssueComment[]) => {
   const subdomain = hostname?.split('.')?.[0] || '';
-  const noti = chrome.notifications;
-  const comment = comments && comments.length ? comments[0] : undefined;
+  const comment = isArray(comments) ? comments[0] : isObject(comments) ? comments : undefined;
   let lastCommentId = typeof comment !== 'undefined' ? `#comment-${comment.id}` : '';
+  const notifyIds = await getAllNotificationIds();
+  const notifyId = `backlog-${subdomain}-${issueId}`;
 
-  noti.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
+  // 通知ウインドウが閉じられていない場合は同じ通知は作らない
+  if (notifyIds.includes(notifyId)) return;
+
+  chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
     const listener = () => {
       chrome.tabs.create({
         url: `https://${hostname}/view/${issueId}${lastCommentId}`,
       });
-      noti.onClicked.removeListener(listener);
-      noti.clear(notificationId);
+      chrome.notifications.onClicked.removeListener(listener);
+      chrome.notifications.clear(notificationId);
     };
-    noti.onClicked.addListener(listener);
-    noti.onClosed.addListener(() => {
-      noti.onClicked.removeListener(listener);
-      noti.clear(notificationId);
+    chrome.notifications.onClicked.addListener(listener);
+    chrome.notifications.onClosed.addListener(() => {
+      chrome.notifications.onClicked.removeListener(listener);
+      chrome.notifications.clear(notificationId);
     });
     // 機能オプション
     closeNotificationAfterSeconds(notificationId);
   });
 };
-const createMessage = (comments: false | IssueComment[], issue: Issues) => {
-  if (comments && comments.length) {
-    if (comments[0].content) {
-      return comments[0].content;
-    } else {
-      const log = comments[0].changeLog;
-      if (log && log.length) {
-        return log.reduce((temp, data) => {
-          if (data.field && data.newValue) {
-            if (data.originalValue) {
-              temp += `${data.field}: ${data.originalValue} → ${data.newValue}\n`;
-            } else {
-              temp += `${data.field}: ${data.newValue}\n`;
-            }
+const createMessage = (comments: false | IssueComment | IssueComment[], issue: Issues) => {
+  const getLog = (comment: IssueComment) => {
+    const log = comment.changeLog;
+    if (log && log.length) {
+      return log.reduce((temp, data) => {
+        if (data.field && data.newValue) {
+          if (data.originalValue) {
+            temp += `${data.field}: ${data.originalValue} → ${data.newValue}\n`;
+          } else {
+            temp += `${data.field}: ${data.newValue}\n`;
           }
-          return temp;
-        }, '');
-      }
+        }
+        return temp;
+      }, '');
+    }
+    return issue.description;
+  };
+
+  if (comments) {
+    if (isArray(comments)) {
+      return comments[0].content ? comments[0].content : getLog(comments[0]);
+    } else if (isObject(comments)) {
+      return comments.content ? comments.content : getLog(comments);
     }
   }
   return issue.description;
 };
-const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification) => {
+/** ウォッチの通知 */
+const watchNotification = async ({ hostname, spaceId, options }: WatchNotification) => {
+  const { watch } = options;
   const watchingList = await getWatchListFetchAPI(hostname);
   if (!watchingList || !watchingList.length) return false;
 
@@ -162,18 +179,49 @@ const popupNotification = async ({ hostname, spaceId, watch }: PopupNotification
     backlogCompletedWhenCancel({ hostname, subdomain, watch, status, issueId, watchingId: watching.id });
   }
 };
-const checkWatchIssues = async ({ space, close, watch }: CheckWatchIssues) => {
-  if (!space || !close || !watch) {
+/** お知らせの通知 */
+const infoNotification = async (hostname: string) => {
+  const notifications = await getNotificationsFetchAPI(hostname);
+  if (!notifications || !notifications.length) return false;
+
+  for (const notification of notifications) {
+    if (notification.resourceAlreadyRead) continue;
+
+    const { issue, comment } = notification;
+    const issueId = issue.issueKey;
+
+    const note = `[${issueId}] @${issue.createdUser.name}`;
+    const iconUrl = `https://${hostname}/favicon.ico`;
+    const message = createMessage(comment, issue);
+
+    await createNotifications({
+      type: 'basic',
+      iconUrl,
+      title: issue ? issue.summary : issueId,
+      message,
+      contextMessage: note,
+      requireInteraction: true
+    }, hostname, issueId, comment);
+  }
+};
+const checkWatchIssues = async ({ space, options }: CheckWatchIssues) => {
+  if (!space || !options) {
     return consoleLog('オプション取得失敗');
   }
   for (const spaceId of Object.keys(space)) {
     const hostname = space[spaceId].name;
-    popupNotification({ hostname, spaceId, watch });
+
+    if (options.notifyWatch) {
+      await watchNotification({ hostname, spaceId, options });
+    }
+    if (options.notifyInfo) {
+      await infoNotification(hostname);
+    }
   }
 };
 const intervalCheck = async () => {
-  const [space,close,watch] = await getAllOptions();
-  await checkWatchIssues({ space, close, watch });
+  const [space,options] = await getAllOptions();
+  await checkWatchIssues({ space, options });
 };
 const runChromeFunctions = () => {
   const alarmName = 'backlog';
