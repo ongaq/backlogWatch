@@ -5,7 +5,9 @@
     "build": "rollup -c",
     "start": "rollup -c -w",
     "sass": "ts-node tasks/watcher.ts",
-    "check": "npx tsc --noEmit"
+    "check": "npx tsc --noEmit",
+    "firebase:dev": "firebase serve --only hosting",
+    "firebase:deploy": "firebase deploy"
   },
   "volta": {
     "node": "18.14.0"

@@ -4,7 +4,7 @@ https://chrome.google.com/webstore/detail/backlog-watch/hgbfbnmhafkhigfegihpgapn
 ## 主な機能
 - Backlogのダッシュボードにウォッチ中の課題を固定表示
 - 拡張機能のアイコンクリックでウォッチ中の課題を一覧表示
-- ウォッチに追加された課題をデスクトップ通知
+- ウォッチした課題やお知らせに更新があった際にデスクトップ通知
 
 ### 課題のウォッチ追加方法
 - 各課題にアクセスします。

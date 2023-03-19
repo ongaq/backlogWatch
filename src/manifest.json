@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "minimum_chrome_version": "90.0",
   "name": "Backlog Watch Notifications",
-  "description": "Backlogでウォッチした課題に更新があった際にデスクトップ通知を表示します",
+  "description": "Backlogでウォッチした課題やお知らせに更新があった際にデスクトップ通知を表示します",
   "version": "2.0.0",
   "icons": {
     "16": "images/icon16.png",
@@ -51,10 +51,6 @@
         "common.ts",
         "issues.ts"
       ]
-    },
-    {
-      "matches": ["<all_urls>"],
-      "resources": ["history.html"]
     }
   ],
   "background": {
