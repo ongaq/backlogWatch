@@ -10,13 +10,13 @@ export type Add = (
   spaceId: string,
   item: IssueItem | CommentCount,
   tableName: string,
-) => Promise<Boolean>;
+) => Promise<boolean>;
 
 export type Common = (
   spaceId: string,
   itemId: string,
   tableName: string,
-) => Promise<Boolean>;
+) => Promise<boolean>;
 
 export type ItemId = {
   [itemId: string]: IssueItem;

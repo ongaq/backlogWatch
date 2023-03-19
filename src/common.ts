@@ -17,7 +17,7 @@ export const returnMsec = (number: number) => {
   return millisecond * sec * number;
 };
 /** ローディング待機 */
-export const locationObserver = (callback: Function) => {
+export const locationObserver = (callback: () => void) => {
   const target = document.querySelector('.ticket__mask');
   if (target === null) return;
 
@@ -53,22 +53,20 @@ export const watchControl = (element: HTMLElement, state: string) => {
   }
   setTimeout(() => element.classList.add('is-running'), timer);
 };
-export const getOptions = <T extends GetOptionsArg>(target: T) => {
-  return new Promise<GetOptionsReturn<T>>(async(resolve) => {
-    const items = await storageManager.get('options');
+export const getOptions = async <T extends GetOptionsArg>(target: T): Promise<GetOptionsReturn<T>> => {
+  const items = await storageManager.get('options');
 
-    if (items && items.options) {
-      const space = items.options.space;
-      const options = items.options.options;
+  if (items && items.options) {
+    const space = items.options.space;
+    const options = items.options.options;
 
-      if (target === 'options') {
-        return resolve(options as unknown as GetOptionsReturn<T>);
-      } else if (target === 'space' && Object.keys(space).length) {
-        return resolve(space as unknown as GetOptionsReturn<T>);
-      }
+    if (target === 'options') {
+      return options as unknown as GetOptionsReturn<T>;
+    } else if (target === 'space' && Object.keys(space).length) {
+      return space as unknown as GetOptionsReturn<T>;
     }
-    return resolve(false as unknown as GetOptionsReturn<T>);
-  });
+  }
+  return false as unknown as GetOptionsReturn<T>;
 };
 export const spaceUrl = (argHostname?: string) => {
   const data = {

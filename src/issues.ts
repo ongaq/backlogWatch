@@ -204,7 +204,7 @@ const createWatchIssue = async () => {
   }
 };
 /** 課題ページでDOMが構築されるのを待つ */
-const observeIssueCard = (callback: Function) => {
+const observeIssueCard = (callback: () => void) => {
   const rootElement = document.querySelector('#root');
   const hasIssueArea = () => document.querySelector('#issueArea') !== null;
   if (rootElement === null) return;

@@ -1,5 +1,4 @@
-import type { SpaceName, SpaceData, Options } from './index';
-import type { IssueComment } from './issues';
+import type { SpaceName, Options } from './index';
 
 export type CheckWatchIssues = {
   space: SpaceName | false;

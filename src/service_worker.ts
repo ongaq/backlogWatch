@@ -71,7 +71,7 @@ const getAllNotificationIds = (): Promise<string[]> => {
 const createNotifications = async (options: chrome.notifications.NotificationOptions<true>, hostname: string, issueId: string, comments: false | IssueComment | IssueComment[]) => {
   const subdomain = hostname?.split('.')?.[0] || '';
   const comment = isArray(comments) ? comments[0] : isObject(comments) ? comments : undefined;
-  let lastCommentId = typeof comment !== 'undefined' ? `#comment-${comment.id}` : '';
+  const lastCommentId = typeof comment !== 'undefined' ? `#comment-${comment.id}` : '';
   const notifyIds = await getAllNotificationIds();
   const notifyId = `backlog-${subdomain}-${issueId}`;
 
