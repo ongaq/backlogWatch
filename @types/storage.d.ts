@@ -1,14 +1,9 @@
-import type { IssueItem, Options, User } from 'index';
+import type { IssueItem, Options, User, CommentCount } from 'index';
 import type { ProjectItem } from 'projects';
-
-export type ThrowItem = (
-  spaceId: string,
-  tableName: string
-) => Promise<IssueItem[] | false>;
 
 export type Add = (
   spaceId: string,
-  item: IssueItem | CommentCount,
+  item: CommentCount,
   tableName: string,
 ) => Promise<boolean>;
 
@@ -19,7 +14,7 @@ export type Common = (
 ) => Promise<boolean>;
 
 export type ItemId = {
-  [itemId: string]: IssueItem;
+  [itemId: string]: number | CommentCount;
 }
 export type Space = {
   [space: string]: ItemId;
@@ -28,37 +23,19 @@ export type DataBase = {
   [tableName: string]: Space;
 };
 
-export type GetArg = 'issues' | 'watching' | 'projects' | 'options' | 'user';
-export type GetReturn<T> = T extends 'issues'
-  ? IssuesDB | false
-  : T extends 'watching'
+export type GetArg = 'watching' | 'options' | 'user';
+export type GetReturn<T> = T extends 'watching'
   ? WatchingDB | false
-  : T extends 'projects'
-  ? ProjectsDB | false
   : T extends 'options'
   ? Options | false
   : T extends 'user'
   ? UserDB | false
   : never;
 
-export type IssuesDB = {
-  [tableName: string]: {
-    [spaceName: string]: {
-      [issueId: string]: IssueItem;
-    }
-  }
-};
 export type WatchingDB = {
   [tableName: string]: {
     [spaceName: string]: {
       [issueId: string]: number;
-    }
-  }
-};
-export type ProjectsDB = {
-  [tableName: string]: {
-    [spaceName: string]: {
-      [projectId: string]: ProjectItem;
     }
   }
 };

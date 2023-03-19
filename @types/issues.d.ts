@@ -1,3 +1,5 @@
+import type { NulabAccount } from './index';
+
 export type CreatedUser = {
   id: number;
   userId: string;
@@ -8,11 +10,6 @@ export type CreatedUser = {
   nulabAccount: NulabAccount;
   keyword: string;
   lastLoginTime: Date;
-};
-export type NulabAccount = {
-  nulabId: string;
-  name: string;
-  uniqueId: string;
 };
 export type Category = {
   id: number;

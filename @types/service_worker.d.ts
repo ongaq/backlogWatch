@@ -9,14 +9,6 @@ export type WatchNotification = {
   spaceId: string;
   options: Options['options']['options'];
 };
-export type IssueCommentsCount = {
-  [issueId: string]: number;
-}
-export type SpaceComments = {
-  [issueDBName: string]: {
-    [spaceId: string]: IssueCommentsCount | undefined;
-  };
-}
 export type BacklogCompletedWhenCancel = {
   hostname: string;
   subdomain: string;

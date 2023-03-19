@@ -12,5 +12,3 @@ export type Watchings = {
   updated: Date;
   errors?: Record<any, any>;
 }
-/** response: /api/v2/users/:userId/watchings */
-export type WatchingsList = Watchings[];

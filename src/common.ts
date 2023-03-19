@@ -5,16 +5,9 @@ import storageManager from './storage';
 
 /** BacklogWatch用コンソールログ */
 export const consoleLog = (...log: any) => console.log('[BacklogWatchNotifications]', ...log);
-export const spaceDomain = typeof window !== 'undefined' && window.location.hostname;
 export const backlogLocation = {
   isHome: typeof window !== 'undefined' && window.location.href.includes('/dashboard'),
   isIssue: typeof window !== 'undefined' && window.location.href.includes('/view'),
-};
-export const returnMsec = (number: number) => {
-  const millisecond = 1000;
-  const sec = 60;
-
-  return millisecond * sec * number;
 };
 /** ローディング待機 */
 export const locationObserver = (callback: () => void) => {

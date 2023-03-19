@@ -9,30 +9,6 @@ const getAllOptions = async () => await Promise.all([
   getOptions('options'),
 ]);
 
-const acceptNotification = async () => {
-  const alarmName = 'backlogOptionsSetting';
-  const [space,options] = await getAllOptions();
-
-  if (space && options) {
-    chrome.alarms.get(alarmName, (val) => val && chrome.alarms.clear(alarmName));
-    chrome.notifications.getPermissionLevel((response) => {
-      if (response === 'granted') {
-        checkWatchIssues({ space, options });
-      } else if (response === 'denied') {
-        throw new Error('notification request false.');
-      }
-    });
-  } else {
-    console.warn('It does not have to set the options.');
-    chrome.alarms.get(alarmName, (val) => {
-      if (typeof val !== 'undefined') {
-        return;
-      }
-      chrome.alarms.create(alarmName, { periodInMinutes: 1 });
-      chrome.alarms.onAlarm.addListener((alarm) => alarm && alarm.name === alarmName && acceptNotification());
-    });
-  }
-};
 /** n秒後に通知を閉じる */
 const closeNotificationAfterSeconds = async (notificationId: string) => {
   const result = await storageManager.get('options');
