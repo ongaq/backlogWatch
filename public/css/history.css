@@ -23,4 +23,10 @@ a {
   background-color: #fff;
   z-index: 10;
 }
-
+.history {
+  list-style: disc outside;
+  margin: 1em 0 1em 2em;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  padding-inline-start: 0;
+}

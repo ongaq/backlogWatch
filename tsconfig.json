@@ -7,9 +7,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "experimentalDecorators": true
   },
-  "include": ["src", "@types"],
+  "include": ["src", "@types", "public/js"],
   "ts-node": {
     "swc": true,
     "esm": true
