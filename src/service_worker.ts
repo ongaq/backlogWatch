@@ -216,9 +216,9 @@ const runChromeFunctions = () => {
   // アラーム設定
   chrome.alarms.onAlarm.addListener((alarm) =>
     alarm && alarm.name === alarmName && intervalCheck());
-  // 1分毎にイベントを発生させる
+  // 3分毎にイベントを発生させる
   chrome.alarms.get(alarmName, (val) =>
-    typeof val === 'undefined' && chrome.alarms.create(alarmName, { periodInMinutes: 1 }));
+    typeof val === 'undefined' && chrome.alarms.create(alarmName, { periodInMinutes: 3 }));
 };
 
 chrome.notifications.getPermissionLevel(async(response) => {
