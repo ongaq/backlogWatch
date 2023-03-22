@@ -203,7 +203,7 @@ const intervalCheck = async () => {
   const [space,options] = await getAllOptions();
   await checkWatchIssues({ space, options });
 };
-const runChromeFunctions = () => {
+const runChromeFunctions = async () => {
   const alarmName = 'backlog';
   // オプション保存時に発火
   chrome.storage.onChanged.addListener((changes) => {
@@ -213,6 +213,7 @@ const runChromeFunctions = () => {
       }
     });
   });
+  await chrome.alarms.clearAll();
   // アラーム設定
   chrome.alarms.onAlarm.addListener((alarm) =>
     alarm && alarm.name === alarmName && intervalCheck());
@@ -224,7 +225,7 @@ const runChromeFunctions = () => {
 chrome.notifications.getPermissionLevel(async(response) => {
   if (response === 'granted') {
     await intervalCheck();
-    runChromeFunctions();
+    void runChromeFunctions();
   } else if (response === 'denied') {
     throw new Error('notification request false.');
   }
