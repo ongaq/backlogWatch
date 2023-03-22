@@ -1,5 +1,5 @@
-import { html, css, LitElement } from "https://esm.sh/lit@2.6.1";
-import { customElement, property } from "https://esm.sh/lit@2.6.1/decorators";
+import { html, css, LitElement } from 'https://esm.sh/lit@2.6.1';
+import { customElement, property } from 'https://esm.sh/lit@2.6.1/decorators';
 
 @customElement('history-list')
 export class HistoryList extends LitElement {
