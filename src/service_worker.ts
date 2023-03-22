@@ -55,17 +55,21 @@ const createNotifications = async (options: chrome.notifications.NotificationOpt
   if (notifyIds.includes(notifyId)) return;
 
   chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
-    const listener = () => {
-      chrome.tabs.create({
-        url: `https://${hostname}/view/${issueId}${lastCommentId}`,
-      });
-      chrome.notifications.onClicked.removeListener(listener);
-      chrome.notifications.clear(notificationId);
+    const listener = (clickedNotificationId: string) => {
+      if (clickedNotificationId === notificationId) {
+        chrome.tabs.create({
+          url: `https://${hostname}/view/${issueId}${lastCommentId}`,
+        });
+        chrome.notifications.onClicked.removeListener(listener);
+        chrome.notifications.clear(notificationId);
+      }
     };
     chrome.notifications.onClicked.addListener(listener);
-    chrome.notifications.onClosed.addListener(() => {
-      chrome.notifications.onClicked.removeListener(listener);
-      chrome.notifications.clear(notificationId);
+    chrome.notifications.onClosed.addListener((closedNotificationId) => {
+      if (closedNotificationId === notificationId) {
+        chrome.notifications.onClicked.removeListener(listener);
+        chrome.notifications.clear(notificationId);
+      }
     });
     // 機能オプション
     closeNotificationAfterSeconds(notificationId);
