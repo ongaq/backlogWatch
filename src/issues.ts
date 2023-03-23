@@ -14,6 +14,29 @@ import {
 import storageManager from './storage';
 import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
+/** 課題ページでDOMが構築されるのを待つ */
+const observeIssueCard = (callback: () => void) => {
+  const rootElement = document.querySelector('#root');
+  let currentSummaryObserve = '';
+  const getCurrentSummary = (currentSummary: string) => {
+    const summary = document.querySelector('#summary')?.textContent;
+
+    if (typeof summary === 'string' && currentSummary !== summary) {
+      return summary;
+    }
+    return false;
+  };
+  if (rootElement === null) return;
+
+  const observer = new MutationObserver(() => {
+    const currentSummary = getCurrentSummary(currentSummaryObserve);
+    if (currentSummary !== false) {
+      currentSummaryObserve = currentSummary;
+      callback();
+    }
+  });
+  observer.observe(rootElement, { childList: true, subtree: true });
+};
 /** ダッシュボードのウォッチ一覧用HTML */
 const createHTML = (watchings: Watchings[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
@@ -167,8 +190,8 @@ const createWatchIssue = async () => {
     }
   };
   const createWatchButton = async (issueId: string) => {
-    const watchIconWrap = document.querySelector('.watchIconWrap');
-    if (watchIconWrap) {
+    const watchIconWrap = document.querySelector('#extension-btn');
+    if (watchIconWrap !== null) {
       watchIconWrap.remove();
     }
     const html = (text: string) => `<div id="extension-btn" class="watchIconWrap watchIconWrap_new">
@@ -201,24 +224,6 @@ const createWatchIssue = async () => {
     const items = { heartElement, textElement, issueId };
     await saveIssueWatching(items);
     watchBtnElement.addEventListener('click', () => changeWatchState(items));
-  }
-};
-/** 課題ページでDOMが構築されるのを待つ */
-const observeIssueCard = (callback: () => void) => {
-  const rootElement = document.querySelector('#root');
-  const hasIssueArea = () => document.querySelector('#issueArea') !== null;
-  if (rootElement === null) return;
-
-  const observer = new MutationObserver((_, observer: MutationObserver) => {
-    if (!hasIssueArea()) return;
-    observer.disconnect();
-    callback();
-  });
-
-  if (hasIssueArea()) {
-    callback();
-  } else {
-    observer.observe(rootElement, { childList: true, subtree: true });
   }
 };
 
