@@ -165,8 +165,9 @@ const infoNotification = async (hostname: string) => {
   if (!notifications || !notifications.length) return false;
 
   for (const notification of notifications) {
-    if (notification.resourceAlreadyRead) continue;
-
+    if (notification.resourceAlreadyRead || notification.alreadyRead || !notification.issue) {
+      continue;
+    }
     const { issue, comment } = notification;
     const issueId = issue.issueKey;
 
