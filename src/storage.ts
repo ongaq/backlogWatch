@@ -47,8 +47,8 @@ class StorageManager {
    * @param {String} tableName - DBのテーブル名を入力します
    */
   add: Storage.Add = (spaceId, item, tableName) => {
-    const tableKey = tableName === 'issues' ? item.id : Object.keys(item)[0];
-    const tableValue = tableName === 'issues' ? item : Object.values(item)[0];
+    const tableKey = Object.keys(item)[0];
+    const tableValue = Object.values(item)[0];
     const createTable = (resolve: Resolve<boolean>) => {
       this.db[tableName] = {
         [spaceId]: {

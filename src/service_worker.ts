@@ -122,38 +122,42 @@ const watchNotification = async ({ hostname, spaceId, options }: WatchNotificati
     watchDB['watching'][spaceId] ??= {};
     const space = watchDB['watching'][spaceId];
 
-    if (typeof space?.[issue.issueKey] === 'undefined') {
-      space[issue.issueKey] = 0;
+    if (typeof space?.[issueId] === 'undefined') {
+      space[issueId] = { updateTime: 0, watchId: 0 };
     }
-    const updateTimeStoredInDB = space[issue.issueKey];
+    const updateTimeStoredInDB = space[issueId];
 
-    if (updateTimeStoredInDB === 0) {
-      const lastUpdate = { [issueId]: updateTime };
-      await storageManager.add(spaceId, lastUpdate, 'watching');
+    if (updateTimeStoredInDB.updateTime === 0) {
+      const issueWatchingId = { [issueId]: { updateTime, watchId: watching.id } };
+      await storageManager.add(spaceId, issueWatchingId, 'watching');
     }
     // APIで取得した最終更新時間のほうが保存された時間より新しければ
-    if (updateTime > updateTimeStoredInDB) {
-      space[issue.issueKey] = updateTime;
-      const note = `[${issueId}] @${issue.createdUser.name}`;
-      const iconUrl = `https://${hostname}/favicon.ico`;
-      const [issues, comments] = await Promise.all([
-        getIssueFetchAPI(issueId, hostname),
-        getIssueCommentFetchAPI(issueId, hostname),
-      ]);
-      const message = createMessage(comments, issue);
+    if (updateTime > updateTimeStoredInDB.updateTime) {
+      space[issueId] = { updateTime, watchId: watching.id };
 
-      await createNotifications({
-        type: 'basic',
-        iconUrl,
-        title: issues ? issues.summary : issueId,
-        message,
-        contextMessage: note,
-        requireInteraction: true
-      }, hostname, issueId, comments);
+      // 初回登録時は通知させない
+      if (updateTimeStoredInDB.updateTime !== 0) {
+        const note = `[${issueId}] @${issue.createdUser.name}`;
+        const iconUrl = `https://${hostname}/favicon.ico`;
+        const [issues, comments] = await Promise.all([
+          getIssueFetchAPI(issueId, hostname),
+          getIssueCommentFetchAPI(issueId, hostname),
+        ]);
+        const message = createMessage(comments, issue);
+
+        await createNotifications({
+          type: 'basic',
+          iconUrl,
+          title: issues ? issues.summary : issueId,
+          message,
+          contextMessage: note,
+          requireInteraction: true
+        }, hostname, issueId, comments);
+      }
     }
     const subdomain = hostname.split('.')[0];
     const status = issue.status.name;
-    if (watchDB && updateTime !== updateTimeStoredInDB) {
+    if (watchDB && updateTime !== updateTimeStoredInDB.updateTime) {
       await storageManager.set(watchDB);
     }
     backlogCompletedWhenCancel({ hostname, subdomain, watch, status, issueId, watchingId: watching.id });

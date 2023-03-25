@@ -95,11 +95,14 @@ export const addWatch = async ({ heartElement, textElement, issueId, watchingId 
   addWatchStyle({ heartElement, textElement });
   const { subdomain } = spaceUrl();
   const setValue = {
-    [issueId]: 0,
+    [issueId]: {
+      updateTime: 0,
+      watchId: 0,
+    },
   };
 
   if (watchingId && subdomain) {
-    setValue[issueId] = watchingId;
+    setValue[issueId]['watchId'] = watchingId;
   } else if (subdomain) {
     const watching = await addWatchFetchAPI(issueId);
 
@@ -110,7 +113,7 @@ export const addWatch = async ({ heartElement, textElement, issueId, watchingId 
         }
         return;
       }
-      setValue[issueId] = watching.id;
+      setValue[issueId]['watchId'] = watching.id;
     }
   }
   if (setValue[issueId]) {
@@ -126,8 +129,8 @@ export const removeWatch = async ({ heartElement, textElement, issueId }: WatchS
     addWatchStyle({ heartElement, textElement });
     return;
   }
-  const watchingId = watching['watching'][subdomain][issueId];
-  void deleteWatchFetchAPI(watchingId);
+  const { watchId } = watching['watching'][subdomain][issueId];
+  void deleteWatchFetchAPI(watchId);
   void storageManager.remove(subdomain, issueId, 'watching');
 };
 /** Chrome.Storageにウォッチが保存されているか */
@@ -149,9 +152,10 @@ export const saveIssueWatching = async ({ heartElement, textElement, issueId }: 
     const watchingIssues = await getWatchListFetchAPI(hostname);
     if (!watchingIssues || !watchingIssues.length) return;
 
-    for (const { issue } of watchingIssues) {
+    for (const watching of watchingIssues) {
+      const { issue } = watching;
       if (issue.issueKey === issueId) {
-        addWatch({ heartElement, textElement, issueId, watchingId: issue.id });
+        addWatch({ heartElement, textElement, issueId, watchingId: watching.id });
         break;
       }
     }

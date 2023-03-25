@@ -14,6 +14,8 @@ import {
 import storageManager from './storage';
 import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
+const HEART_URL = chrome.runtime.getURL('images/heart.svg');
+
 /** 課題ページでDOMが構築されるのを待つ */
 const observeIssueCard = (callback: () => void) => {
   const rootElement = document.querySelector('#root');
@@ -51,7 +53,7 @@ const createHTML = (watchings: Watchings[]) => {
       <td class="Title"><p>${summary}</p></td>
       <td class="Assigner">${assignee.name}</td>
       <td class="Description" title="${desc}"><p>${desc}...</p></td>
-      <td class="Watch"><i class="fa fa-heart is-watch"></i></td>
+      <td class="Watch"><i class="fa fa-heart is-watch" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});"></i></td>
     </tr>`;
   };
   const html = (tr: string) => `<section id="myIssues" class="watch-issueSection" data-id="projects-issues">
@@ -155,8 +157,9 @@ const createWatchHome = async () => {
 };
 /** 課題ページでウォッチボタンの作成 */
 const createWatchIssue = async () => {
+  const options = await storageManager.get('options');
   const spaceInfo = spaceUrl();
-  if (!spaceInfo) return;
+  if (!spaceInfo || !options || !Object.keys(options).length) return;
   const subdomain = spaceInfo.subdomain;
 
   const issueCard = document.querySelector<HTMLElement>('#issueArea');
@@ -196,7 +199,7 @@ const createWatchIssue = async () => {
     }
     const html = (text: string) => `<div id="extension-btn" class="watchIconWrap watchIconWrap_new">
       <span id="extension-text">${text}</span>
-      <i id="extension-heartIcon" class="fa fa-heart" title="${text}"></i>
+      <i id="extension-heartIcon" class="fa fa-heart" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});" title="${text}"></i>
     </div>`;
 
     // Storageに課題キーが存在するか確認
