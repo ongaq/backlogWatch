@@ -1,29 +1,40 @@
 import type { Watchings } from '../@types/watch';
+import type { Options } from '../@types/index';
+import type { CreateTag, Tags } from '../@types/popup';
 import { getWatchListFetchAPI } from './api';
 import storageManager from './storage';
 
-const createTag = (name: string, value: string | boolean, date?: Date) => {
+const createPeople = (name: string, value: string) => {
+  return `<li class="people">
+    <span class="people__text">${name}</span>
+    <span class="people__name">${value}</span>
+  </li>`;
+};
+const createTag = ({ name, value, grow, date }: CreateTag) => {
   let addClass = '';
+  let dateClass = '';
   if (date && new Date().getTime() > new Date(date).getTime()) {
-    addClass = ' is-danger';
+    addClass = ' -danger';
   }
   if (name === '未読/既読') {
     value = value ? '既読' : '未読';
   } else if (name === 'ステータス') {
     if (value === '処理中') {
-      addClass = ' is-info';
+      addClass = ' -info';
+    } else if (value === '開発中') {
+      addClass = ' -link';
     } else if (value === '処理済み') {
-      addClass = ' is-success';
+      addClass = ' -primary';
     } else if (value === '完了') {
-      addClass = ' is-primary';
+      addClass = ' -success';
     }
+  } else if (name === '最終更新日時' || name === '開始日' || name === '期限日') {
+    dateClass = ' is-date';
   }
-  return `<div class="control">
-    <div class="tags has-addons">
-      <span class="tag is-dark">${name}</span>
-      <span class="tag is-light${addClass}">${value}</span>
-    </div>
-  </div>`;
+  return `<li class="tag${grow}${dateClass}">
+    <span class="tag__text">${name}</span>
+    <span class="tag__state${addClass}">${value}</span>
+  </li>`;
 };
 const dateConvert = (date: Date) => {
   const d = new Date(date);
@@ -35,77 +46,112 @@ const dateConvert = (date: Date) => {
 const createHTML = (watching: Watchings, hostname: string) => {
   const issue = watching.issue;
   const hasResourceAlreadyRead = typeof watching.resourceAlreadyRead === 'boolean';
+  const tags: Tags = {
+    'ステータス': issue?.status?.name,
+    '未読/既読': hasResourceAlreadyRead,
+    '優先度': issue?.priority?.name,
+    '最終更新日時': watching.lastContentUpdated,
+    '開始日': issue.startDate,
+    '期限日': issue.dueDate,
+  };
+  const tagEntries = Object.entries(tags);
+  const definedTags = tagEntries.filter(([_, value]) => value);
+  const grow = definedTags.length > 5 ? ' is-grow' : '';
 
   return `<li class="watchList__li">
     <a href="https://${hostname}/view/${issue.issueKey}" class="watchList__li__a" target="_blank">
-      <h2 class="watchList__li__title title is-6">[${issue.issueKey}] ${issue.summary}</h2>
-      <p class="watchList__li__desc subtitle is-7">${issue.description}</p>
-      <div class="field is-grouped is-grouped-multiline">
-        ${hasResourceAlreadyRead ? createTag('未読/既読', watching.resourceAlreadyRead) : ''}
-        ${issue?.status?.name ? createTag('ステータス', issue.status.name) : ''}
-        ${issue?.priority?.name ? createTag('優先度', issue.priority.name) : ''}
-        ${issue?.createdUser?.name ? createTag('課題作成者', issue.createdUser.name) : ''}
-        ${watching.lastContentUpdated ? createTag('最終更新日時', dateConvert(watching.lastContentUpdated)) : ''}
-        ${issue?.assignee?.name ? createTag('担当', issue.assignee.name) : ''}
-        ${issue.startDate ? createTag('開始日', dateConvert(issue.startDate)) : ''}
-        ${issue.dueDate ? createTag('期限日', dateConvert(issue.dueDate), issue.dueDate) : ''}
-      </div>
+      <h2 class="watchList__li__title">[${issue.issueKey}] ${issue.summary}</h2>
+      <p class="watchList__li__desc">${issue.description}</p>
+      <ul class="tags">
+        ${issue?.status?.name ? createTag({ name: 'ステータス', value: issue.status.name, grow }) : ''}
+        ${hasResourceAlreadyRead ? createTag({ name: '未読/既読', value: watching.resourceAlreadyRead, grow }) : ''}
+        ${issue?.priority?.name ? createTag({ name: '優先度', value: issue.priority.name, grow }) : ''}
+        ${watching.lastContentUpdated ? createTag({ name: '最終更新日時', value: dateConvert(watching.lastContentUpdated), grow }) : ''}
+        ${issue.startDate ? createTag({ name: '開始日', value: dateConvert(issue.startDate), grow }) : ''}
+        ${issue.dueDate ? createTag({ name: '期限日', value: dateConvert(issue.dueDate), date: issue.dueDate, grow }) : ''}
+      </ul>
+      <ul class="peoples">
+        ${issue?.createdUser?.name ? createPeople('課題作成者', issue.createdUser.name) : ''}
+        ${issue?.assignee?.name ? createPeople('担当', issue.assignee.name) : ''}
+      </ul>
     </a>
   </li>`;
 };
-const createHTMLFromAPI = async () => {
-  const options = await storageManager.get('options');
-  if (!options || !Object.keys(options).length) return [];
-  const spaceNames = Object.keys(options.options.space);
-  const htmlArray = [];
+const createHTMLFromAPI = async ({ space, init, spaceName }: { space: Options['options']['space'], init: boolean; spaceName?: string }) => {
+  const spaceNames = Object.keys(space);
+  let hostname = '';
 
-  for (const spaceName of spaceNames) {
-    const hostname = options.options.space[spaceName].name;
-    const watchList = await getWatchListFetchAPI(hostname);
-    if (!watchList || !watchList.length) continue;
-    let html = `<ul class="watchList" data-tab="${spaceName}">`;
-    for (const watching of watchList) {
-      html += createHTML(watching, hostname);
-    }
-    html += '</ul>';
-    htmlArray.push({ spaceName, html });
+  if (init) {
+    hostname = space[spaceNames[0]].name;
+    spaceName ??= spaceNames[0];
+  } else if (spaceName) {
+    hostname = space[spaceName].name;
   }
-  return htmlArray;
+  if (hostname === '') return false;
+
+  const watchList = await getWatchListFetchAPI(hostname);
+  if (!watchList || !watchList.length) return false;
+
+  let html = `<ul class="watchList" data-tab="${spaceName}">`;
+  for (const watching of watchList) {
+    html += createHTML(watching, hostname);
+  }
+  html += '</ul>';
+  return { spaceName, html };
 };
-const createTabs = (htmlArray: { spaceName: string, html: string; }[]) => {
+const createTabs = (htmlArray: string[]) => {
   return `<div class="tabs">
-    <ul>
-      ${htmlArray.map(({ spaceName }) => `<li data-tab="${spaceName}"><a><span>${spaceName}</span></a></li>`).join('')}
-    </ul>
+    <div class="tabs__wrapper">
+      ${htmlArray.map((spaceName) => `<button type="button" data-tab="${spaceName}"><span>${spaceName}</span></button>`).join('')}
+    </div>
   </div>`;
 };
-const createNotWatchHTML = () => {
-  return '<div class="notWatch">現在ウォッチしてる課題が無いか、オプションでスペース情報の入力がありません</div>';
+const createNotWatchHTML = ({ init }: { init: boolean }) => {
+  const initFalsyText = '現在ウォッチしてる課題が無いか、オプションでスペース情報の入力がありません';
+  const falsyText = 'データの取得に失敗しました';
+  return `<div class="notWatch">${init ? initFalsyText : falsyText}</div>`;
 };
-
-const selectInitialActive = (htmlArray: { spaceName: string; html: string; }[]) => {
+const selectInitialActive = async (spaceNames: string[]) => {
+  const wrapperElm = document.querySelector('#wrapper');
+  const options = await storageManager.get('options');
+  if (!wrapperElm || !options || !Object.keys(options).length) return;
   const lists = document.querySelectorAll<HTMLUListElement>('.watchList');
-  const tabs = document.querySelectorAll<HTMLLIElement>('.tabs li');
-  const selectTab = (e: Event, tabs: NodeListOf<HTMLLIElement>, lists: NodeListOf<HTMLUListElement>) => {
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.tabs button');
+  const selectTab = async (e: Event, tabs: NodeListOf<HTMLButtonElement>, lists: NodeListOf<HTMLUListElement>) => {
+    const removeActiveClass = () => {
+      tabs.forEach((el) => el.classList.remove('is-active'));
+      lists.forEach((el) => el.classList.remove('is-active'));
+    };
     const self = e.currentTarget as HTMLElement;
-
     if (self.classList.contains('is-active')) {
       return;
     }
     const spaceName = self.getAttribute('data-tab');
-    const list = [...lists].find((el) => el.getAttribute('data-tab') === spaceName);
+    const currentWatchListElm = document.querySelector('.watchList');
+    if (!spaceName) return;
+    currentWatchListElm?.remove();
+    const space = options['options']['space'];
+    const data = await createHTMLFromAPI({ space, spaceName, init: false });
 
-    if (spaceName && list) {
-      tabs.forEach((el) => el.classList.remove('is-active'));
-      lists.forEach((el) => el.classList.remove('is-active'));
+    if (data) {
+      wrapperElm.insertAdjacentHTML('beforeend', data.html);
+      const newWatchListElm = document.querySelector('.watchList');
+
+      if (newWatchListElm) {
+        removeActiveClass();
+        self.classList.add('is-active');
+        newWatchListElm.classList.add('is-active');
+      }
+    } else {
+      removeActiveClass();
       self.classList.add('is-active');
-      list.classList.add('is-active');
+      wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: false }));
     }
   };
-  const spaceName = htmlArray[0].spaceName;
+  const spaceName = spaceNames[0];
   const list = [...lists].find((el) => el.getAttribute('data-tab') === spaceName);
 
-  if (lists.length > 1 && tabs.length > 1) {
+  if (tabs.length > 1) {
     const tab = [...tabs].find((el) => el.getAttribute('data-tab') === spaceName);
     list?.classList.add('is-active');
     tab?.classList.add('is-active');
@@ -118,23 +164,21 @@ const selectInitialActive = (htmlArray: { spaceName: string; html: string; }[]) 
   }
 };
 const setHTML = async () => {
-  const appElm = document.querySelector('#app');
-  if (!appElm) return;
-  const htmlArray = await createHTMLFromAPI();
+  const wrapperElm = document.querySelector('#wrapper');
+  const options = await storageManager.get('options');
+  if (!wrapperElm || !options || !Object.keys(options).length) return;
+  const space = options['options']['space'];
+  const data = await createHTMLFromAPI({ space, init: true });
 
-  if (htmlArray.length === 0) {
-    appElm.insertAdjacentHTML('afterbegin', createNotWatchHTML());
-  } else if (htmlArray.length >= 1) {
-    const div = document.createElement('div');
-    div.classList.add('watchListWrap');
-    for (const data of htmlArray) {
-      div.insertAdjacentHTML('afterbegin', data.html);
+  if (data) {
+    const spaceNames = Object.keys(space);
+    if (spaceNames.length > 1) {
+      wrapperElm.insertAdjacentHTML('beforeend', createTabs(spaceNames));
     }
-    appElm.insertAdjacentElement('afterbegin', div);
-    if (htmlArray.length > 1) {
-      appElm.insertAdjacentHTML('afterbegin', createTabs(htmlArray));
-    }
-    selectInitialActive(htmlArray);
+    wrapperElm.insertAdjacentHTML('beforeend', data.html);
+    selectInitialActive(spaceNames);
+  } else {
+    wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: true }));
   }
 };
 

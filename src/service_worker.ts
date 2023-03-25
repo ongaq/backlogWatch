@@ -95,9 +95,9 @@ const createMessage = (comments: false | IssueComment | IssueComment[], issue: I
 
   if (comments) {
     if (isArray(comments)) {
-      return comments[0].content ? comments[0].content : getLog(comments[0]);
+      return comments?.[0]?.content ? comments[0].content : getLog(comments?.[0]);
     } else if (isObject(comments)) {
-      return comments.content ? comments.content : getLog(comments);
+      return comments?.content ? comments.content : getLog(comments);
     }
   }
   return issue.description;

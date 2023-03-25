@@ -42,7 +42,7 @@ export type Issues = {
   category: Category[];
   versions: any[];
   milestone: any[];
-  startDate: null;
+  startDate: Date;
   dueDate: Date;
   estimatedHours: null;
   actualHours: null;

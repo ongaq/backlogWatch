@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-	<meta charset="UTF-8">
-	<title></title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c">
-	<link rel="stylesheet" href="css/popup.css">
+  <meta charset="UTF-8">
+  <title></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap">
+  <link rel="stylesheet" href="css/popup.css">
 </head>
 <body>
-
-<h1 class="watchListTitle title is-5">ウォッチ中の課題</h1>
-<div id="app"></div>
-
-<script type="module" src="popup.ts"></script>
+  <div id="app">
+    <div id="wrapper" class="watchListWrap">
+      <h1 id="title" class="watchListTitle">
+        <i class="eye"></i>
+        <span>ウォッチ中の課題</span>
+      </h1>
+    </div>
+  </div>
+  <script type="module" src="popup.ts"></script>
 </body>
 </html>

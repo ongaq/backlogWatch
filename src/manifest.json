@@ -51,6 +51,10 @@
         "common.ts",
         "issues.ts"
       ]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["images/eye.svg"]
     }
   ],
   "background": {
