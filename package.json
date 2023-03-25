@@ -2,7 +2,8 @@
   "name": "backlog-watch",
   "version": "2.0.0",
   "scripts": {
-    "build": "rollup -c",
+    "clean": "rimraf dist",
+    "build": "npm run clean && rollup -c",
     "start": "rollup -c -w",
     "dev": "ts-node tasks/watcher.ts",
     "check": "npx tsc --noEmit",
@@ -32,6 +33,7 @@
     "eslint": "^8.36.0",
     "fs-extra": "^11.1.0",
     "prettier": "^2.8.4",
+    "rimraf": "^4.4.1",
     "rollup": "^3.18.0",
     "rollup-plugin-chrome-extension": "^3.6.10",
     "rollup-plugin-sass": "^1.12.18",
