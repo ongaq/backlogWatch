@@ -448,6 +448,9 @@ li {
   height: fit-content;
   min-height: 223px;
 }
+.watchListWrap:has(.notWatch) {
+  min-height: 122px;
+}
 .watchListWrap:has(.tabs) {
   min-height: 257px;
 }
@@ -586,4 +589,8 @@ li {
   font-size: 12px;
   background-color: #fff;
   border-radius: 6px;
+}
+.notWatch a {
+  color: var(--link);
+  text-decoration: underline;
 }

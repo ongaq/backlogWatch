@@ -107,7 +107,7 @@ const createTabs = (htmlArray: string[]) => {
   </div>`;
 };
 const createNotWatchHTML = ({ init }: { init: boolean }) => {
-  const initFalsyText = '現在ウォッチしてる課題が無いか、オプションでスペース情報の入力がありません';
+  const initFalsyText = '現在ウォッチしてる課題が無いか、<a href="options.html" target="_blank">オプション</a>でスペース情報の入力がありません';
   const falsyText = 'データの取得に失敗しました';
   return `<div class="notWatch">${init ? initFalsyText : falsyText}</div>`;
 };
@@ -166,7 +166,11 @@ const selectInitialActive = async (spaceNames: string[]) => {
 const setHTML = async () => {
   const wrapperElm = document.querySelector('#wrapper');
   const options = await storageManager.get('options');
-  if (!wrapperElm || !options || !Object.keys(options).length) return;
+  if (!wrapperElm) return;
+  if (!options || !Object.keys(options).length) {
+    wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: true }));
+    return;
+  }
   const space = options['options']['space'];
   const data = await createHTMLFromAPI({ space, init: true });
 

@@ -133,6 +133,9 @@ li {
   height: fit-content;
   min-height: 223px;
 
+  &:has(.notWatch) {
+    min-height: 122px;
+  }
   &:has(.tabs) {
     min-height: 257px;
   }
@@ -273,4 +276,9 @@ li {
   font-size: 12px;
   background-color: #fff;
   border-radius: 6px;
+
+  a {
+    color: var(--link);
+    text-decoration: underline;
+  }
 }
