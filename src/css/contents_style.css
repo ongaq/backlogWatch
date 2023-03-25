@@ -1,3 +1,47 @@
+.fa {
+  cursor: pointer;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.fa-pencil {
+  width: 18px;
+  height: 18px;
+  -webkit-mask-image: url('../images/pencil.svg');
+  mask-image: url('../images/pencil.svg');
+  -webkit-mask-size: 18px;
+  mask-size: 18px;
+}
+
+.fa-plus-circle,
+.fa-minus-circle {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-size: 24px;
+  mask-size: 24px;
+}
+
+.fa-plus-circle {
+  -webkit-mask-image: url('../images/plus.svg');
+  mask-image: url('../images/plus.svg');
+}
+
+.fa-minus-circle {
+  -webkit-mask-image: url('../images/minus.svg');
+  mask-image: url('../images/minus.svg');
+}
+
+.fa-heart {
+  width: 36px;
+  height: 36px;
+  -webkit-mask-image: url('../images/heart.svg');
+  mask-image: url('../images/heart.svg');
+  -webkit-mask-size: 36px;
+  mask-size: 36px;
+}
+
 i.fa {
   font-size: 36px;
 }
@@ -6,10 +50,18 @@ i.fa-eye {
   color: #333;
 }
 i.fa-heart {
-  cursor: pointer;
+  background-color: #0a0a0a;
+}
+.watchIconWrap i.fa-heart {
+  width: 80px;
+  height: 60px;
+}
+.Watch i.fa-heart {
+  display: block;
+  margin: 0 auto;
 }
 i.fa-heart.is-watch {
-  color: #e00040;
+  background-color: #ff3860;
 }
 i.fa-heart.is-running {
   -webkit-animation: heartBeat 0.4s ease-in-out;
@@ -126,10 +178,6 @@ i.fa-heart.is-running {
 .watch-issue .Assigner,
 .watch-issue .Watch {
   text-align: center;
-}
-.watch-issue .Assigner i.fa,
-.watch-issue .Watch i.fa {
-  font-size: 30px;
 }
 
 .Description .is-visible {

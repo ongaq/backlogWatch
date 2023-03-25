@@ -1,9 +1,10 @@
-/* ====================================== */
-/* reset */
-@import "ress";
+// ======================================
+// reset
+@use "ress";
+@use "font";
 
-/* ====================================== */
-/* Global */
+// ======================================
+// Global
 body {
   display: grid;
   margin: 0;
@@ -16,8 +17,8 @@ a {
   text-decoration: underline !important;
 }
 
-/* ====================================== */
-/* parts */
+// ======================================
+// parts
 .fa {
   position: relative;
   display: inline-block;
@@ -28,24 +29,20 @@ a {
 .fa-plus-circle,
 .fa-minus-circle,
 .fa-pencil {
-  width: 24px;
-  height: 24px;
-  color: #00d1b2;
-  font-size: 24px;
+  background-color: #00d1b2;
 
   &:hover {
-    color: darken(#00d1b2, 10%);
+    background-color: darken(#00d1b2, 10%);
   }
 }
 .fa-pencil {
   width: 18px;
   height: 18px;
-  color: #333;
-  font-size: 18px;
+  background-color: #333;
 }
 
-/* ====================================== */
-/* selector */
+// ======================================
+// selector
 .wrap {
   position: relative;
   margin: 0 auto;
@@ -160,6 +157,7 @@ a {
           position: absolute;
           display: flex;
           justify-content: space-between;
+          top: -6px;
           right: -82px;
           width: 52px;
         }
@@ -171,7 +169,7 @@ a {
         }
         &_pencil {
           position: absolute;
-          bottom: 3px;
+          bottom: 5px;
           right: 5px;
           display: none;
 

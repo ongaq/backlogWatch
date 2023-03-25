@@ -29,7 +29,6 @@
         "*://*.backlog.com/*"
       ],
       "css": [
-        "css/font-awesome.min.css",
         "css/contents_style.css"
       ],
       "js": [
@@ -54,7 +53,9 @@
     },
     {
       "matches": ["<all_urls>"],
-      "resources": ["images/eye.svg"]
+      "resources": [
+        "images/*"
+      ]
     }
   ],
   "background": {

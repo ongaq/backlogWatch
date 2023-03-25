@@ -1,10 +1,22 @@
+@use "font";
+
 i {
   &.fa { font-size: 36px;}
   &.fa-eye { font-size: 18px; color: #333;}
   &.fa-heart {
-    cursor: pointer;
+    background-color: #0a0a0a;
 
-    &.is-watch { color: #e00040;}
+    .watchIconWrap & {
+      width: 80px;
+      height: 60px;
+    }
+    .Watch & {
+      display: block;
+      margin: 0 auto;
+    }
+    &.is-watch {
+      background-color: #FF3860;
+    }
     &.is-running {
       -webkit-animation: heartBeat 0.4s ease-in-out;
       animation: heartBeat 0.4s ease-in-out;
@@ -125,8 +137,6 @@ i {
   .Assigner,
   .Watch {
     text-align: center;
-
-    i.fa { font-size: 30px;}
   }
 }
 .Description {

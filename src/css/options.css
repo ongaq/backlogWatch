@@ -1,6 +1,4 @@
 @charset "UTF-8";
-/* ====================================== */
-/* reset */
 /*!
  * resset.dev • v5.0.2
  * MIT License
@@ -281,8 +279,50 @@ progress {
   cursor: default;
 }
 
-/* ====================================== */
-/* Global */
+.fa {
+  cursor: pointer;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.fa-pencil {
+  width: 18px;
+  height: 18px;
+  -webkit-mask-image: url('../images/pencil.svg');
+  mask-image: url('../images/pencil.svg');
+  -webkit-mask-size: 18px;
+  mask-size: 18px;
+}
+
+.fa-plus-circle,
+.fa-minus-circle {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-size: 24px;
+  mask-size: 24px;
+}
+
+.fa-plus-circle {
+  -webkit-mask-image: url('../images/plus.svg');
+  mask-image: url('../images/plus.svg');
+}
+
+.fa-minus-circle {
+  -webkit-mask-image: url('../images/minus.svg');
+  mask-image: url('../images/minus.svg');
+}
+
+.fa-heart {
+  width: 36px;
+  height: 36px;
+  -webkit-mask-image: url('../images/heart.svg');
+  mask-image: url('../images/heart.svg');
+  -webkit-mask-size: 36px;
+  mask-size: 36px;
+}
+
 body {
   display: grid;
   margin: 0;
@@ -296,8 +336,6 @@ a {
   text-decoration: underline !important;
 }
 
-/* ====================================== */
-/* parts */
 .fa {
   position: relative;
   display: inline-block;
@@ -309,26 +347,20 @@ a {
 .fa-plus-circle,
 .fa-minus-circle,
 .fa-pencil {
-  width: 24px;
-  height: 24px;
-  color: #00d1b2;
-  font-size: 24px;
+  background-color: #00d1b2;
 }
 .fa-plus-circle:hover,
 .fa-minus-circle:hover,
 .fa-pencil:hover {
-  color: #009e87;
+  background-color: #009e87;
 }
 
 .fa-pencil {
   width: 18px;
   height: 18px;
-  color: #333;
-  font-size: 18px;
+  background-color: #333;
 }
 
-/* ====================================== */
-/* selector */
 .wrap {
   position: relative;
   margin: 0 auto;
@@ -439,6 +471,7 @@ a {
   position: absolute;
   display: flex;
   justify-content: space-between;
+  top: -6px;
   right: -82px;
   width: 52px;
 }
@@ -450,7 +483,7 @@ a {
 }
 .field-list-li_plus .icon_pencil {
   position: absolute;
-  bottom: 3px;
+  bottom: 5px;
   right: 5px;
   display: none;
 }
