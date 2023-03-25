@@ -7,8 +7,8 @@
     "start": "rollup -c -w",
     "dev": "ts-node tasks/watcher.ts",
     "check": "npx tsc --noEmit",
-    "firebase:dev": "firebase serve --only hosting",
-    "firebase:deploy": "firebase deploy"
+    "deploy": "firebase deploy",
+    "firebase:dev": "firebase serve --only hosting"
   },
   "volta": {
     "node": "18.14.0"
