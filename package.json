@@ -4,8 +4,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && rollup -c",
-    "start": "rollup -c -w",
-    "dev": "ts-node tasks/watcher.ts",
+    "dev": "concurrently \"ts-node tasks/watcher.ts\" \"rollup -c -w\"",
     "check": "npx tsc --noEmit",
     "deploy": "firebase deploy",
     "firebase:dev": "firebase serve --only hosting"
@@ -29,6 +28,7 @@
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
     "chalk": "4.1.2",
+    "concurrently": "^7.6.0",
     "dayjs": "^1.11.7",
     "eslint": "^8.36.0",
     "fs-extra": "^11.1.0",
@@ -37,7 +37,7 @@
     "rollup": "^3.18.0",
     "rollup-plugin-chrome-extension": "^3.6.10",
     "rollup-plugin-sass": "^1.12.18",
-    "sass": "^1.58.3",
+    "sass": "^1.60.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
   },
