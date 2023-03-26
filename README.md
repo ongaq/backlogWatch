@@ -7,13 +7,14 @@ https://chrome.google.com/webstore/detail/backlog-watch/hgbfbnmhafkhigfegihpgapn
 - ウォッチした課題やお知らせに更新があった際にデスクトップ通知
 
 ### 課題のウォッチ追加方法
-- 各課題にアクセスします。
-- 公式機能のウォッチボタンを押下、または画面右下の黒いハートマークを押下します。
+1. オプションからスペースのAPIキーを保存します。
+2. 各課題にアクセスします。
+3. 公式機能のウォッチボタンを押下、または画面右下の黒いハートマークを押下します。
 
 ## 開発
 
 ```
 npm run start // 拡張機能周りのhot-reload
-npm run sass // sassのhot-reload
+npm run dev // sass,public/jsのhot-reload
 npm run build // 拡張機能のbuild
 ```
