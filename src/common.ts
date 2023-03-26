@@ -86,10 +86,12 @@ const watchText = {
 export const removeWatchStyle = ({ heartElement, textElement }: WatchStyle) => {
   watchControl(heartElement, 'remove');
   textElement.textContent = watchText.notWatch;
+  heartElement.title = watchText.notWatch;
 };
 export const addWatchStyle = ({ heartElement, textElement }: WatchStyle) => {
   watchControl(heartElement, 'add');
   textElement.textContent = watchText.watching;
+  heartElement.title = watchText.watching;
 };
 export const addWatch = async ({ heartElement, textElement, issueId, watchingId }: WatchStyle & WatchState) => {
   addWatchStyle({ heartElement, textElement });

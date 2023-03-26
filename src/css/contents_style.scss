@@ -1,3 +1,4 @@
+@use "root";
 @use "font";
 
 i {
@@ -6,10 +7,6 @@ i {
   &.fa-heart {
     background-color: #0a0a0a;
 
-    .watchIconWrap & {
-      width: 80px;
-      height: 60px;
-    }
     .Watch & {
       display: block;
       margin: 0 auto;
@@ -23,86 +20,44 @@ i {
     }
   }
 }
-
-#projectList {
-  .Project {
-    position: relative;
-
-    .fa-star {
-      position: absolute;
-      top: 17px;
-      right: 10px;
-      margin-top: -12px;
-      font-size: 24px;
-      cursor: pointer;
-
-      &.is-watch { color: orange;}
-      &.is-running {
-        -webkit-animation: heartBeat 0.4s ease-in-out;
-        animation: heartBeat 0.4s ease-in-out;
-      }
-    }
-  }
-}
 // ================================
-// new ui
-// ================================
-.watch-title {
-  display: block;
-  height: 35px;
-}
-.project-list__item .fa-star {
-  position: absolute;
-  bottom: 5px;
-  right: 6px;
-  font-size: 24px;
+.watchIconWrap {
+  position: fixed;
+  right: 16px;
+  bottom: 84px;
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  height: fit-content;
+  white-space: nowrap;
+  background-color: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 7px rgba(#000, 0.15);
+  border: 1px solid #ccc;
+  border-radius: 4px;
   cursor: pointer;
-  z-index: 6;
+  z-index: 50;
 
-  &.is-watch { color: orange;}
-  &.is-running {
-    -webkit-animation: heartBeat 0.4s ease-in-out;
-    animation: heartBeat 0.4s ease-in-out;
-  }
-}
-// ================================
-.Page--view-issue {
-  position: relative;
-
-  > .watchIconWrap {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    display: table;
-    width: auto;
-    white-space: nowrap;
-    background-color: #fff;
+  * {
+    line-height: 1;
+    vertical-align: top;
     box-sizing: border-box;
-    box-shadow: 0 0 7px rgba(#000, 0.15);
-    border-radius: 6px 0 0 0;
-    cursor: pointer;
-    z-index: 50;
-
-    &_new {
-      bottom: 68px;
-    }
-
-    > span,
-    > i.fa-heart {
-      display: table-cell;
-      vertical-align: middle;
-      box-sizing: border-box;
-    }
-
-    > span {
-      padding: 0 20px;
-      color: #fff;
-      background-color: #222;
-      border-radius: 4px 0 0 0;
-    }
-    > i.fa-heart {
-      padding: 10px 20px;
-    }
+  }
+  &__text {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    color: var(--black);
+    font-weight: 300;
+    color: #666;
+    background-color: #f0f0f0;
+    border-radius: 4px 0 0 4px;
+  }
+  &__icon {
+    display: flex;
+    padding: 10px 20px;
+    width: 80px;
+    height: 60px;
   }
 }
 .watch-issueSection {

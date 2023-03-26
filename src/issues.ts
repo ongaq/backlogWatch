@@ -197,9 +197,9 @@ const createWatchIssue = async () => {
     if (watchIconWrap !== null) {
       watchIconWrap.remove();
     }
-    const html = (text: string) => `<div id="extension-btn" class="watchIconWrap watchIconWrap_new">
-      <span id="extension-text">${text}</span>
-      <i id="extension-heartIcon" class="fa fa-heart" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});" title="${text}"></i>
+    const html = (text: string) => `<div id="extension-btn" class="watchIconWrap">
+      <span id="extension-text" class="watchIconWrap__text">${text}</span>
+      <i id="extension-heartIcon" class="watchIconWrap__icon fa fa-heart" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});" title="${text}"></i>
     </div>`;
 
     // Storageに課題キーが存在するか確認
@@ -233,9 +233,8 @@ const createWatchIssue = async () => {
 const exec = () => {
   if (backlogLocation.isHome) {
     createWatchHome();
-  } else if (backlogLocation.isIssue) {
-    observeIssueCard(() => createWatchIssue());
   }
+  observeIssueCard(() => createWatchIssue());
 };
 
 if (document.readyState !== 'loading') {

@@ -1,4 +1,21 @@
 @charset "UTF-8";
+:root {
+  --primary: #00d1b2;
+  --primary-light: #ebfffc;
+  --success: #48c78e;
+  --success-light: #f0faf4;
+  --danger: #ff3860;
+  --danger-light: #feecf0;
+  --info: #209cee;
+  --info-light: #eef6fc;
+  --link: #485fc7;
+  --link-info: #eef3fc;
+  --black: #0a0a0a;
+  --gray: #4a4a4a;
+  --gray-light: #b5b5b5;
+  --gray-lighter: #dbdbdb;
+}
+
 /*!
  * resset.dev • v5.0.2
  * MIT License
@@ -277,23 +294,6 @@ progress {
 /* Specify the unstyled cursor of disabled, not-editable, or otherwise inoperable elements */
 [aria-disabled='true'] {
   cursor: default;
-}
-
-:root {
-  --primary: #00d1b2;
-  --primary-light: #ebfffc;
-  --success: #48c78e;
-  --success-light: #f0faf4;
-  --danger: #ff3860;
-  --danger-light: #feecf0;
-  --info: #209cee;
-  --info-light: #eef6fc;
-  --link: #485fc7;
-  --link-info: #eef3fc;
-  --black: #0a0a0a;
-  --gray: #4a4a4a;
-  --gray-light: #b5b5b5;
-  --gray-lighter: #dbdbdb;
 }
 
 body {
