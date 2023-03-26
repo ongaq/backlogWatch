@@ -57,15 +57,16 @@ const createHTML = (watchings: Watchings[]) => {
   const tableClass = 'watch-issue watch-issue_new data-table data-table--default my-issues-table';
   const createTR = (data: Watchings, evenOdd: string) => {
     const { issueKey, summary, assignee, description } = data.issue;
-    const desc = description.slice(0, 60);
+    const desc = description || '-';
+    const name = assignee?.name || '-';
 
     return `<tr class="Issue watch-issue-list watch-issue-list_new ${evenOdd}" data-watch-id="${data.id}">
       <td class="Key">
         <p><a href="/view/${issueKey}" class="watch-issue-anchor" title="${issueKey}">${issueKey}</a></p>
       </td>
-      <td class="Title"><p>${summary}</p></td>
-      <td class="Assigner">${assignee?.name || '-'}</td>
-      <td class="Description" title="${desc}"><p>${desc ? `${desc}...` : '-'}</p></td>
+      <td class="Title" title="${summary}"><p>${summary}</p></td>
+      <td class="Assigner" title="${name}"><p>${name}</p></td>
+      <td class="Description" title="${desc}"><p>${desc}</p></td>
       <td class="Watch"><i class="fa fa-heart is-watch" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});"></i></td>
     </tr>`;
   };

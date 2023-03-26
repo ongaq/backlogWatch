@@ -155,11 +155,16 @@ i.fa-heart.is-running {
 .watch-issue .Watch {
   text-align: center;
 }
-
-.Description .is-visible {
+.watch-issue :is(.Title, .Assigner, .Description) p {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.watch-issue .Description .is-visible {
   display: block;
 }
-.Description .is-hidden {
+.watch-issue .Description .is-hidden {
   display: none;
 }
 
