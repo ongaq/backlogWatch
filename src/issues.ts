@@ -16,6 +16,14 @@ import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
 const HEART_URL = chrome.runtime.getURL('images/heart.svg');
 
+/** ウォッチボタンの削除 */
+const deleteWatchBtn = () => {
+  const watchIconWrap = document.querySelector('#extension-btn');
+
+  if (watchIconWrap !== null) {
+    watchIconWrap.remove();
+  }
+};
 /** 課題ページでDOMが構築されるのを待つ */
 const observeIssueCard = (callback: () => void) => {
   const rootElement = document.querySelector('#root');
@@ -23,6 +31,11 @@ const observeIssueCard = (callback: () => void) => {
   const getCurrentSummary = (currentSummary: string) => {
     const summary = document.querySelector('#summary')?.textContent;
 
+    // 課題ページのタイトルが無かったら初期化
+    if (!summary) {
+      deleteWatchBtn();
+      currentSummaryObserve = '';
+    }
     if (typeof summary === 'string' && currentSummary !== summary) {
       return summary;
     }
@@ -51,8 +64,8 @@ const createHTML = (watchings: Watchings[]) => {
         <p><a href="/view/${issueKey}" class="watch-issue-anchor" title="${issueKey}">${issueKey}</a></p>
       </td>
       <td class="Title"><p>${summary}</p></td>
-      <td class="Assigner">${assignee.name}</td>
-      <td class="Description" title="${desc}"><p>${desc}...</p></td>
+      <td class="Assigner">${assignee?.name || '-'}</td>
+      <td class="Description" title="${desc}"><p>${desc ? `${desc}...` : '-'}</p></td>
       <td class="Watch"><i class="fa fa-heart is-watch" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});"></i></td>
     </tr>`;
   };
@@ -136,7 +149,7 @@ const createWatchHome = async () => {
     }
     if (typeof href === 'undefined') return;
 
-    if (e.ctrlKey || e.button === 2) {
+    if ((e.ctrlKey && e.button === 0) || e.button === 1) {
       window.open(href);
     } else if (e.button === 0) {
       location.href = href;
@@ -193,10 +206,7 @@ const createWatchIssue = async () => {
     }
   };
   const createWatchButton = async (issueId: string) => {
-    const watchIconWrap = document.querySelector('#extension-btn');
-    if (watchIconWrap !== null) {
-      watchIconWrap.remove();
-    }
+    deleteWatchBtn();
     const html = (text: string) => `<div id="extension-btn" class="watchIconWrap">
       <span id="extension-text" class="watchIconWrap__text">${text}</span>
       <i id="extension-heartIcon" class="watchIconWrap__icon fa fa-heart" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});" title="${text}"></i>
