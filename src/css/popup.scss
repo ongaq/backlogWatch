@@ -6,10 +6,17 @@ body {
   display: flex;
   flex-direction: column;
   width: 700px;
-  height: 100%;
   font-weight: 400;
   font-family: 'Noto Sans JP', sans-serif;
   background: #F5F5F5;
+
+  &.is-watch3 {
+    height: 500px;
+
+    &:has(.tabs.is-overflow) {
+      height: 483px;
+    }
+  }
 }
 a {
   color: inherit;
@@ -42,6 +49,7 @@ li {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+  padding: 16px 16px 0;
   line-height: 1;
   color: var(--black);
 
@@ -79,11 +87,13 @@ li {
   overflow-x: auto;
   display: flex;
   margin-bottom: 16px;
+  padding: 0 16px;
+  min-height: 34px;
   z-index: 999;
 
   &.is-overflow {
     margin: 0 -16px 16px;
-    padding: 0 16px;
+    min-height: 51px;
   }
   &__wrapper {
     display: flex;
@@ -112,16 +122,13 @@ li {
   }
 }
 .watchListWrap {
-  padding: 16px;
+  padding: 0 16px 16px;
   overflow-y: auto;
-  height: fit-content;
-  min-height: 223px;
+  height: 100%;
+  min-height: 161px;
 
   &:has(.notWatch) {
-    min-height: 122px;
-  }
-  &:has(.tabs) {
-    min-height: 257px;
+    min-height: 60px;
   }
 }
 .watchList {
@@ -132,6 +139,7 @@ li {
   &.is-active {
     display: flex;
     flex-direction: column;
+    row-gap: 16px;
   }
   &__li {
     &__title {

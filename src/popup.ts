@@ -4,6 +4,15 @@ import type { CreateTag, Tags } from '../@types/popup';
 import { getWatchListFetchAPI } from './api';
 import storageManager from './storage';
 
+const addNumberWatchesToClass = (watchCount: number) => {
+  document.body.removeAttribute('class');
+
+  if (watchCount < 3) {
+    document.body.classList.add(`is-watch${watchCount}`);
+  } else {
+    document.body.classList.add('is-watch3');
+  }
+};
 const createPeople = (name: string, value: string) => {
   return `<li class="people">
     <span class="people__text">${name}</span>
@@ -97,7 +106,7 @@ const createHTMLFromAPI = async ({ space, init, spaceName }: { space: Options['o
     html += createHTML(watching, hostname);
   }
   html += '</ul>';
-  return { spaceName, html };
+  return { spaceName, html, watchCount: watchList.length };
 };
 const createTabs = (htmlArray: string[]) => {
   return `<div class="tabs">
@@ -134,6 +143,7 @@ const selectInitialActive = async (spaceNames: string[]) => {
     const data = await createHTMLFromAPI({ space, spaceName, init: false });
 
     if (data) {
+      addNumberWatchesToClass(data.watchCount);
       wrapperElm.insertAdjacentHTML('beforeend', data.html);
       const newWatchListElm = document.querySelector('.watchList');
 
@@ -164,9 +174,10 @@ const selectInitialActive = async (spaceNames: string[]) => {
   }
 };
 const setHTML = async () => {
+  const titleElm = document.querySelector('#title');
   const wrapperElm = document.querySelector('#wrapper');
   const options = await storageManager.get('options');
-  if (!wrapperElm) return;
+  if (!wrapperElm || !titleElm) return;
   if (!options || !Object.keys(options).length) {
     wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: true }));
     return;
@@ -177,8 +188,9 @@ const setHTML = async () => {
   if (data) {
     const spaceNames = Object.keys(space);
     if (spaceNames.length > 1) {
-      wrapperElm.insertAdjacentHTML('beforeend', createTabs(spaceNames));
+      titleElm.insertAdjacentHTML('afterend', createTabs(spaceNames));
     }
+    addNumberWatchesToClass(data.watchCount);
     wrapperElm.insertAdjacentHTML('beforeend', data.html);
     selectInitialActive(spaceNames);
   } else {
