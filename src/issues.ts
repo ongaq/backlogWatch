@@ -71,7 +71,9 @@ const createHTML = (watchings: Watchings[]) => {
     </tr>`;
   };
   const html = (tr: string) => `<section id="myIssues" class="watch-issueSection" data-id="projects-issues">
-  <h3 class="watch-title title title--thirdly title-group__inline-title">ウォッチ中の課題</h3>
+  <h3 class="watch-title title title--thirdly">
+    ウォッチ中の課題
+  </h3>
   <div>
     <table id="issueList" class="${tableClass}" cellspacing="0" cellpadding="0" border="0">
       <thead>
