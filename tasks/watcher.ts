@@ -25,22 +25,26 @@ const compileScss = async (filePath: string) => {
 
   try {
     console.time('scss');
-    const result = sass.compile(filePath);
-    const fileName = path.basename(filePath).replace('.scss', '.css');
-    const distPath = path.resolve(`${dist}/css`, fileName);
-    const srcPath = path.resolve(`${src}/css`, fileName);
+    while (true) {
+      const result = await sass.compileAsync(filePath);
+      if (result.css.length === 0) continue;
+      const fileName = path.basename(filePath).replace('.scss', '.css');
+      const distPath = path.resolve(`${dist}/css`, fileName);
+      const srcPath = path.resolve(`${src}/css`, fileName);
 
-    await fs.writeFile(
-      distPath,
-      prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
-      'utf8'
-    );
-    // rollupの都合上srcにも吐き出す必要がある
-    await fs.writeFile(
-      srcPath,
-      prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
-      'utf8'
-    );
+      await fs.writeFile(
+        distPath,
+        prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
+        'utf8'
+      );
+      // rollupの都合上srcにも吐き出す必要がある
+      await fs.writeFile(
+        srcPath,
+        prettier.format(result.css, { ...prettierOptions, parser: 'css' }),
+        'utf8'
+      );
+      break;
+    }
   } catch (e) {
     log(e);
   } finally {
