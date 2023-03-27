@@ -30,7 +30,7 @@ const observeIssueCard = (callback: () => void) => {
   let currentSummaryObserve = '';
   /** 再帰的に引数の要素がDOMとして表示されているか確認する */
   const isElementVisible = (element: HTMLElement | null): boolean => {
-    if (!element || element === document.documentElement) return true;
+    if (!element || element === rootElement) return true;
     const style = window.getComputedStyle(element);
     const isVisible = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
     if (!isVisible) return false;
