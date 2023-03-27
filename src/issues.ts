@@ -28,11 +28,22 @@ const deleteWatchBtn = () => {
 const observeIssueCard = (callback: () => void) => {
   const rootElement = document.querySelector('#root');
   let currentSummaryObserve = '';
+  /** 再帰的に引数の要素がDOMとして表示されているか確認する */
+  const isElementVisible = (element: HTMLElement | null): boolean => {
+    if (!element || element === document.documentElement) return true;
+    const style = window.getComputedStyle(element);
+    const isVisible = style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    if (!isVisible) return false;
+
+    return isElementVisible(element.parentElement);
+  };
   const getCurrentSummary = (currentSummary: string) => {
-    const summary = document.querySelector('#summary')?.textContent;
+    const summaryElm = document.querySelector('#summary') as HTMLElement;
+    const summary = summaryElm?.textContent;
+    const isVisible = isElementVisible(summaryElm);
 
     // 課題ページのタイトルが無かったら初期化
-    if (!summary) {
+    if (!summaryElm || !summary || !isVisible) {
       deleteWatchBtn();
       currentSummaryObserve = '';
     }
