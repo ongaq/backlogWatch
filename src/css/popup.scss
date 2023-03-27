@@ -98,6 +98,7 @@ li {
   &__wrapper {
     display: flex;
     flex-wrap: nowrap;
+    width: 100%;
     height: 34px;
     align-items: center;
     border-bottom: 1px solid var(--gray-lighter);
