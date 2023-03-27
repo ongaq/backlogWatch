@@ -53,6 +53,15 @@ a {
   background-color: #fff;
   z-index: 10;
 }
+.options {
+  &__subtitle,
+  &__notes {
+    line-height: 1.6;
+  }
+  &__spaceInfo {
+    margin-bottom: 1.5rem !important;
+  }
+}
 
 .field {
   display: flex;

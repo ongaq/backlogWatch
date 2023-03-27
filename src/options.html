@@ -9,15 +9,15 @@
 </head>
 <body class="has-background-primary-light">
 
-<div class="wrap">
+<div class="options wrap">
   <h1 class="title is-1 has-text-primary">Backlog Watch Options</h1>
 
   <section>
-    <h2 class="title is-4">スペース情報の入力</h2>
-    <p class="subtitle is-6">拡張機能で通知やポップアップ機能が必要な場合は以下を入力して下さい。<br>
+    <h2 class="title is-4 is-spaced">スペース情報の入力</h2>
+    <p class="options__subtitle subtitle is-6">拡張機能で通知やポップアップ機能が必要な場合は以下を入力して下さい。<br>
     複数スペースで通知をされたい方は入力フィールド横のプラスアイコンをクリックして入力フィールドを増やして下さい。</p>
 
-    <div class="js-field field has-background-info-light">
+    <div class="options__spaceInfo js-field field has-background-info-light">
       <ul class="js-field-list field-list" data-id="0">
         <li class="field-list-li field-list-li_spaceName">
           <strong>スペース名を入力</strong>
@@ -36,9 +36,10 @@
         </li>
       </ul>
     </div>
-    <p>※スペース名を含む backlog.jp もしくは backlog.com まで入力して下さい。(例: test.backlog.com)</p>
-    <p>※API KeyはBacklogの個人設定にある「新しいAPIキーを発行」から登録して下さい。
-    <a href="https://support-ja.backlog.com/hc/ja/articles/360035641754" target="_blank">詳しくはこちら</a></p>
+    <div class="options__notes">
+      <p>※スペース名を含む backlog.jp もしくは backlog.com まで入力して下さい。(例: test.backlog.com)</p>
+      <p>※API KeyはBacklogの個人設定にある「新しいAPIキーを発行」から登録して下さい。<a href="https://support-ja.backlog.com/hc/ja/articles/360035641754" target="_blank">詳しくはこちら</a></p>
+    </div>
   </section>
 
   <section class="optionWrap">
