@@ -46,6 +46,7 @@ const observeIssueCard = (callback: () => void) => {
     if (!summaryElm || !summary || !isVisible) {
       deleteWatchBtn();
       currentSummaryObserve = '';
+      return false;
     }
     if (typeof summary === 'string' && currentSummary !== summary) {
       return summary;
