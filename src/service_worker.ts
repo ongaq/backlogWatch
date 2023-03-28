@@ -54,23 +54,25 @@ const createNotifications = async (options: chrome.notifications.NotificationOpt
   // 通知ウインドウが閉じられていない場合は同じ通知は作らない
   if (notifyIds.includes(notifyId)) return;
 
-  chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId) => {
+  const handleNotificationEvent = (eventNotificationId: string, targetNotificationId: string, listener: (id: string) => void) => {
+    if (eventNotificationId === targetNotificationId) {
+      chrome.notifications.onClicked.removeListener(listener);
+      chrome.notifications.clear(targetNotificationId);
+    }
+  };
+  chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId: string) => {
     const listener = (clickedNotificationId: string) => {
       if (clickedNotificationId === notificationId) {
         chrome.tabs.create({
           url: `https://${hostname}/view/${issueId}${lastCommentId}`,
         });
-        chrome.notifications.onClicked.removeListener(listener);
-        chrome.notifications.clear(notificationId);
+        handleNotificationEvent(clickedNotificationId, notificationId, listener);
       }
     };
+    const closeListener = (closedNotificationId: string) =>
+      handleNotificationEvent(closedNotificationId, notificationId, listener);
     chrome.notifications.onClicked.addListener(listener);
-    chrome.notifications.onClosed.addListener((closedNotificationId) => {
-      if (closedNotificationId === notificationId) {
-        chrome.notifications.onClicked.removeListener(listener);
-        chrome.notifications.clear(notificationId);
-      }
-    });
+    chrome.notifications.onClosed.addListener(closeListener);
     // 機能オプション
     closeNotificationAfterSeconds(notificationId);
   });
