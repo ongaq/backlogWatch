@@ -96,6 +96,10 @@ class StorageManager {
   }
   async deleteDB() {
     await this.storage.clear();
+    // 通知IDの消去
+    chrome.notifications.getAll((notify) =>
+      Object.keys(notify).forEach((id) =>
+        chrome.notifications.clear(id)));
   }
 }
 
