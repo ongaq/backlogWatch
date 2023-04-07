@@ -1,5 +1,6 @@
 @use 'root';
 @use 'ress';
+@use 'font';
 
 body {
   overflow: hidden;
@@ -45,11 +46,37 @@ li {
   flex-grow: 1;
   height: 100%;
 }
+.header {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 16px 16px 0;
+  align-items: center;
+  justify-content: space-between;
+
+  .dropdown-item,
+  .dropdown-trigger span {
+    font-size: 14px;
+  }
+  .dropdown {
+    min-width: 225px;
+  }
+  .dropdown-trigger,
+  .button {
+    width: 100%;
+  }
+  .button {
+    display: flex;
+    text-align: left;
+    justify-content: space-between;
+  }
+  .dropdown-menu {
+    width: 100%;
+  }
+}
 .watchListTitle {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
-  padding: 16px 16px 0;
+  height: 30px;
   line-height: 1;
   color: var(--black);
 
@@ -181,13 +208,13 @@ li {
     }
   }
 }
-.tags {
+.watchTags {
   display: flex;
   flex-wrap: nowrap;
   width: 100%;
   column-gap: 12px;
 }
-.tag {
+.watchTag {
   display: flex;
   flex-direction: column;
   min-width: 74px;

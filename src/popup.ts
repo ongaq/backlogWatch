@@ -40,9 +40,9 @@ const createTag = ({ name, value, grow, date }: CreateTag) => {
   } else if (name === '最終更新日時' || name === '開始日' || name === '期限日') {
     dateClass = ' is-date';
   }
-  return `<li class="tag${grow}${dateClass}">
-    <span class="tag__text">${name}</span>
-    <span class="tag__state${addClass}">${value}</span>
+  return `<li class="watchTag${grow}${dateClass}">
+    <span class="watchTag__text">${name}</span>
+    <span class="watchTag__state${addClass}">${value}</span>
   </li>`;
 };
 const dateConvert = (date: Date) => {
@@ -71,7 +71,7 @@ const createHTML = (watching: Watchings, hostname: string) => {
     <a href="https://${hostname}/view/${issue.issueKey}" class="watchList__li__a" target="_blank">
       <h2 class="watchList__li__title">[${issue.issueKey}] ${issue.summary}</h2>
       <p class="watchList__li__desc">${issue.description}</p>
-      <ul class="tags">
+      <ul class="watchTags">
         ${issue?.status?.name ? createTag({ name: 'ステータス', value: issue.status.name, grow }) : ''}
         ${hasResourceAlreadyRead ? createTag({ name: '未読/既読', value: watching.resourceAlreadyRead, grow }) : ''}
         ${issue?.priority?.name ? createTag({ name: '優先度', value: issue.priority.name, grow }) : ''}
@@ -101,83 +101,105 @@ const createHTMLFromAPI = async ({ space, init, spaceName }: { space: Options['o
   const watchList = await getWatchListFetchAPI(hostname);
   if (!watchList || !watchList.length) return false;
 
-  let html = `<ul class="watchList" data-tab="${spaceName}">`;
+  let html = `<ul class="watchList is-active" data-dropdown="${spaceName}">`;
   for (const watching of watchList) {
     html += createHTML(watching, hostname);
   }
   html += '</ul>';
   return { spaceName, html, watchCount: watchList.length };
 };
-const createTabs = (htmlArray: string[]) => {
-  return `<div class="tabs">
-    <div class="tabs__wrapper">
-      ${htmlArray.map((spaceName) => `<button type="button" data-tab="${spaceName}"><span>${spaceName}</span></button>`).join('')}
+const createDropdown = (htmlArray: string[]) => {
+  return `<div id="dropdown" class="dropdown">
+    <div class="dropdown-trigger">
+      <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+        <span>${htmlArray[0]}</span>
+        <span class="icon is-small">
+          <i class="fas fa-angle-down" aria-hidden="true"></i>
+        </span>
+      </button>
+    </div>
+    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+      <div class="dropdown-content">
+        ${htmlArray.map((spaceName, idx) => `<a href="#" class="dropdown-item${idx===0?' is-active':''}" data-dropdown="${spaceName}">
+          ${spaceName}
+        </a>`).join('')}
+      </div>
     </div>
   </div>`;
+};
+const setDropdownEvents = async () => {
+  const options = await storageManager.get('options');
+  const wrapperElm = document.querySelector('#wrapper');
+  const dropdownElm = document.querySelector('#dropdown');
+  const linkElms = document.querySelectorAll('#dropdown-menu a');
+  const triggerElm = document.querySelector('.dropdown-trigger');
+
+  if (!linkElms || !wrapperElm || !triggerElm || !options || !Object.keys(options).length) {
+    dropdownElm?.remove();
+    return;
+  }
+  if (!dropdownElm) return;
+  const space = options['options']['space'];
+  const removeActiveClass = () => {
+    linkElms.forEach((el) => el.classList.remove('is-active'));
+  };
+  const clickEvent = (e: Event) => {
+    e.preventDefault();
+    const self = e.currentTarget as HTMLElement;
+    const spaceName = self.getAttribute('data-dropdown');
+    const isSelfClick = self.classList.contains('is-active');
+
+    if (!spaceName || isSelfClick) return;
+
+    (async() => {
+      const watchListElm = document.querySelector('.watchList');
+      watchListElm?.remove();
+      const data = await createHTMLFromAPI({ space, spaceName, init: false });
+
+      if (data) {
+        addNumberWatchesToClass(data.watchCount);
+        wrapperElm.insertAdjacentHTML('beforeend', data.html);
+        const newWatchListElm = document.querySelector('.watchList');
+
+        if (newWatchListElm) {
+          removeActiveClass();
+          self.classList.add('is-active');
+        }
+      } else {
+        removeActiveClass();
+        self.classList.add('is-active');
+        wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: false }));
+      }
+    })();
+  };
+  const toggleDropdownEvent = (e: Event) => {
+    e.stopPropagation();
+    const classList = dropdownElm.classList;
+    const toggleEvent = () => {
+      if (classList.contains('is-active')) {
+        classList.remove('is-active');
+      } else {
+        classList.add('is-active');
+      }
+      document.body.removeEventListener('click', toggleEvent);
+    };
+    toggleEvent();
+    document.body.addEventListener('click', toggleEvent);
+  };
+
+  triggerElm.addEventListener('click', toggleDropdownEvent);
+  linkElms.forEach((el) => el.addEventListener('click', (e) => clickEvent(e)));
 };
 const createNotWatchHTML = ({ init }: { init: boolean }) => {
   const initFalsyText = '現在ウォッチしてる課題が無いか、<a href="options.html" target="_blank">オプション</a>でスペース情報の入力がありません';
   const falsyText = 'データの取得に失敗しました';
   return `<div class="notWatch">${init ? initFalsyText : falsyText}</div>`;
 };
-const selectInitialActive = async (spaceNames: string[]) => {
-  const wrapperElm = document.querySelector('#wrapper');
-  const options = await storageManager.get('options');
-  if (!wrapperElm || !options || !Object.keys(options).length) return;
-  const lists = document.querySelectorAll<HTMLUListElement>('.watchList');
-  const tabs = document.querySelectorAll<HTMLButtonElement>('.tabs button');
-  const selectTab = async (e: Event, tabs: NodeListOf<HTMLButtonElement>, lists: NodeListOf<HTMLUListElement>) => {
-    const removeActiveClass = () => {
-      tabs.forEach((el) => el.classList.remove('is-active'));
-      lists.forEach((el) => el.classList.remove('is-active'));
-    };
-    const self = e.currentTarget as HTMLElement;
-    if (self.classList.contains('is-active')) {
-      return;
-    }
-    const spaceName = self.getAttribute('data-tab');
-    const currentWatchListElm = document.querySelector('.watchList');
-    if (!spaceName) return;
-    currentWatchListElm?.remove();
-    const space = options['options']['space'];
-    const data = await createHTMLFromAPI({ space, spaceName, init: false });
-
-    if (data) {
-      addNumberWatchesToClass(data.watchCount);
-      wrapperElm.insertAdjacentHTML('beforeend', data.html);
-      const newWatchListElm = document.querySelector('.watchList');
-
-      if (newWatchListElm) {
-        removeActiveClass();
-        self.classList.add('is-active');
-        newWatchListElm.classList.add('is-active');
-      }
-    } else {
-      removeActiveClass();
-      self.classList.add('is-active');
-      wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: false }));
-    }
-  };
-  const spaceName = spaceNames[0];
-  const list = [...lists].find((el) => el.getAttribute('data-tab') === spaceName);
-
-  if (tabs.length > 1) {
-    const tab = [...tabs].find((el) => el.getAttribute('data-tab') === spaceName);
-    list?.classList.add('is-active');
-    tab?.classList.add('is-active');
-
-    for (const tab of tabs) {
-      tab.addEventListener('click', (e) => selectTab(e, tabs, lists));
-    }
-  } else if (lists.length === 1) {
-    list?.classList.add('is-active');
-  }
-};
 const setHTML = async () => {
-  const titleElm = document.querySelector('#title');
+  const headerElm = document.querySelector('.header');
   const wrapperElm = document.querySelector('#wrapper');
   const options = await storageManager.get('options');
-  if (!wrapperElm || !titleElm) return;
+  if (!wrapperElm || !headerElm) return;
   if (!options || !Object.keys(options).length) {
     wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: true }));
     return;
@@ -187,12 +209,12 @@ const setHTML = async () => {
 
   if (data) {
     const spaceNames = Object.keys(space);
-    if (spaceNames.length > 1) {
-      titleElm.insertAdjacentHTML('afterend', createTabs(spaceNames));
+    if (spaceNames.length >= 2) {
+      headerElm.insertAdjacentHTML('beforeend', createDropdown(spaceNames));
+      setDropdownEvents();
     }
     addNumberWatchesToClass(data.watchCount);
     wrapperElm.insertAdjacentHTML('beforeend', data.html);
-    selectInitialActive(spaceNames);
   } else {
     wrapperElm.insertAdjacentHTML('beforeend', createNotWatchHTML({ init: true }));
   }
