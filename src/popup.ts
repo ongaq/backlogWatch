@@ -112,7 +112,7 @@ const createDropdown = (htmlArray: string[]) => {
   return `<div id="dropdown" class="dropdown">
     <div class="dropdown-trigger">
       <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-        <span>${htmlArray[0]}</span>
+        <span id="dropdown-name">${htmlArray[0]}</span>
         <span class="icon is-small">
           <i class="fas fa-angle-down" aria-hidden="true"></i>
         </span>
@@ -157,7 +157,10 @@ const setDropdownEvents = async () => {
       const data = await createHTMLFromAPI({ space, spaceName, init: false });
 
       if (data) {
+        const nameElm = document.querySelector('#dropdown-name');
+        if (!nameElm) return;
         addNumberWatchesToClass(data.watchCount);
+        nameElm.textContent = spaceName;
         wrapperElm.insertAdjacentHTML('beforeend', data.html);
         const newWatchListElm = document.querySelector('.watchList');
 
@@ -211,6 +214,7 @@ const setHTML = async () => {
     const spaceNames = Object.keys(space);
     if (spaceNames.length >= 2) {
       headerElm.insertAdjacentHTML('beforeend', createDropdown(spaceNames));
+      headerElm.classList.add('has-dropdown');
       setDropdownEvents();
     }
     addNumberWatchesToClass(data.watchCount);
