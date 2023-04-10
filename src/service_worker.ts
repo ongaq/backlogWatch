@@ -259,7 +259,7 @@ chrome.runtime.onInstalled.addListener((details) => {
       if (thisVersion === '2.0.0') {
         chrome.tabs.create({ url: chrome.runtime.getURL(`options.html?v=${thisVersion}`) });
       }
-      chrome.tabs.create({ url: chrome.runtime.getURL(`https://backlog.4kissa.me/history.html?v=${thisVersion}`) });
+      chrome.tabs.create({ url: `https://backlog.4kissa.me/history.html?v=${thisVersion}` });
     }
   }
 });
