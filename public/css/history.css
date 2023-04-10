@@ -1,0 +1,32 @@
+@charset "UTF-8";
+body {
+  display: grid;
+  margin: 0;
+  min-height: 100vh;
+  color: #363636;
+  font-family: 'M PLUS Rounded 1c';
+  backface-visibility: hidden;
+}
+img {
+  vertical-align: top;
+}
+a {
+  text-decoration: underline !important;
+}
+.wrap {
+  position: relative;
+  margin: 0 auto;
+  padding: 24px;
+  min-width: 1024px;
+  width: 96vw;
+  min-height: 100%;
+  background-color: #fff;
+  z-index: 10;
+}
+.history {
+  list-style: disc outside;
+  margin: 1em 0 1em 2em;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  padding-inline-start: 0;
+}

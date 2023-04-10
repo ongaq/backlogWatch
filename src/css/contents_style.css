@@ -1,0 +1,189 @@
+:root {
+  --primary: #00d1b2;
+  --primary-light: #ebfffc;
+  --success: #48c78e;
+  --success-light: #f0faf4;
+  --danger: #ff3860;
+  --danger-light: #feecf0;
+  --info: #209cee;
+  --info-light: #eef6fc;
+  --link: #485fc7;
+  --link-info: #eef3fc;
+  --black: #0a0a0a;
+  --gray: #4a4a4a;
+  --gray-light: #b5b5b5;
+  --gray-lighter: #dbdbdb;
+}
+
+.fa {
+  cursor: pointer;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.fa-pencil {
+  width: 18px;
+  height: 18px;
+  -webkit-mask-image: url('../images/pencil.svg');
+  mask-image: url('../images/pencil.svg');
+  -webkit-mask-size: 18px;
+  mask-size: 18px;
+}
+
+.fa-plus-circle,
+.fa-minus-circle {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-size: 24px;
+  mask-size: 24px;
+}
+
+.fa-plus-circle {
+  -webkit-mask-image: url('../images/plus.svg');
+  mask-image: url('../images/plus.svg');
+}
+
+.fa-minus-circle {
+  -webkit-mask-image: url('../images/minus.svg');
+  mask-image: url('../images/minus.svg');
+}
+
+.fa-heart {
+  width: 36px;
+  height: 36px;
+  -webkit-mask-image: url('../images/heart.svg');
+  mask-image: url('../images/heart.svg');
+  -webkit-mask-size: 36px;
+  mask-size: 36px;
+}
+
+i.fa {
+  font-size: 36px;
+}
+i.fa-eye {
+  font-size: 18px;
+  color: #333;
+}
+i.fa-heart {
+  background-color: #0a0a0a;
+}
+.Watch i.fa-heart {
+  display: block;
+  margin: 0 auto;
+}
+i.fa-heart.is-watch {
+  background-color: #ff3860;
+}
+i.fa-heart.is-running {
+  -webkit-animation: heartBeat 0.4s ease-in-out;
+  animation: heartBeat 0.4s ease-in-out;
+}
+
+.watchIconWrap {
+  position: fixed;
+  right: 16px;
+  bottom: 84px;
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  height: fit-content;
+  white-space: nowrap;
+  background-color: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 50;
+}
+.watchIconWrap * {
+  line-height: 1;
+  vertical-align: top;
+  box-sizing: border-box;
+}
+.watchIconWrap__text {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: var(--black);
+  font-weight: 300;
+  color: #666;
+  background-color: #f0f0f0;
+  border-radius: 4px 0 0 4px;
+}
+.watchIconWrap__icon {
+  display: flex;
+  padding: 10px 20px;
+  width: 80px;
+  height: 60px;
+}
+
+.watch-issueSection {
+  margin-bottom: 40px;
+}
+
+.watch-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px !important;
+  height: 32px;
+}
+
+.watch-issue {
+  table-layout: fixed;
+  font-size: 93%;
+}
+.watch-issue_new {
+  font-size: 100%;
+}
+.watch-issue_new td {
+  white-space: normal !important;
+}
+.watch-issue-col-1 {
+  width: 115px;
+}
+.watch-issue-col-3 {
+  width: 90px;
+}
+.watch-issue-col-5 {
+  width: 65px;
+}
+.watch-issue-list.is-hover:not(.watch-issue-list_new),
+.watch-issue-list.is-hover:not(.watch-issue-list_new) td {
+  background-color: #fffde9 !important;
+}
+.watch-issue-list_new {
+  cursor: pointer;
+  font-size: 90%;
+}
+.watch-issue .Assigner,
+.watch-issue .Watch {
+  text-align: center;
+}
+.watch-issue :is(.Title, .Assigner, .Description) p {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.watch-issue .Description .is-visible {
+  display: block;
+}
+.watch-issue .Description .is-hidden {
+  display: none;
+}
+
+@-webkit-keyframes heartBeat {
+  50% {
+    transform: scale(2);
+    opacity: 0.5;
+  }
+}
+@keyframes heartBeat {
+  50% {
+    transform: scale(2);
+    opacity: 0.5;
+  }
+}

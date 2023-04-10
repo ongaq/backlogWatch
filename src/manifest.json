@@ -1,0 +1,75 @@
+{
+  "manifest_version": 3,
+  "minimum_chrome_version": "90.0",
+  "name": "Backlog Watch Notifications",
+  "description": "Backlogでウォッチした課題やお知らせに更新があった際にデスクトップ通知を表示します",
+  "version": "2.0.0",
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    },
+    "default_title": "Backlog Watch Notifications",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.backlog.jp/*",
+        "*://*.backlog.com/*"
+      ],
+      "css": [
+        "css/contents_style.css"
+      ],
+      "js": [
+        "storage.ts",
+        "common.ts",
+        "issues.ts"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "*://*.backlog.jp/*",
+        "*://*.backlog.com/*"
+      ],
+      "resources": [
+        "storage.ts",
+        "common.ts",
+        "issues.ts"
+      ]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "resources": [
+        "images/*"
+      ]
+    }
+  ],
+  "background": {
+    "service_worker": "service_worker.ts"
+  },
+  "permissions": [
+    "tabs",
+    "alarms",
+    "storage",
+    "notifications",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "*://*.backlog.jp/*",
+    "*://*.backlog.com/*"
+  ]
+}

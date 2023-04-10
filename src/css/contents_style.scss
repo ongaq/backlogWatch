@@ -1,0 +1,119 @@
+@use "root";
+@use "font";
+
+i {
+  &.fa { font-size: 36px;}
+  &.fa-eye { font-size: 18px; color: #333;}
+  &.fa-heart {
+    background-color: #0a0a0a;
+
+    .Watch & {
+      display: block;
+      margin: 0 auto;
+    }
+    &.is-watch {
+      background-color: #FF3860;
+    }
+    &.is-running {
+      -webkit-animation: heartBeat 0.4s ease-in-out;
+      animation: heartBeat 0.4s ease-in-out;
+    }
+  }
+}
+// ================================
+.watchIconWrap {
+  position: fixed;
+  right: 16px;
+  bottom: 84px;
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  height: fit-content;
+  white-space: nowrap;
+  background-color: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 7px rgba(#000, 0.15);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 50;
+
+  * {
+    line-height: 1;
+    vertical-align: top;
+    box-sizing: border-box;
+  }
+  &__text {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    color: var(--black);
+    font-weight: 300;
+    color: #666;
+    background-color: #f0f0f0;
+    border-radius: 4px 0 0 4px;
+  }
+  &__icon {
+    display: flex;
+    padding: 10px 20px;
+    width: 80px;
+    height: 60px;
+  }
+}
+.watch-issueSection {
+  margin-bottom: 40px;
+}
+.watch-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px !important;
+  height: 32px;
+}
+.watch-issue {
+  table-layout: fixed;
+  font-size: 93%;
+
+  &_new {
+    font-size: 100%;
+
+    td {
+      white-space: normal !important;
+    }
+  }
+
+  &-col-1 { width: 115px;}
+  &-col-3 { width: 90px;}
+  &-col-5 { width: 65px;}
+
+  &-list.is-hover:not(.watch-issue-list_new),
+  &-list.is-hover:not(.watch-issue-list_new) td {
+    background-color: #fffde9 !important;
+  }
+
+  &-list_new {
+    cursor: pointer;
+    font-size: 90%;
+  }
+
+  .Assigner,
+  .Watch {
+    text-align: center;
+  }
+  :is(.Title, .Assigner, .Description) p {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+  .Description {
+    .is-visible { display: block;}
+    .is-hidden { display: none;}
+  }
+}
+
+@-webkit-keyframes heartBeat {
+  50% { transform: scale(2); opacity: 0.5;}
+}
+@keyframes heartBeat {
+  50% { transform: scale(2); opacity: 0.5;}
+}

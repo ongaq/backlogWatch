@@ -1,0 +1,286 @@
+// ======================================
+// reset
+@use "ress";
+@use "font";
+
+// ======================================
+// Global
+body {
+  display: grid;
+  margin: 0;
+  min-height: 100vh;
+  color: #363636;
+  font-family: "M PLUS Rounded 1c";
+  backface-visibility: hidden;
+}
+a {
+  text-decoration: underline !important;
+}
+
+// ======================================
+// parts
+.fa {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.fa-plus-circle,
+.fa-minus-circle,
+.fa-pencil {
+  background-color: #00d1b2;
+
+  &:hover {
+    background-color: darken(#00d1b2, 10%);
+  }
+}
+.fa-pencil {
+  width: 18px;
+  height: 18px;
+  background-color: #333;
+}
+
+// ======================================
+// selector
+.wrap {
+  position: relative;
+  margin: 0 auto;
+  padding: 24px;
+  min-width: 1024px;
+  width: 96vw;
+  min-height: 100%;
+  background-color: #fff;
+  z-index: 10;
+}
+.options {
+  &__subtitle,
+  &__notes {
+    line-height: 1.6;
+  }
+  &__spaceInfo {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  width: calc(100% - 60px);
+  border-radius: 4px;
+
+  &-list {
+    position: relative;
+    display: flex;
+    row-gap: 16px;
+
+    &:not(:first-child) strong { display: none;}
+    &.is-ok &-li_plus {
+      padding-left: 16px;
+      width: 40px;
+    }
+
+    &.is-ok .icon_pencil {
+      display: inline-block;
+    }
+    .fa-plus-circle {
+      display: none;
+    }
+    &:last-child .fa-plus-circle {
+      display: inline-block;
+    }
+  }
+
+  .input-spaceName,
+  .input-spaceApi { width: 100%;}
+
+  &-list-li {
+    &_spaceName {
+      width: 250px;
+    }
+    &_spaceApi {
+      padding-left: 16px;
+      width: calc(100% - 250px);
+
+      .is-ok & {
+        width: calc(100% - 290px);
+      }
+    }
+    &_plus {
+      position: relative;
+      align-self: flex-end;
+      width: 0;
+      height: 25px;
+
+      .icon {
+        position: relative;
+
+        &:before,
+        &:after {
+          visibility: hidden;
+          transition: all 0.3s ease;
+          opacity: 0;
+          z-index: -1;
+        }
+        &:hover:before,
+        &:hover:after {
+          visibility: visible;
+          opacity: 1;
+          z-index: 1;
+        }
+
+        &:not(.icon_ctrl):before {
+          position: absolute;
+          bottom: 32px;
+          right: 0;
+          padding: 8px 10px;
+          display: block;
+          width: 180px;
+          line-height: 1.2;
+          color: #fff;
+          font-weight: normal;
+          font-size: 1.2rem;
+          background-color: #000;
+          border: 1px solid #000;
+          border-radius: 3px;
+        }
+        &:not(.icon_ctrl):after {
+          position: absolute;
+          bottom: 26px;
+          right: 7px;
+          content: "";
+          display: block;
+          width: 0;
+          height: 0;
+          border-style: solid;
+          border-right: 5px solid transparent;
+          border-left: 5px solid transparent;
+          border-top: 7px solid #000;
+          border-bottom: 0;
+        }
+
+        &_ctrl {
+          position: absolute;
+          display: flex;
+          justify-content: space-between;
+          top: -6px;
+          right: -82px;
+          width: 52px;
+        }
+        &_plus:before {
+          content: "スペースを追加したい場合は＋をクリック";
+        }
+        &_minus:before {
+          content: "スペースを削除したい場合は－をクリック";
+        }
+        &_pencil {
+          position: absolute;
+          bottom: 5px;
+          right: 5px;
+          display: none;
+
+          &:before {
+            content: "スペースを編集したい場合は✎をクリック";
+          }
+        }
+      }
+    }
+
+    strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+  }
+}
+.optionWrap {
+  margin: 40px -24px 0;
+  padding: 24px 24px 0;
+  border-top: 1px solid #e0e0e0;
+}
+.optionList {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  gap: 8px;
+
+  &-li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    > p {
+      min-width: 270px;
+    }
+  }
+}
+.buttonArea {
+  margin-top: 64px;
+  text-align: center;
+}
+.input {
+  background-color: #fff;
+  transition: all 0.3s ease;
+
+  &::placeholder {
+    color: #ccc;
+  }
+  &.is-ok {
+    padding: 5px 0;
+    background-color: #eff5fb;
+    border: 0;
+  }
+}
+
+.notice {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  padding: 10px 20px;
+  width: auto;
+  vertical-align: middle;
+  line-height: 1.2;
+  color: #fff;
+  font-weight: bold;
+  background-color: #000;
+  border: 1px solid #000;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.3s ease;
+  transform: translate3d(-50%, 20px, 0);
+
+  &:before {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    content: "";
+    display: block;
+    margin-left: -8px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 8px 10px 8px;
+    border-color: transparent transparent #000 transparent;
+  }
+  &.is-visible {
+    opacity: 1;
+    transform: translate3d(-50%, 30px, 0);
+  }
+  &.is-danger {
+    bottom: -35px;
+    color: #fff;
+    background-color: #f03a5f;
+    border-color: #f03a5f;
+
+    &:before {
+      border-color: transparent transparent #f03a5f transparent;
+    }
+  }
+}
+.deleteDB {
+  margin-top: 64px;
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Update | Backlog Watch Notifications</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ress@5.0.2/dist/ress.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c">
+  <link rel="stylesheet" href="css/history.css">
+  <script type="module" src="./js/history.js"></script>
+</head>
+<body class="has-background-primary-light">
+
+  <div class="wrap">
+    <h1 class="title is-1 has-text-primary">Backlog Watch Update</h1>
+    <p class="content">バグの発見や何か問題があった場合は<a href="https://github.com/ongaq/backlogWatch" target="_blank">GitHubのIssues</a>からご利用の環境、再現手順などを添えて問い合わせ下さい</p>
+
+    <history-list version="2.0.0" date="2023/03" sections='[
+      "新機能",
+      "改善",
+      "その他"
+    ]'>
+      <ul class="history" slot="新機能">
+        <li>
+          <p class="mb-4">拡張機能のアイコンクリックでウォッチ中の課題一覧の表示を追加</p>
+          <img src="./images/popup.webp" class="mb-4" width="600" alt="">
+        </li>
+        <li>お知らせ覧に更新（メンションや担当変更など）があった場合に通知する機能を追加</li>
+        <li>ウォッチの通知、お知らせの通知のオンオフを切り替えられるように変更<br>（例えば両方オフにして拡張機能のアイコンクリックでウォッチ中の課題一覧のみを確認したい時とか）</li>
+      </ul>
+      <ul class="history" slot="改善">
+        <li>
+          <p class="mb-4">更新の取得方法の変更によりBacklog本来のウォッチ機能を流用するように処理を変更</p>
+          <article class="message is-warning mb-4">
+            <div class="message-body">
+              <strong class="tag">v1.3.0.17</strong> から <strong class="tag">v2.0.0</strong> へアップデートされた方はウォッチ機能変更のため<br>
+              オプション画面からスペース情報の再設定とBacklogから再度ウォッチのほう宜しくお願い致します。
+            </div>
+          </article>
+        </li>
+        <li>ウォッチしたい（通知させたい）課題数の上限を増加（Backlog側のウォッチ機能に依存するため上限は無い）</li>
+        <li>複数件通知が届いていた場合、どれか一つをクリックすると全部の通知のURLが開いてしまっていたため個別に開くように修正</li>
+        <li>オプション画面のデザイン変更</li>
+      </ul>
+      <ul class="history" slot="その他">
+        <li>更新取得間隔の変更（1分毎から3分毎に変更）</li>
+        <li>プロジェクトのウォッチ機能を削除（以後は公式機能の<a href="https://backlog.com/ja/blog/backlog-update-list-of-projects-on-the-dashboard/" target="_blank">ピン留め</a>を利用して下さい）</li>
+        <li>内部処理全般のリファクタ</li>
+      </ul>
+    </history-list>
+
+    <history-list version="1.3.0.17" date="2023/01/16" history='[
+      "課題のウォッチボタンが表示されない事がある問題を修正"
+    ]'></history-list>
+
+    <history-list version="1.3.0.16" date="2022/06/23" history='[
+      "不要な権限リクエストを削除"
+    ]'></history-list>
+
+    <history-list version="1.3.0.15" date="2022/01/23" history='[
+      "backlog.comに対応"
+    ]'></history-list>
+
+    <history-list version="1.3.0.14" date="2017/02/08" history='[
+      "ウォッチUIのz-index調整"
+    ]'></history-list>
+
+    <history-list version="1.3.0.13" date="2017/02/01" history='[
+      "公式アップデート「親子課題の表示などの変更」による弊害の修正"
+    ]'></history-list>
+
+    <history-list version="1.3.0.12" date="2016/12/15" history='[
+      "New UI正式リリースに起因するバグに対応"
+    ]'></history-list>
+
+    <history-list version="1.3.0.11" date="2016/11/11" history='[
+      "Backlog New UI(β)に対応"
+    ]'></history-list>
+  </div>
+
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V6ZGGVBQ78"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-V6ZGGVBQ78');
+  </script>
+</body>
+</html>
