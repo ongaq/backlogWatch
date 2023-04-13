@@ -51,38 +51,33 @@ const createNotifications = async (options: chrome.notifications.NotificationOpt
   const notifyIds = await getAllNotificationIds();
   const notifyId = `backlog-${subdomain}-${issueId}`;
 
-  // 通知ウインドウが閉じられていない場合は同じ通知は作らない
-  if (notifyIds.includes(notifyId)) return;
-
-  const handleNotificationEvent = (
-    eventNotificationId: string,
-    targetNotificationId: string,
-    listener: (id: string) => void,
-    closeListener: (id: string) => void
-  ) => {
-    if (eventNotificationId === targetNotificationId) {
-      chrome.notifications.onClicked.removeListener(listener);
-      chrome.notifications.onClosed.removeListener(closeListener);
-      chrome.notifications.clear(targetNotificationId);
-    }
-  };
-  chrome.notifications.create(`backlog-${subdomain}-${issueId}`, options, (notificationId: string) => {
-    const closeListener = (closedNotificationId: string) => {
-      handleNotificationEvent(closedNotificationId, notificationId, listener, closeListener);
-    };
-    const listener = (clickedNotificationId: string) => {
-      if (clickedNotificationId === notificationId) {
-        chrome.tabs.create({
-          url: `https://${hostname}/view/${issueId}${lastCommentId}`,
-        });
-        handleNotificationEvent(clickedNotificationId, notificationId, listener, closeListener);
-      }
-    };
-    chrome.notifications.onClicked.addListener(listener);
-    chrome.notifications.onClosed.addListener(closeListener);
-    // 機能オプション
-    closeNotificationAfterSeconds(notificationId);
-  });
+  if (notifyIds.includes(notifyId)) {
+    chrome.notifications.update(notifyId, options);
+  } else {
+    chrome.notifications.create(notifyId, options, (notificationId: string) => {
+      const closeListener = async (closedNotificationId: string, byUser: boolean) => {
+        if (closedNotificationId === notificationId && byUser) {
+          chrome.notifications.onClicked.removeListener(clickListener);
+          chrome.notifications.onClosed.removeListener(closeListener);
+          chrome.notifications.clear(notificationId);
+        }
+      };
+      const clickListener = (clickedNotificationId: string) => {
+        if (clickedNotificationId === notificationId) {
+          chrome.notifications.onClicked.removeListener(clickListener);
+          chrome.notifications.onClosed.removeListener(closeListener);
+          chrome.tabs.create({
+            url: `https://${hostname}/view/${issueId}${lastCommentId}`,
+          });
+          chrome.notifications.clear(clickedNotificationId);
+        }
+      };
+      chrome.notifications.onClicked.addListener(clickListener);
+      chrome.notifications.onClosed.addListener(closeListener);
+      // 機能オプション
+      closeNotificationAfterSeconds(notificationId);
+    });
+  }
 };
 const createMessage = (comments: false | IssueComment | IssueComment[], issue: Issues) => {
   const getLog = (comment: IssueComment) => {
@@ -178,7 +173,7 @@ const infoNotification = async (hostname: string) => {
   if (!notifications || !notifications.length) return false;
 
   for (const notification of notifications) {
-    if (notification.resourceAlreadyRead || notification.alreadyRead || !notification.issue) {
+    if (notification.resourceAlreadyRead || !notification.issue) {
       continue;
     }
     const { issue, comment } = notification;
