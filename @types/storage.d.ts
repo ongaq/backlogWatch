@@ -27,13 +27,21 @@ export type DataBase = {
   [tableName: string]: Space;
 };
 
-export type GetArg = 'watching' | 'options' | 'user';
+export type PopupDB = {
+  'popup': {
+    'selectedSpace': string | undefined;
+  }
+};
+
+export type GetArg = 'watching' | 'options' | 'user' | 'popup';
 export type GetReturn<T> = T extends 'watching'
   ? DataBase | false
   : T extends 'options'
   ? Options | false
   : T extends 'user'
   ? UserDB | false
+  : T extends 'popup'
+  ? PopupDB | false
   : never;
 
 export type UserDB = {

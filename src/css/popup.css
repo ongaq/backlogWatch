@@ -359,7 +359,8 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
   background: #f5f5f5;
 }
-body.is-watch3 {
+body.is-watch3,
+body.has-dropdown {
   height: 600px;
 }
 
@@ -426,7 +427,7 @@ li {
   flex-grow: 1;
   height: calc(100% - 62px);
 }
-.header.has-dropdown + #app {
+.has-dropdown .header + #app {
   height: calc(100% - 72px);
 }
 
@@ -438,7 +439,7 @@ li {
   align-items: center;
   justify-content: space-between;
 }
-.header.has-dropdown {
+.has-dropdown .header {
   height: 56px;
 }
 .header .dropdown-item,

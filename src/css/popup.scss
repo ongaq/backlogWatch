@@ -11,7 +11,8 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
   background: #F5F5F5;
 
-  &.is-watch3 {
+  &.is-watch3,
+  &.has-dropdown {
     height: 600px;
   }
 }
@@ -42,7 +43,7 @@ li {
   flex-grow: 1;
   height: calc(100% - 62px); // 46 + 16
 
-  .header.has-dropdown + & {
+  .has-dropdown .header + & {
     height: calc(100% - 72px); // 56 + 16
   }
 }
@@ -54,7 +55,7 @@ li {
   align-items: center;
   justify-content: space-between;
 
-  &.has-dropdown {
+  .has-dropdown & {
     height: 56px;
   }
 

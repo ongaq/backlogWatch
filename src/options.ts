@@ -177,6 +177,7 @@ const deleteDB = async () => {
 
   if (window.confirm(caution)) {
     await storageManager.deleteDB();
+    window.scrollTo(0, 0);
     location.reload();
   }
 };
