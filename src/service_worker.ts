@@ -164,13 +164,10 @@ const watchNotification = async ({ hostname, spaceId, options }: WatchNotificati
   const watchDB = await getWatchDB(spaceId);
   if (!watchDB) return false;
 
-  console.log('============================');
-
   for (const watching of watchingList) {
     const { issue, lastContentUpdated } = watching;
     const issueId = issue.issueKey;
     const updateOptions = { watchDB, spaceId, issueId, watching, lastContentUpdated };
-    console.log('watching-updateOptions:', updateOptions);
     const { isUpdate, isInitial } = await updateWatchDB(updateOptions);
     const isSelfUpdate = userId === issue.updatedUser.id;
 
@@ -209,8 +206,6 @@ const infoNotification = async ({ hostname, spaceId }: WatchNotification) => {
   const watchDB = await getWatchDB(spaceId);
   if (!watchDB) return false;
 
-  console.log('============================');
-
   for (const notification of notifications) {
     if (notification.resourceAlreadyRead || !notification.issue) {
       continue;
@@ -222,7 +217,6 @@ const infoNotification = async ({ hostname, spaceId }: WatchNotification) => {
     const iconUrl = `https://${hostname}/favicon.ico`;
     const message = createMessage(comment, issue);
     const updateOptions = { watchDB, spaceId, issueId, lastContentUpdated };
-    console.log('notifications-updateOptions:', updateOptions);
     const { isUpdate } = await updateWatchDB(updateOptions);
 
     if (isUpdate) {
