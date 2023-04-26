@@ -1,4 +1,6 @@
-import type { SpaceName, Options } from './index';
+import type { SpaceName, Options, WatchingData } from './index';
+import type { DataBase } from './storage';
+import type { Watchings } from './watch';
 
 export type CheckWatchIssues = {
   space: SpaceName | false;
@@ -16,4 +18,11 @@ export type BacklogCompletedWhenCancel = {
   status: string;
   issueId: string;
   watchingId: number;
+};
+export type UpdateWatchDB = {
+  watchDB: DataBase;
+  spaceId: string;
+  issueId: string;
+  lastContentUpdated: Date;
+  watching?: Watchings;
 };

@@ -73,7 +73,7 @@ export type IssueComment = {
 };
 
 export type WatchStyle = {
-  heartElement: HTMLElement;
+  watchBtnElement: HTMLElement;
   textElement: HTMLElement;
 };
 export type WatchState = {

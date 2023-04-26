@@ -287,6 +287,16 @@ progress {
   mask-position: center;
 }
 
+.fa-angle-down {
+  width: 14px;
+  height: 14px;
+  -webkit-mask-image: url('../images/angle-down.svg');
+  mask-image: url('../images/angle-down.svg');
+  -webkit-mask-size: 14px;
+  mask-size: 14px;
+  background-color: #363636;
+}
+
 .fa-pencil {
   width: 18px;
   height: 18px;
@@ -312,15 +322,6 @@ progress {
 .fa-minus-circle {
   -webkit-mask-image: url('../images/minus.svg');
   mask-image: url('../images/minus.svg');
-}
-
-.fa-heart {
-  width: 36px;
-  height: 36px;
-  -webkit-mask-image: url('../images/heart.svg');
-  mask-image: url('../images/heart.svg');
-  -webkit-mask-size: 36px;
-  mask-size: 36px;
 }
 
 body {

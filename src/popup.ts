@@ -68,8 +68,8 @@ const createHTML = (watching: Watchings, hostname: string) => {
 
   return `<li class="watchList__li">
     <a href="https://${hostname}/view/${issue.issueKey}" class="watchList__li__a" target="_blank">
-      <h2 class="watchList__li__title">[${issue.issueKey}] ${issue.summary}</h2>
-      <p class="watchList__li__desc">${issue.description}</p>
+      <h2 class="watchList__li__title" title="${issue.summary}">[${issue.issueKey}] ${issue.summary}</h2>
+      <p class="watchList__li__desc" title="${issue.description}">${issue.description}</p>
       <ul class="watchTags">
         ${issue?.status?.name ? createTag({ name: 'ステータス', value: issue.status.name, grow }) : ''}
         ${hasResourceAlreadyRead ? createTag({ name: '未読/既読', value: watching.resourceAlreadyRead, grow }) : ''}

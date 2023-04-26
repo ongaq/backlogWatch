@@ -1,4 +1,4 @@
-import type { GetOptionsArg, GetOptionsReturn } from '../@types/index';
+import type { GetOptionsArg, GetOptionsReturn, IssueWatchingId } from '../@types/index';
 import type { WatchStyle, WatchState } from '../@types/issues';
 import { addWatchFetchAPI, deleteWatchFetchAPI, getWatchListFetchAPI, getUserInfoFetchAPI } from './api';
 import storageManager from './storage';
@@ -36,15 +36,11 @@ export const locationObserver = (callback: () => void) => {
   observer.observe(target, observeConfig);
 };
 export const watchControl = (element: HTMLElement, state: string) => {
-  const timer = 10;
-
   if (state === 'add') {
-    element.classList.remove('is-running');
-    element.classList.add('is-watch');
+    element.classList.add('is-watched');
   } else if (state === 'remove') {
-    element.classList.remove('is-running', 'is-watch');
+    element.classList.remove('is-watched');
   }
-  setTimeout(() => element.classList.add('is-running'), timer);
 };
 export const getOptions = async <T extends GetOptionsArg>(target: T): Promise<GetOptionsReturn<T>> => {
   const items = await storageManager.get('options');
@@ -83,20 +79,20 @@ const watchText = {
   watching: 'ウォッチ中',
   notWatch: 'ウォッチリストに入れる',
 };
-export const removeWatchStyle = ({ heartElement, textElement }: WatchStyle) => {
-  watchControl(heartElement, 'remove');
+export const removeWatchStyle = ({ watchBtnElement, textElement }: WatchStyle) => {
+  watchControl(watchBtnElement, 'remove');
   textElement.textContent = watchText.notWatch;
-  heartElement.title = watchText.notWatch;
+  watchBtnElement.title = watchText.notWatch;
 };
-export const addWatchStyle = ({ heartElement, textElement }: WatchStyle) => {
-  watchControl(heartElement, 'add');
+export const addWatchStyle = ({ watchBtnElement, textElement }: WatchStyle) => {
+  watchControl(watchBtnElement, 'add');
   textElement.textContent = watchText.watching;
-  heartElement.title = watchText.watching;
+  watchBtnElement.title = watchText.watching;
 };
-export const addWatch = async ({ heartElement, textElement, issueId, watchingId }: WatchStyle & WatchState) => {
-  addWatchStyle({ heartElement, textElement });
+export const addWatch = async ({ watchBtnElement, textElement, issueId, watchingId }: WatchStyle & WatchState) => {
+  addWatchStyle({ watchBtnElement, textElement });
   const { subdomain } = spaceUrl();
-  const setValue = {
+  const setValue: IssueWatchingId = {
     [issueId]: {
       updateTime: 0,
       watchId: 0,
@@ -110,8 +106,8 @@ export const addWatch = async ({ heartElement, textElement, issueId, watchingId 
 
     if (watching) {
       if (typeof watching?.errors !== 'undefined') {
-        if (heartElement && textElement) {
-          removeWatchStyle({ heartElement, textElement });
+        if (watchBtnElement && textElement) {
+          removeWatchStyle({ watchBtnElement, textElement });
         }
         return;
       }
@@ -122,18 +118,21 @@ export const addWatch = async ({ heartElement, textElement, issueId, watchingId 
     void storageManager.add(subdomain, setValue, 'watching');
   }
 };
-export const removeWatch = async ({ heartElement, textElement, issueId }: WatchStyle & WatchState) => {
-  removeWatchStyle({ heartElement, textElement });
+export const removeWatch = async ({ watchBtnElement, textElement, issueId }: WatchStyle & WatchState) => {
+  removeWatchStyle({ watchBtnElement, textElement });
   const { subdomain } = spaceUrl();
 
   const watching = await storageManager.get('watching');
   if (!watching || !subdomain) {
-    addWatchStyle({ heartElement, textElement });
+    addWatchStyle({ watchBtnElement, textElement });
     return;
   }
   const { watchId } = watching['watching'][subdomain][issueId];
-  void deleteWatchFetchAPI(watchId);
-  void storageManager.remove(subdomain, issueId, 'watching');
+
+  if (watchId) {
+    void deleteWatchFetchAPI(watchId);
+    void storageManager.remove(subdomain, issueId, 'watching');
+  }
 };
 /** Chrome.Storageにウォッチが保存されているか */
 export const hasStorageWatchItem = async (issueId: string) => {
@@ -145,7 +144,7 @@ export const hasStorageWatchItem = async (issueId: string) => {
   return Object.keys(domainStorage).includes(issueId);
 };
 /** ウォッチ中の課題を保存する */
-export const saveIssueWatching = async ({ heartElement, textElement, issueId }: WatchStyle & WatchState) => {
+export const saveIssueWatching = async ({ watchBtnElement, textElement, issueId }: WatchStyle & WatchState) => {
   const { hostname } = spaceUrl();
   const isWatching = document.querySelector('.title-group__edit-actions button[aria-label="ウォッチ中"]') !== null;
 
@@ -157,7 +156,7 @@ export const saveIssueWatching = async ({ heartElement, textElement, issueId }: 
     for (const watching of watchingIssues) {
       const { issue } = watching;
       if (issue.issueKey === issueId) {
-        addWatch({ heartElement, textElement, issueId, watchingId: watching.id });
+        addWatch({ watchBtnElement, textElement, issueId, watchingId: watching.id });
         break;
       }
     }

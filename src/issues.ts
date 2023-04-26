@@ -14,7 +14,7 @@ import {
 import storageManager from './storage';
 import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
-const HEART_URL = chrome.runtime.getURL('images/heart.svg');
+const EYE_URL = chrome.runtime.getURL('images/eye.svg');
 
 /** ウォッチボタンの削除 */
 const deleteWatchBtn = () => {
@@ -79,7 +79,7 @@ const createHTML = (watchings: Watchings[]) => {
       <td class="Title" title="${summary}"><p>${summary}</p></td>
       <td class="Assigner" title="${name}"><p>${name}</p></td>
       <td class="Description" title="${desc}"><p>${desc}</p></td>
-      <td class="Watch"><i class="fa fa-heart is-watch" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});"></i></td>
+      <td class="Watch"><i class="fa fa-eye is-watch" style="-webkit-mask-image:url(${EYE_URL});mask-image:url(${EYE_URL});"></i></td>
     </tr>`;
   };
   const html = (tr: string) => `<section id="myIssues" class="watch-issueSection" data-id="projects-issues">
@@ -159,7 +159,7 @@ const createWatchHome = async () => {
     const self = <HTMLElement>e.currentTarget;
     const href = self.querySelector<HTMLAnchorElement>('.watch-issue-anchor')?.href;
 
-    if ((e.target as HTMLElement)?.classList.contains('fa-heart')) {
+    if ((e.target as HTMLElement)?.classList.contains('fa-eye')) {
       return;
     }
     if (typeof href === 'undefined') return;
@@ -172,7 +172,7 @@ const createWatchHome = async () => {
   };
 
   const watchIssueElements = document.querySelectorAll<HTMLElement>('.watch-issue-list');
-  const watchingElements = document.querySelectorAll<HTMLElement>('.watch-issue .fa-heart');
+  const watchingElements = document.querySelectorAll<HTMLElement>('.watch-issue .fa-eye');
 
   for (const watchingElement of watchingElements) {
     watchingElement.addEventListener('click', (event) => void watchRemoveHandler(event));
@@ -205,26 +205,26 @@ const createWatchIssue = async () => {
     description: issueCard.querySelector<HTMLElement>('.ticket__description')?.textContent || '',
     time: new Date()
   });
-  const changeWatchState = async ({ heartElement, textElement, issueId }: WatchStyle & WatchState) => {
+  const changeWatchState = async ({ watchBtnElement, textElement, issueId }: WatchStyle & WatchState) => {
     const watching = await storageManager.get('watching');
     if (!watching) return;
     const issueIds = watching?.['watching']?.[subdomain] || {};
     const isWatching = Object.keys(issueIds).includes(issueItem.id);
 
-    if (!textElement || !heartElement) {
+    if (!textElement || !watchBtnElement) {
       return consoleLog('ウォッチ状態変更の失敗');
     }
     if (isWatching) {
-      removeWatch({ heartElement, textElement, issueId });
+      removeWatch({ watchBtnElement, textElement, issueId });
     } else {
-      addWatch({ heartElement, textElement, issueId });
+      addWatch({ watchBtnElement, textElement, issueId });
     }
   };
   const createWatchButton = async (issueId: string) => {
     deleteWatchBtn();
-    const html = (text: string) => `<div id="extension-btn" class="watchIconWrap">
+    const html = (text: string) => `<div id="extension-btn" class="watchIconWrap" title="${text}">
+      <i id="extension-eyeIcon" class="watchIconWrap__icon fa fa-eye" style="-webkit-mask-image:url(${EYE_URL});mask-image:url(${EYE_URL});"></i>
       <span id="extension-text" class="watchIconWrap__text">${text}</span>
-      <i id="extension-heartIcon" class="watchIconWrap__icon fa fa-heart" style="-webkit-mask-image:url(${HEART_URL});mask-image:url(${HEART_URL});" title="${text}"></i>
     </div>`;
 
     // Storageに課題キーが存在するか確認
@@ -232,9 +232,9 @@ const createWatchIssue = async () => {
 
     if (isWatching) {
       document.body.insertAdjacentHTML('beforeend', html(watchText.watching));
-      const watchElement = document.querySelector<HTMLElement>('.watchIconWrap .fa-heart');
-      if (watchElement === null) return;
-      watchControl(watchElement, 'add');
+      const watchBtnElement = document.querySelector<HTMLElement>('#extension-btn');
+      if (watchBtnElement === null) return;
+      watchControl(watchBtnElement, 'add');
     } else {
       document.body.insertAdjacentHTML('beforeend', html(watchText.notWatch));
     }
@@ -243,13 +243,13 @@ const createWatchIssue = async () => {
   const issueItem = getIssueItem(issueCard);
   const issueId = issueItem.id;
   await createWatchButton(issueId);
-  const watchBtnElement = document.querySelector('.watchIconWrap');
+  const watchBtnElement = document.querySelector<HTMLElement>('#extension-btn');
   if (watchBtnElement === null) return;
-  const heartElement = document.querySelector<HTMLElement>('#extension-heartIcon');
+  const eyeElement = document.querySelector<HTMLElement>('#extension-eyeIcon');
   const textElement = document.querySelector<HTMLElement>('#extension-text');
 
-  if (heartElement && textElement && issueId) {
-    const items = { heartElement, textElement, issueId };
+  if (eyeElement && textElement && issueId) {
+    const items = { watchBtnElement, textElement, issueId };
     await saveIssueWatching(items);
     watchBtnElement.addEventListener('click', () => changeWatchState(items));
   }

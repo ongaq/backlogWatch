@@ -1,4 +1,6 @@
-import type { CheckWatchIssues, WatchNotification, BacklogCompletedWhenCancel } from '../@types/service_worker';
+import type { IssueWatchingId } from '../@types/index';
+import type { UpdateWatchDB, CheckWatchIssues, WatchNotification, BacklogCompletedWhenCancel } from '../@types/service_worker';
+import type { DataBase } from '../@types/storage';
 import type { IssueComment, Issues } from '../@types/issues';
 import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI, deleteWatchFetchAPI, getNotificationsFetchAPI } from './api';
 import { getOptions, consoleLog, isObject, isArray } from './common';
@@ -106,91 +108,127 @@ const createMessage = (comments: false | IssueComment | IssueComment[], issue: I
   }
   return issue.description;
 };
+const getWatchDB = async (spaceId: string): Promise<false | DataBase> => {
+  let watchDB = await storageManager.get('watching');
+  if (!watchDB || !Object.keys(watchDB).length) {
+    await storageManager.add(spaceId, {}, 'watching');
+    watchDB = await storageManager.get('watching');
+  }
+  if (!watchDB) {
+    return false;
+  }
+  watchDB['watching'][spaceId] ??= {};
+  return watchDB;
+};
+const updateWatchDB = async (options: UpdateWatchDB) => {
+  const { watchDB, spaceId, issueId, watching, lastContentUpdated } = options;
+  const updateTime = new Date(lastContentUpdated).getTime() / 1000;
+  const space = watchDB['watching'][spaceId];
+
+  if (typeof space?.[issueId] === 'undefined') {
+    space[issueId] = { updateTime: 0, watchId: 0 };
+  }
+  const updateTimeStoredInDB = space[issueId];
+
+  if (updateTimeStoredInDB.updateTime === 0) {
+    const issueWatchingId: IssueWatchingId = {
+      [issueId]: { updateTime }
+    };
+    if (typeof watching !== 'undefined') {
+      issueWatchingId[issueId]['watchId'] = watching.id;
+    }
+    await storageManager.add(spaceId, issueWatchingId, 'watching');
+  }
+  if (updateTime > updateTimeStoredInDB.updateTime) {
+    space[issueId] = { updateTime };
+    if (typeof watching !== 'undefined') {
+      space[issueId]['watchId'] = watching.id;
+    }
+  }
+  if (watchDB && updateTime !== updateTimeStoredInDB.updateTime) {
+    await storageManager.set(watchDB);
+  }
+  return {
+    isUpdate: updateTime > updateTimeStoredInDB.updateTime,
+    isInitial: updateTimeStoredInDB.updateTime === 0,
+  };
+};
 /** ウォッチの通知 */
 const watchNotification = async ({ hostname, spaceId, options }: WatchNotification) => {
   const { watch } = options;
   const watchingList = await getWatchListFetchAPI(hostname);
   if (!watchingList || !watchingList.length) return false;
 
-  let watchDB = await storageManager.get('watching');
-  if (!watchDB || !Object.keys(watchDB).length) {
-    await storageManager.add(spaceId, {}, 'watching');
-    watchDB = await storageManager.get('watching');
-  }
+  const watchDB = await getWatchDB(spaceId);
   if (!watchDB) return false;
+
+  console.log('============================');
 
   for (const watching of watchingList) {
     const { issue, lastContentUpdated } = watching;
     const issueId = issue.issueKey;
-    const updateTime = new Date(lastContentUpdated).getTime() / 1000;
-    watchDB['watching'][spaceId] ??= {};
-    const space = watchDB['watching'][spaceId];
+    const updateOptions = { watchDB, spaceId, issueId, watching, lastContentUpdated };
+    console.log('watching-updateOptions:', updateOptions);
+    const { isUpdate, isInitial } = await updateWatchDB(updateOptions);
 
-    if (typeof space?.[issueId] === 'undefined') {
-      space[issueId] = { updateTime: 0, watchId: 0 };
-    }
-    const updateTimeStoredInDB = space[issueId];
-
-    if (updateTimeStoredInDB.updateTime === 0) {
-      const issueWatchingId = { [issueId]: { updateTime, watchId: watching.id } };
-      await storageManager.add(spaceId, issueWatchingId, 'watching');
-    }
     // APIで取得した最終更新時間のほうが保存された時間より新しければ
-    if (updateTime > updateTimeStoredInDB.updateTime) {
-      space[issueId] = { updateTime, watchId: watching.id };
+    if (isUpdate && !isInitial) {
+      const note = `[${issueId}] @${issue.createdUser.name}`;
+      const iconUrl = `https://${hostname}/favicon.ico`;
+      const [issues, comments] = await Promise.all([
+        getIssueFetchAPI(issueId, hostname),
+        getIssueCommentFetchAPI(issueId, hostname),
+      ]);
+      const message = createMessage(comments, issue);
 
-      // 初回登録時は通知させない
-      if (updateTimeStoredInDB.updateTime !== 0) {
-        const note = `[${issueId}] @${issue.createdUser.name}`;
-        const iconUrl = `https://${hostname}/favicon.ico`;
-        const [issues, comments] = await Promise.all([
-          getIssueFetchAPI(issueId, hostname),
-          getIssueCommentFetchAPI(issueId, hostname),
-        ]);
-        const message = createMessage(comments, issue);
-
-        await createNotifications({
-          type: 'basic',
-          iconUrl,
-          title: issues ? issues.summary : issueId,
-          message,
-          contextMessage: note,
-          requireInteraction: true
-        }, hostname, issueId, comments);
-      }
+      await createNotifications({
+        type: 'basic',
+        iconUrl,
+        title: issues ? issues.summary : issueId,
+        message,
+        contextMessage: note,
+        requireInteraction: true
+      }, hostname, issueId, comments);
     }
     const subdomain = hostname.split('.')[0];
     const status = issue.status.name;
-    if (watchDB && updateTime !== updateTimeStoredInDB.updateTime) {
-      await storageManager.set(watchDB);
-    }
     backlogCompletedWhenCancel({ hostname, subdomain, watch, status, issueId, watchingId: watching.id });
   }
 };
 /** お知らせの通知 */
-const infoNotification = async (hostname: string) => {
+const infoNotification = async ({ hostname, spaceId }: WatchNotification) => {
   const notifications = await getNotificationsFetchAPI(hostname);
   if (!notifications || !notifications.length) return false;
+
+  const watchDB = await getWatchDB(spaceId);
+  if (!watchDB) return false;
+
+  console.log('============================');
 
   for (const notification of notifications) {
     if (notification.resourceAlreadyRead || !notification.issue) {
       continue;
     }
-    const { issue, comment } = notification;
+    const { issue, comment, created: lastContentUpdated } = notification;
     const issueId = issue.issueKey;
 
     const note = `[${issueId}] @${issue.createdUser.name}`;
     const iconUrl = `https://${hostname}/favicon.ico`;
     const message = createMessage(comment, issue);
+    const updateOptions = { watchDB, spaceId, issueId, lastContentUpdated };
+    console.log('notifications-updateOptions:', updateOptions);
+    const { isUpdate } = await updateWatchDB(updateOptions);
 
-    await createNotifications({
-      type: 'basic',
-      iconUrl,
-      title: issue ? issue.summary : issueId,
-      message,
-      contextMessage: note,
-      requireInteraction: true
-    }, hostname, issueId, comment);
+    if (isUpdate) {
+      await createNotifications({
+        type: 'basic',
+        iconUrl,
+        title: issue ? issue.summary : issueId,
+        message,
+        contextMessage: note,
+        requireInteraction: true
+      }, hostname, issueId, comment);
+    }
   }
 };
 const checkWatchIssues = async ({ space, options }: CheckWatchIssues) => {
@@ -204,7 +242,7 @@ const checkWatchIssues = async ({ space, options }: CheckWatchIssues) => {
       await watchNotification({ hostname, spaceId, options });
     }
     if (options.notifyInfo) {
-      await infoNotification(hostname);
+      await infoNotification({ hostname, spaceId, options });
     }
   }
 };
