@@ -3,7 +3,7 @@ import type { UpdateWatchDB, CheckWatchIssues, WatchNotification, BacklogComplet
 import type { DataBase } from '../@types/storage';
 import type { IssueComment, Issues } from '../@types/issues';
 import { getIssueFetchAPI, getWatchListFetchAPI, getIssueCommentFetchAPI, deleteWatchFetchAPI, getNotificationsFetchAPI } from './api';
-import { getOptions, consoleLog, isObject, isArray } from './common';
+import { getOptions, getBacklogUserId, consoleLog, isObject, isArray } from './common';
 import storageManager from './storage';
 
 const getAllOptions = async () => await Promise.all([
@@ -156,7 +156,9 @@ const updateWatchDB = async (options: UpdateWatchDB) => {
 /** ウォッチの通知 */
 const watchNotification = async ({ hostname, spaceId, options }: WatchNotification) => {
   const { watch } = options;
-  const watchingList = await getWatchListFetchAPI(hostname);
+  const userId = await getBacklogUserId(hostname);
+  if (!userId) return false;
+  const watchingList = await getWatchListFetchAPI(hostname, userId);
   if (!watchingList || !watchingList.length) return false;
 
   const watchDB = await getWatchDB(spaceId);
@@ -170,9 +172,13 @@ const watchNotification = async ({ hostname, spaceId, options }: WatchNotificati
     const updateOptions = { watchDB, spaceId, issueId, watching, lastContentUpdated };
     console.log('watching-updateOptions:', updateOptions);
     const { isUpdate, isInitial } = await updateWatchDB(updateOptions);
+    const isSelfUpdate = userId === issue.updatedUser.id;
 
-    // APIで取得した最終更新時間のほうが保存された時間より新しければ
-    if (isUpdate && !isInitial) {
+    /*
+     * APIで取得した最終更新時間のほうが保存された時間より新しく、
+     * 初回ウォッチ登録時ではなく、自分が更新した内容でなければ通知
+     */
+    if (isUpdate && !isInitial && !isSelfUpdate) {
       const note = `[${issueId}] @${issue.createdUser.name}`;
       const iconUrl = `https://${hostname}/favicon.ico`;
       const [issues, comments] = await Promise.all([

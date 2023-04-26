@@ -64,9 +64,11 @@ export const addWatchFetchAPI = async (issueId: string) => {
     return false;
   }
 };
-export const getWatchListFetchAPI = async (hostname: string) => {
-  const userId = await getBacklogUserId(hostname);
-  if (!userId) return false;
+export const getWatchListFetchAPI = async (hostname: string, userId?: number | false) => {
+  if (typeof userId === 'undefined') {
+    userId = await getBacklogUserId(hostname);
+    if (!userId) return false;
+  }
   const apiPath = `users/${userId}/watchings` as const;
   const method = 'GET';
   const query = '&count=100';
