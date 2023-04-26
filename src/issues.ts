@@ -206,10 +206,8 @@ const createWatchIssue = async () => {
     time: new Date()
   });
   const changeWatchState = async ({ watchBtnElement, textElement, issueId }: WatchStyle & WatchState) => {
-    const watching = await storageManager.get('watching');
-    if (!watching) return;
-    const issueIds = watching?.['watching']?.[subdomain] || {};
-    const isWatching = Object.keys(issueIds).includes(issueItem.id);
+    // Storageに課題キーが存在するか確認
+    const isWatching = await hasStorageWatchItem(issueId, subdomain);
 
     if (!textElement || !watchBtnElement) {
       return consoleLog('ウォッチ状態変更の失敗');

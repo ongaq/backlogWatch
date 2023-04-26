@@ -134,14 +134,17 @@ export const removeWatch = async ({ watchBtnElement, textElement, issueId }: Wat
     void storageManager.remove(subdomain, issueId, 'watching');
   }
 };
-/** Chrome.Storageにウォッチが保存されているか */
-export const hasStorageWatchItem = async (issueId: string) => {
+/** Chrome.StorageにウォッチIDが保存されているか */
+export const hasStorageWatchItem = async (issueId: string, subdomain?: string) => {
   const watching = await storageManager.get('watching');
   if (!watching) return;
-  const { subdomain } = spaceUrl();
-  const domainStorage = watching['watching']?.[subdomain] || {};
+  if (typeof subdomain === 'undefined') {
+    const obj = spaceUrl();
+    subdomain = obj.subdomain;
+  }
+  const domainStorage = watching['watching']?.[subdomain]?.[issueId] || {};
 
-  return Object.keys(domainStorage).includes(issueId);
+  return typeof domainStorage?.watchId !== 'undefined';
 };
 /** ウォッチ中の課題を保存する */
 export const saveIssueWatching = async ({ watchBtnElement, textElement, issueId }: WatchStyle & WatchState) => {
