@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
 :root {
   --primary: #00d1b2;
+  --primary-dark: #00947e;
   --primary-light: #ebfffc;
+  --primary-active: #00b89c;
   --success: #48c78e;
   --success-light: #f0faf4;
   --danger: #ff3860;
@@ -21,6 +24,16 @@
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
+}
+
+.fa-angle-down {
+  width: 14px;
+  height: 14px;
+  -webkit-mask-image: url('../images/angle-down.svg');
+  mask-image: url('../images/angle-down.svg');
+  -webkit-mask-size: 14px;
+  mask-size: 14px;
+  background-color: #363636;
 }
 
 .fa-pencil {
@@ -50,35 +63,18 @@
   mask-image: url('../images/minus.svg');
 }
 
-.fa-heart {
-  width: 36px;
-  height: 36px;
-  -webkit-mask-image: url('../images/heart.svg');
-  mask-image: url('../images/heart.svg');
-  -webkit-mask-size: 36px;
-  mask-size: 36px;
-}
-
 i.fa {
   font-size: 36px;
 }
 i.fa-eye {
-  font-size: 18px;
-  color: #333;
+  font-size: 20px;
+  background-color: var(--primary-dark);
 }
-i.fa-heart {
-  background-color: #0a0a0a;
-}
-.Watch i.fa-heart {
+.Watch i.fa-eye {
   display: block;
   margin: 0 auto;
-}
-i.fa-heart.is-watch {
-  background-color: #ff3860;
-}
-i.fa-heart.is-running {
-  -webkit-animation: heartBeat 0.4s ease-in-out;
-  animation: heartBeat 0.4s ease-in-out;
+  width: 20px;
+  height: 20px;
 }
 
 .watchIconWrap {
@@ -86,17 +82,37 @@ i.fa-heart.is-running {
   right: 16px;
   bottom: 84px;
   display: flex;
-  align-items: stretch;
-  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 23px;
+  width: 251px;
   height: fit-content;
   white-space: nowrap;
-  background-color: #fff;
+  background-color: var(--primary-light);
   box-sizing: border-box;
-  box-shadow: 0 0 7px rgba(0, 0, 0, 0.15);
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--primary-dark);
+  border-radius: 9px;
+  will-change: background-color, border-color;
+  transition: background-color 0.3s ease-out, border-color 0.3s ease-out;
   cursor: pointer;
   z-index: 50;
+}
+.watchIconWrap:hover .watchIconWrap__text,
+.watchIconWrap.is-watched .watchIconWrap__text {
+  color: var(--primary-light);
+}
+.watchIconWrap:hover .watchIconWrap__icon,
+.watchIconWrap.is-watched .watchIconWrap__icon {
+  background-color: var(--primary-light);
+}
+.watchIconWrap.is-watched {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+.watchIconWrap:hover {
+  background-color: var(--primary-active);
+  border-color: var(--primary-active);
 }
 .watchIconWrap * {
   line-height: 1;
@@ -106,18 +122,21 @@ i.fa-heart.is-running {
 .watchIconWrap__text {
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  color: var(--black);
-  font-weight: 300;
-  color: #666;
-  background-color: #f0f0f0;
-  border-radius: 4px 0 0 4px;
+  line-height: 1.5;
+  color: var(--primary-dark);
+  font-weight: 400;
+  font-size: 16px;
+  font-family: 'Noto Sans JP', sans-serif;
+  will-change: color;
+  transition: color 0.3s ease-out;
 }
 .watchIconWrap__icon {
   display: flex;
-  padding: 10px 20px;
-  width: 80px;
-  height: 60px;
+  margin-right: 7px;
+  width: 20px;
+  height: 20px;
+  will-change: background-color;
+  transition: background-color 0.3s ease-out;
 }
 
 .watch-issueSection {
@@ -173,17 +192,4 @@ i.fa-heart.is-running {
 }
 .watch-issue .Description .is-hidden {
   display: none;
-}
-
-@-webkit-keyframes heartBeat {
-  50% {
-    transform: scale(2);
-    opacity: 0.5;
-  }
-}
-@keyframes heartBeat {
-  50% {
-    transform: scale(2);
-    opacity: 0.5;
-  }
 }

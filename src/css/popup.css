@@ -1,7 +1,9 @@
 @charset "UTF-8";
 :root {
   --primary: #00d1b2;
+  --primary-dark: #00947e;
   --primary-light: #ebfffc;
+  --primary-active: #00b89c;
   --success: #48c78e;
   --success-light: #f0faf4;
   --danger: #ff3860;
@@ -339,15 +341,6 @@ progress {
 .fa-minus-circle {
   -webkit-mask-image: url('../images/minus.svg');
   mask-image: url('../images/minus.svg');
-}
-
-.fa-heart {
-  width: 36px;
-  height: 36px;
-  -webkit-mask-image: url('../images/heart.svg');
-  mask-image: url('../images/heart.svg');
-  -webkit-mask-size: 36px;
-  mask-size: 36px;
 }
 
 body {

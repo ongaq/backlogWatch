@@ -1,22 +1,18 @@
 @use "root";
 @use "font";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap');
 
 i {
   &.fa { font-size: 36px;}
-  &.fa-eye { font-size: 18px; color: #333;}
-  &.fa-heart {
-    background-color: #0a0a0a;
+  &.fa-eye {
+    font-size: 20px;
+    background-color: var(--primary-dark);
 
     .Watch & {
       display: block;
       margin: 0 auto;
-    }
-    &.is-watch {
-      background-color: #FF3860;
-    }
-    &.is-running {
-      -webkit-animation: heartBeat 0.4s ease-in-out;
-      animation: heartBeat 0.4s ease-in-out;
+      width: 20px;
+      height: 20px;
     }
   }
 }
@@ -26,17 +22,42 @@ i {
   right: 16px;
   bottom: 84px;
   display: flex;
-  align-items: stretch;
-  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 23px;
+  width: 251px;
   height: fit-content;
   white-space: nowrap;
-  background-color: #fff;
+  background-color: var(--primary-light);
   box-sizing: border-box;
-  box-shadow: 0 0 7px rgba(#000, 0.15);
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--primary-dark);
+  border-radius: 9px;
+  will-change: background-color, border-color;
+  transition:
+    background-color 0.3s ease-out,
+    border-color 0.3s ease-out;
   cursor: pointer;
   z-index: 50;
+  $parent: &;
+
+  &:hover,
+  &.is-watched {
+    #{$parent}__text {
+      color: var(--primary-light);
+    }
+    #{$parent}__icon {
+      background-color: var(--primary-light);
+    }
+  }
+  &.is-watched {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+  }
+  &:hover {
+    background-color: var(--primary-active);
+    border-color: var(--primary-active);
+  }
 
   * {
     line-height: 1;
@@ -46,18 +67,21 @@ i {
   &__text {
     display: flex;
     align-items: center;
-    padding: 0 20px;
-    color: var(--black);
-    font-weight: 300;
-    color: #666;
-    background-color: #f0f0f0;
-    border-radius: 4px 0 0 4px;
+    line-height: 1.5;
+    color: var(--primary-dark);
+    font-weight: 400;
+    font-size: 16px;
+    font-family: 'Noto Sans JP', sans-serif;
+    will-change: color;
+    transition: color 0.3s ease-out;
   }
   &__icon {
     display: flex;
-    padding: 10px 20px;
-    width: 80px;
-    height: 60px;
+    margin-right: 7px;
+    width: 20px;
+    height: 20px;
+    will-change: background-color;
+    transition: background-color 0.3s ease-out;
   }
 }
 .watch-issueSection {
@@ -109,11 +133,4 @@ i {
     .is-visible { display: block;}
     .is-hidden { display: none;}
   }
-}
-
-@-webkit-keyframes heartBeat {
-  50% { transform: scale(2); opacity: 0.5;}
-}
-@keyframes heartBeat {
-  50% { transform: scale(2); opacity: 0.5;}
 }

@@ -12,7 +12,10 @@ export type WatchingData = {
   /** serviceWorkerで更新時間を比較するのに必要 */
   updateTime: number;
   /** ウォッチ削除に必要なID */
-  watchId: number;
+  watchId?: number;
+};
+export type IssueWatchingId = {
+  [issueId: string]: WatchingData;
 };
 export type SpaceData = {
   name: string;
