@@ -7,6 +7,24 @@ const error = 'is-danger';
 const visible = 'is-visible';
 const ok = 'is-ok';
 
+const getOptionElmAndValue = () => {
+  const autoCloseElm = document.querySelector('[data-options="autoClose"]');
+  const releaseWatchElm = document.querySelector('[data-options="releaseWatch"]');
+  const notifyWatchElm = document.querySelector('[data-options="watchNotify"]');
+  const notifyInfoElm = document.querySelector('[data-options="infoNotify"]');
+  const imageLeftElm = document.querySelector('[data-options="displayUserImageOnLeft"]');
+  const getValue = (target: Element | null, fallback: number) => {
+    return Number(target?.querySelector<HTMLOptionElement>('option:checked')?.value || fallback);
+  };
+  return {
+    close: { elm: autoCloseElm, value: getValue(autoCloseElm, 0) },
+    watch: { elm: releaseWatchElm, value: getValue(releaseWatchElm, 0) },
+    notifyWatch: { elm: notifyWatchElm, value: getValue(notifyWatchElm, 1) },
+    notifyInfo: { elm: notifyInfoElm, value: getValue(notifyInfoElm, 1) },
+    imageLeft: { elm: imageLeftElm, value: getValue(imageLeftElm, 1) },
+  } as const;
+};
+
 /** 入力フィールドをスペースごとに複製する */
 const addCloneFieldList = (spaceFieldULElm: HTMLUListElement, fieldListLen: number) => {
   const cloneFieldUlElm = spaceFieldULElm.cloneNode(true) as HTMLUListElement;
@@ -71,6 +89,7 @@ const waitPromise = async (settings: Record<string, any>, promises: Promise<Spac
         watch: 0,
         notifyWatch: 1,
         notifyInfo: 1,
+        imageLeft: 1,
       },
     },
   };
@@ -124,21 +143,18 @@ const editSpaceInputField = (self: HTMLElement) => {
 /** 入力、オプションデータの保存 */
 const saveSettings = async () => {
   const promises: Promise<SpaceInfo | (Space & SpaceInfo)>[] = [];
-  const autoCloseElm = document.querySelector('[data-options="autoClose"]');
-  const releaseWatchElm = document.querySelector('[data-options="releaseWatch"]');
-  const notifyWatchElm = document.querySelector('[data-options="watchNotify"]');
-  const notifyInfoElm = document.querySelector('[data-options="infoNotify"]');
-  const getValue = (target: Element | null, fallback: number) => Number(target?.querySelector<HTMLOptionElement>('option:checked')?.value || fallback);
+  const { close, watch, notifyWatch, notifyInfo, imageLeft } = getOptionElmAndValue();
   const settings = {
     space: {
       name: getFieldValues('space'),
       apiKey: getFieldValues('key'),
     },
     options: {
-      close: getValue(autoCloseElm, 0),
-      watch: getValue(releaseWatchElm, 0),
-      notifyWatch: getValue(notifyWatchElm, 1),
-      notifyInfo: getValue(notifyInfoElm, 1),
+      close: close.value,
+      watch: watch.value,
+      notifyWatch: notifyWatch.value,
+      notifyInfo: notifyInfo.value,
+      imageLeft: imageLeft.value,
     },
   };
   const apiLength = 64;
@@ -214,14 +230,27 @@ const setInitialDisplay = async () => {
   }
 
   // 機能オプションの初期選択設定
-  const autoCloseElm = document.querySelector('[data-options="autoClose"]');
-  const releaseWatchElm = document.querySelector('[data-options="releaseWatch"]');
-  const autoCloseOptionElm = autoCloseElm?.querySelector<HTMLOptionElement>(`option[value="${options.close}"]`);
-  const releaseWatchOptionElm = releaseWatchElm?.querySelector<HTMLOptionElement>(`option[value="${options.watch}"]`);
+  const { close, watch, notifyWatch, notifyInfo, imageLeft } = getOptionElmAndValue();
+  const autoCloseOptionElm = close.elm?.querySelector<HTMLOptionElement>(`option[value="${options.close}"]`);
+  const releaseWatchOptionElm = watch.elm?.querySelector<HTMLOptionElement>(`option[value="${options.watch}"]`);
+  const notifyWatchOptionElm = notifyWatch.elm?.querySelector<HTMLOptionElement>(`option[value="${options.notifyWatch}"]`);
+  const notifyInfoOptionElm = notifyInfo.elm?.querySelector<HTMLOptionElement>(`option[value="${options.notifyInfo}"]`);
+  const imageLeftOptionElm = imageLeft.elm?.querySelector<HTMLOptionElement>(`option[value="${options.imageLeft}"]`);
 
-  if (autoCloseOptionElm && releaseWatchOptionElm) {
+  if (autoCloseOptionElm) {
     autoCloseOptionElm.selected = true;
+  }
+  if (releaseWatchOptionElm) {
     releaseWatchOptionElm.selected = true;
+  }
+  if (notifyWatchOptionElm) {
+    notifyWatchOptionElm.selected = true;
+  }
+  if (notifyInfoOptionElm) {
+    notifyInfoOptionElm.selected = true;
+  }
+  if (imageLeftOptionElm) {
+    imageLeftOptionElm.selected = true;
   }
 };
 
