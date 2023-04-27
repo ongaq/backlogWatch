@@ -15,7 +15,26 @@ import storageManager from './storage';
 import { getWatchListFetchAPI, deleteWatchFetchAPI } from './api';
 
 const EYE_URL = chrome.runtime.getURL('images/eye.svg');
+const EYE_SLASH_URL = chrome.runtime.getURL('images/eye-slash.svg');
 
+/** 課題コメントの通知ユーザー画像を左側に配置するか */
+const setImageLeft = async () => {
+  const options = await storageManager.get('options');
+  if (!options || !Object.keys(options).length) return;
+  const style = `<style id="ext-imageLeft-style">
+    .comment-notified-users__list {
+      text-align: left !important;
+    }
+  </style>`;
+  const hasStyle = document.querySelector('#ext-imageLeft-style');
+
+  if (typeof options.options.options?.imageLeft === 'undefined') {
+    options.options.options.imageLeft = 1;
+  }
+  if (options.options.options?.imageLeft && !hasStyle) {
+    document.head.insertAdjacentHTML('beforeend', style);
+  }
+};
 /** ウォッチボタンの削除 */
 const deleteWatchBtn = () => {
   const watchIconWrap = document.querySelector('#extension-btn');
@@ -79,13 +98,29 @@ const createHTML = (watchings: Watchings[]) => {
       <td class="Title" title="${summary}"><p>${summary}</p></td>
       <td class="Assigner" title="${name}"><p>${name}</p></td>
       <td class="Description" title="${desc}"><p>${desc}</p></td>
-      <td class="Watch"><i class="fa fa-eye is-watch" style="-webkit-mask-image:url(${EYE_URL});mask-image:url(${EYE_URL});"></i></td>
+      <td class="Watch">
+        <i class="fa fa-eye ext-watching-icon is-watched"></i>
+      </td>
     </tr>`;
   };
   const html = (tr: string) => `<section id="myIssues" class="watch-issueSection" data-id="projects-issues">
   <h3 class="watch-title title title--thirdly">
     ウォッチ中の課題
   </h3>
+  <style id="ext-watching-style">
+  .ext-watching-icon.is-watched {
+    -webkit-mask-image:url(${EYE_URL});
+    mask-image:url(${EYE_URL});
+    width: 20px;
+    height: 20px;
+  }
+  .ext-watching-icon.is-watched:hover {
+    -webkit-mask-image:url(${EYE_SLASH_URL});
+    mask-image:url(${EYE_SLASH_URL});
+    width: 22px;
+    height: 22px;
+  }
+  </style>
   <div>
     <table id="issueList" class="${tableClass}" cellspacing="0" cellpadding="0" border="0">
       <thead>
@@ -136,7 +171,7 @@ const createWatchHome = async () => {
     const speed = 500;
     if (!item.issueKey || !item.id) return;
 
-    if (self.classList.contains('is-watch')) {
+    if (self.classList.contains('is-watched')) {
       watchControl(self, 'remove');
       const res = await deleteWatchFetchAPI(Number(item.id));
 
@@ -257,7 +292,10 @@ const exec = () => {
   if (backlogLocation.isHome) {
     createWatchHome();
   }
-  observeIssueCard(() => createWatchIssue());
+  observeIssueCard(() => {
+    createWatchIssue();
+    setImageLeft();
+  });
 };
 
 if (document.readyState !== 'loading') {

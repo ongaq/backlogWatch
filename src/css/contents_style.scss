@@ -4,7 +4,8 @@
 
 i {
   &.fa { font-size: 36px;}
-  &.fa-eye {
+  &.fa-eye,
+  &.fa-eye-slash {
     font-size: 20px;
     background-color: var(--primary-dark);
 
